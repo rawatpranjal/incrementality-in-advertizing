@@ -24,29 +24,31 @@ Advertising drives exposure but not immediate sales lift. Using staggered adopti
 ## Repository Structure
 
 ```
-incrementality-in-advertising/
-├── analysis/           # All analysis methods
-│   ├── shopping-episode/       # Main causal analysis (choice models, share of voice)
-│   ├── panel/                  # Panel fixed effects models
-│   ├── time-series/            # VAR and time-series models
-│   ├── staggered-adoption/     # Difference-in-differences
-│   ├── holdouts/               # Holdout experiment analysis
+├── analysis/                    # All analysis methods
+│   ├── shopping-episode/        # Main causal analysis (choice models, SOV)
+│   ├── staggered-adoption/      # Callaway-Sant'Anna diff-in-diff
+│   ├── panel/                   # Panel fixed effects models
+│   ├── time-series/             # VAR, VECM, IRF
+│   ├── holdouts/                # Holdout experiment analysis
+│   ├── ghostads-simulations/    # Ghost ads methodology simulations
+│   ├── shopping-sessions/       # Session-level analysis
 │   ├── regression-discontinuity/
-│   ├── sequential-models/      # Funnel and sequential models
-│   ├── causal-attribution/     # Attribution modeling
+│   ├── sequential-models/       # Funnel models
+│   ├── causal-attribution/      # Attribution modeling
 │   ├── collaborative-filtering/
-│   ├── deep-learning/          # Neural network experiments
-│   ├── optimization/           # Bid optimization theory
-│   └── ghostads-simulations/   # Ghost ads methodology simulations
-├── data/               # Data extraction pipelines
-│   ├── daily-summaries/        # Daily aggregation scripts
-│   └── data-pull/              # Raw data extraction
-├── docs/               # Papers and presentations
-│   ├── paper/                  # Main academic paper (LaTeX)
-│   ├── ghostads-paper/         # Ghost ads methodology paper
-│   ├── ghostads-slides/        # Presentation slides
-│   └── presentation-2026/      # Recent presentation
-└── eda/                # Exploratory data analysis
+│   ├── deep-learning/           # Neural network experiments
+│   ├── optimization/            # Bid optimization theory
+│   └── appendices/              # Supporting derivations
+├── data/                        # Data extraction pipelines
+│   ├── daily-summaries/         # Daily aggregation scripts
+│   └── data-pull/               # Raw data extraction
+├── docs/                        # Papers and presentations
+│   ├── presentation-2026/       # Main presentation (start here)
+│   ├── paper/                   # Academic paper (LaTeX)
+│   ├── ghostads-paper/          # Ghost ads methodology
+│   ├── ghostads-slides/         # Ghost ads presentation
+│   └── plans/                   # Implementation plans
+└── eda/                         # Exploratory notebooks
 ```
 
 ## Data Requirements
