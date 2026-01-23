@@ -1,0 +1,157 @@
+% Part 1: The Problem
+
+\begin{frame}[plain]
+\begin{center}
+\includegraphics[width=0.85\textwidth]{meme.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Why Ad Platforms Need to be Incrementality Native}
+
+\vspace{0.3cm}
+
+\large
+
+\begin{itemize}
+\item Measuring incrementality = proving value and building trust
+  \begin{itemize}
+  \item Advertisers distrust last click attribution and run their own tests
+  \end{itemize}
+
+\pause
+
+\vspace{0.3cm}
+
+\item Incrementality will be a core offering in retail media
+  \begin{itemize}
+  \item Molocco, Meta, Google already implementing it
+  \item Technology is $\sim$7 years old, pretty mature
+  \end{itemize}
+
+\pause
+
+\vspace{0.3cm}
+
+\item Incrementality is not just reporting
+  \begin{itemize}
+  \item Can be used in budget pacing and ranking algorithms
+  \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ad exposure correlates with purchase, but there are confounders}
+
+\pause
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2cm,
+    every node/.style={font=\large,align=center},
+    arrow/.style={-{Stealth[length=3mm]}, very thick}
+]
+    \node (intent) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=BrandAccent!20, line width=2.5pt, rounded corners=4pt]
+        {\textbf{User Intent}\\Shopping urgency};
+    \node [above=0.3cm of intent, font=\Huge\bfseries] {\textcolor{ErrorRed}{!!}};
+
+    \node (ad) [draw, rectangle, below left=1.8cm and 1.5cm of intent, minimum width=2.8cm, minimum height=1cm, fill=BrandSecondary!20, line width=2.5pt, rounded corners=4pt]
+        {\faDesktop\ \textbf{Ad Exposure}};
+
+    \node (purchase) [draw, rectangle, below right=1.8cm and 1.5cm of intent, minimum width=2.8cm, minimum height=1cm, fill=SuccessGreen!20, line width=2.5pt, rounded corners=4pt]
+        {\faShoppingCart\ \textbf{Purchase}};
+
+    \pause
+    \draw [arrow, BrandAccent] (intent) -- (ad);
+    \draw [arrow, BrandAccent] (intent) -- (purchase);
+
+    \pause
+    \draw [arrow, dashed, ErrorRed, line width=3pt] (ad) -- node[above, sloped, fill=white] {High Correlation} (purchase);
+\end{tikzpicture}
+\end{center}
+
+\pause
+
+\visible<5->{
+\begin{warningbox}
+\centering
+\textbf{High correlation overestimates true causal effects}
+\end{warningbox}
+}
+
+\end{frame}
+
+\begin{frame}{Last-click attribution inflates ROI when intent is high}
+
+\pause
+
+\vspace{0.3cm}
+
+\begin{center}
+\Huge
+\textcolor{BrandSecondary}{Last-Click Attribution}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{center}
+\normalsize
+Credit 100\% of conversion to the last ad clicked before purchase
+\end{center}
+
+\pause
+
+\vspace{0.3cm}
+
+\begin{columns}
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{SuccessGreen}{\textbf{Why it's popular:}}
+\end{center}
+
+\begin{itemize}
+\item Easy to implement
+\item Simple to explain
+\item No experiments needed
+\end{itemize}
+
+\pause
+
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{ErrorRed}{\textbf{The problems:}}
+\end{center}
+
+\vspace{0.2cm}
+
+\xmark\ Ignores confounders\\[0.2cm]
+\xmark\ What about first/middle clicks?\\[0.2cm]
+\xmark\ Advertisers ignore this and run own XPs
+
+\end{columns}
+
+\end{frame}
+
+% STANDOUT FRAME - Keynote style for impact
+\begin{frame}[standout]
+\vspace{1cm}
+
+\LARGE
+\faBuilding\quad \textbf{Industry Leaders Use Ghost Ads}
+
+\vspace{0.8cm}
+
+\normalsize
+\begin{center}
+Google \quad Yahoo \quad Meta \quad Netflix \quad Criteo
+
+\vspace{0.3cm}
+
+Pandora \quad Roku \quad Nielsen \quad Uber \quad DoorDash
+
+\vspace{0.3cm}
+
+Walmart \quad Catalina \quad CyberAgent \quad Moloco
+\end{center}
+
+\end{frame}

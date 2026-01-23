@@ -1,0 +1,27 @@
+\section*{Notation}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Core Notation}
+\label{tab:notation_core}
+\begin{tabular}{p{1.5cm}p{3cm}p{5.5cm}p{4.5cm}}
+\toprule
+\textbf{Symbol} & \textbf{Name} & \textbf{Definition \& Core Values} & \textbf{Engineering Context} \\
+\midrule
+$i$ & User Index & A unique identifier for an individual user & Primary key for all user-level data \\
+\midrule
+$Z_i$ & Treatment Assignment & $Z_i=1$: Assigned to treatment (eligible for ad)\newline $Z_i=0$: Assigned to control (ineligible for ad) & \textbf{Pre-Auction}. Set by randomization service based on stable user hash. This is the random "coin flip" \\
+\midrule
+$\hat{D}_i$ & Predicted Exposure & $\hat{D}_i=1$: Simulation predicts user would win the ad\newline $\hat{D}_i=0$: Simulation predicts user would lose & \textbf{Mid-Request}. Output of the Ghost Auction module. \textit{This is the core innovation to be built} \\
+\midrule
+$D_i$ & Actual Exposure & $D_i=1$: User was actually shown the focal ad\newline $D_i=0$: User was not shown the focal ad & \textbf{Post-Auction}. Ground truth logged by ad server after final serving decision \\
+\midrule
+$Y_i$ & Observed Outcome & The measured business outcome for the user (e.g., revenue, conversion, click) & \textbf{Post-Session}. Sourced from outcome/conversion logs in data warehouse \\
+\midrule
+$P_i$ & Placebo Exposure & $P_i=1$: User was shown a placebo ad & \textbf{(For PSA method only)}. Logged by ad server for placebo experiments \\
+\midrule
+$\pi$ & Compliance Rate & Fraction of users in a group who receive an ad: $\pi = P(D_i=1 \mid Z_i=1)$ & Statistical parameter calculated during post-experiment analysis \\
+\bottomrule
+\end{tabular}
+\end{table}

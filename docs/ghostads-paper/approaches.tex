@@ -1,0 +1,61 @@
+\section*{Traditional Experimental Approaches}
+
+Randomized experiments solve the confounding problem and remove any need to "control" for anything. When you randomly assign users to see ads or not, the two groups are the same on average—both in ways you can measure and \textit{in the ways you can't}. Any difference in purchase rates must be from the ads.
+
+Here we cover two traditional experimental designs, focusing on one advertiser and one focal ad: intent-to-treat (ITT) and placebo ads (including PSAs). Both use randomization but differ in how they construct the control group.
+
+\subsection*{Intent-to-Treat}
+
+ITT randomizes users before auctions happen. Treatment users can see the advertiser's ads; control users are blocked from seeing them. For user $i$, lets $Z_i=1$ be assignment into the treatment group (also called ``eligibility") and $Z_i=0$ be assignment into the control group. Let $Y_i$ be the outcome variable (e.g., conversions or clicks). Then the Intent-to-Treat effect is $\tau_{\text{ITT}} = E[Y_i|Z_i = 1] - E[Y_i|Z_i = 0]$; typically approximated by the difference in mean outcomes accross the two groups. The problem, however, is many assigned users, with $Z_i=1$ never see ads because they don't visit, or are ineligible for the ad or the ad loses the auction (because the user searched for something different). So this ITT estimate is diluted, and very small and underestimates the effectiveness of ads. ITT might matter for deciding whether to run a campaign at all, but it doesn't tell you the per-exposure effect you need for ad-delivery optimization.
+
+The dilution problem happens because the treatment group mixes people who actually see ads with people who never see ads. Say the real ad effect is 10 percentage points and only 10\% of assigned users see ads. Among 10,000 treatment users, only 1,000 see ads. If those 1,000 convert at 15\% versus 5\% baseline, that's 100 extra conversions. But averaged across all 10,000 users, the treatment group only shows a 1pp increase (much smaller than the true value of 10pp). 
+
+One solution is to "adjust" by the compliance rate. Let $D_i=1$ when the user actually sees the ad; and let $\pi = P(D_i = 1 \mid Z_i = 1)$ be the probability of compliance (i.e. a user who is assigned to treatment group, also sees the ad) or simply the fraction that complied. Then under some non-trivial assumptions, the Local Average Treatment Effect (LATE), or the avg. effect of seeing the ad \textit{in those who complied}, is, $\tau_{\text{LATE}}=\tau_{\text{ITT}}/\pi$. Note, that the LATE is just a "scaling up" of the diluted ITT by the inverse of the compliance rate $\pi$. This scaling up creates the problem: it increases the variance of the estimate by a factor of $\pi^{-2}$. This makes LATE estimates very noisy. 
+
+\begin{table}[H]
+\centering
+\caption{ITT Numerical Example}
+\label{tab:itt_example}
+\begin{tabular}{lrrrr}
+\toprule
+Group & Assigned Users & Saw Ads & Purchases & Conversion Rate \\
+\midrule
+Treatment & 10,000 & 1,000 & 600 & 6.0\% \\
+Control & 10,000 & 0 & 500 & 5.0\% \\
+\midrule
+Difference & & & 100 & 1.0pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The treatment group has 1,000 users seeing ads (converting at 15\%) plus 9,000 users not seeing ads (converting at 5\% baseline), giving 150 + 450 = 600 total purchases.
+   The control group has all 10,000 users at 5\% baseline, giving 500 purchases. The ITT estimate is 1.0 percentage point. With compliance rate $\pi = 1,000/10,000 =
+  0.10$, the LATE estimate is $\tau_{\text{LATE}} = \tau_{\text{ITT}}/\pi = 1.0\text{pp}/0.10 = 10.0$ percentage points, matching the true per-exposure effect. Note, that in this case LATE was spot on, but in practice it will be very noisy and imprecise. 
+
+\subsection*{Placebo Ads}
+
+Placebo designs show different ads to control users instead of blocking them completely. In the placebo design, we introduce a new exposure type. Let $P_i=1$ when the user sees the placebo ad, and $P_i=0$ otherwise. Now we can distinguish three states: focal ad exposure ($D_i=1$), placebo exposure ($P_i=1$), and no ad exposure at all. Earlier, we had a large control group simply prevented from seeing ads. Now, both treatment and control users are eligible to see ads, but of different types. The critical idea is that both groups have the same probability $\pi$ of seeing ads. So we are able to isolate, from within the control group, the exact group of people (who saw placebos) to compare against the treatment group, which we could not earlier. The hope is that the placebo is ``neutral" and has no significant effect on the outcome.
+
+The PSA estimate compares actual focal exposure to placebo exposure: $\tau_{\text{PSA}} = E[Y_i|Z_i=1, D_i = 1] - E[Y_i|Z_i=0, P_i = 1]$. This directly compares treatment users who saw the focal ad against control users who saw the placebo. This is much more precise than the LATE estimate from an ITT design, as it avoids the variance inflation of roughly 1/$\pi$ caused by dilution. Common types of placebos are: (1) PSAs promoting charities: cleanest comparison but costly, (2) Random category ads: assumes no cross-category effects, (3) Competitor ads: free but contaminates the control group
+
+\begin{table}[H]
+\centering
+\caption{Placebo Ads Numerical Example}
+\label{tab:placebo_example}
+\begin{tabular}{lrrrr}
+\toprule
+Group & Users & Saw Ads & Purchases & Conversion Rate \\
+\midrule
+Treatment (real ads) & 1,000 & 1,000 & 150 & 15.0\% \\
+Control (placebo ads) & 1,000 & 1,000 & 50 & 5.0\% \\
+\midrule
+Difference & & & 100 & 10.0pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Now all 1,000 users in treatment see real ads (converting at 15\%) and all 1,000 users in control see placebo ads (converting at 5\% baseline). The placebo estimate is 10 percentage points—recovering the true per-exposure effect.
+
+But placebo designs have problems. PSAs cost. The placebo content itself affects behavior—charity PSAs might reduce spending, random ads grab attention. Automated bid systems that adjust based on performance get confused when control users see substitute ads instead of no ads. Platforms try neutral content like feature announcements, but any impression affects users through attention and memory. 
+
+The placebo design solves the dilution problem as well as the precision problem (its variance is the same as the Ghost Ads estimate). But it ends up creating a contamination problem. The motivation for Ghost Ads design is to solve the dilution and precision problem without any contamination.

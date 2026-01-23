@@ -1,0 +1,79 @@
+
+
+1. Frontdoor effect --> ad click leads user to vendors catalogue and they buy something else (halo purchase)
+2. Awareness --> ad click leads users to like/save/remember the item for later and they buy it later
+3. Position bias --> ad click on a top ranked item signals to the user that this item is of higher quality, leading them to buy it. This can also be if the user is pressed for time and just buys something on the top of the search feed for time-saving. 
+4. Promotion --> user is causally browsing broad categories, and ad click allows the item to be prominently displayed. The ad acts like a promoter of the product. 
+5. Anchor --> product 
+
+How ads generate revenue: 
+1. Ad click reduces "scroll tax" (helps the product naturally be found easily, user may not have scrolled far enough to find the product. In this case, ads just improve search. The product is already high quality and would have been bought anyways, if user had infinite time to scroll. The value here is exactly when user is pressed for time.). 
+2. Ad click generates a lead (add to cart, like, share, etc.) which makes it easier to get a conversion later (targetted offer, discount, etc.). 
+3. Ad click changes user preference (percieved quality). User seeing the ad at the top believes that the product is of a higher quality or simply trusts the seller more (since are paying to advertize). 
+4. Ad click is a doorway... into other products from same vendor (Halo). 
+5. Ad click leads to word-of-mouth, sharing or other effects.. which lead to sales from another user on same product / vendor (type of Halo)
+
+
+Based on your descriptions, these concepts map to specific terms in quantitative marketing, ad-tech, and the economics of advertising.
+
+### 1. Frontdoor Effect (Halo Purchase)
+**Formal Name:** **Brand Spillover** or the **Halo Effect**  
+In performance marketing (especially on platforms like Amazon or eBay), this is formally known as a **Halo Transaction**. The ad acts as an entry point ("front door") to the seller's wider catalog.  
+*   **Mechanism:** The ad reduces the "search cost" to find the *store*, not just the item.
+*   **Metric:** Marketers measure this using **RoAS (Return on Ad Spend)** calculated at the *brand* level rather than the *SKU* level to capture this value.
+
+### 2. Awareness (Buy Later)
+**Formal Name:** **Incubation Effect** or **Delayed Attribution**  
+This phenomenon is often tracked via **View-Through Conversions (VTC)** or **Click-Through Windows**.
+*   **Mechanism:** The ad creates a "memory trace" or enters the user's **Consideration Set**. The delay between the click and the purchase is the **Attribution Lag**.
+*   **Theory:** This aligns with the **Mere Exposure Effect** (familiarity breeds liking) and the **Sleeper Effect** (persuasion increases over time as the source is forgotten but the message remains).
+
+### 3. Position Bias (Quality Signal & Time-Saving)
+**Formal Name:** **Signaling Theory** (Quality) and **Rational Inattention** (Time-saving)  
+*   **Quality Signal:** This is **Nelson’s Signaling Theory** of advertising. The user infers that because a seller can afford the expensive top slot, the product must be high quality (otherwise, they wouldn't make their money back from repeat purchases).
+*   **Time-Saving:** This relates to **Search Frictions**. Users are "cognitive misers" or **Satisficers** (Simon, 1956)—they choose the first "good enough" option to avoid the "transaction cost" of scrolling.
+
+### 4. Promotion (Prominent Display)
+**Formal Name:** **Salience Effect** or **Consideration Set Expansion**  
+*   **Mechanism:** The ad increases the product's **Visual Salience**. In a causal browsing session (often called "window shopping" or "low-intent browsing"), the ad forces the item into the user's immediate attention, overcoming the "noise" of the catalog.
+*   **Economic View:** This is the **Informative View** of advertising—making the user aware of a product's existence.
+
+### 5. Anchor (Product)
+**Formal Name:** **Anchoring Effect**  
+*   **Definition:** The first product a user sees (often the top ad) sets the psychological benchmark for price and quality.
+*   **Effect:** If the "Anchor" ad is expensive ($100), a subsequent organic result ($80) looks like a bargain. If the anchor is cheap, the organic result looks expensive. Marketers use this to frame the user's evaluation of the rest of the feed.
+
+***
+
+### Economic Mapping of "How Ads Generate Revenue"
+
+Your second list maps perfectly to the three classical economic theories of advertising:
+
+| Your Description | Economic Theory | Explanation |
+| :--- | :--- | :--- |
+| **1. Reduces "Scroll Tax"** | **Search Cost Theory** (Stigler, 1961) | Ads reduce the friction (time/effort) for buyers to find sellers. The "tax" is the *Search Cost*. Ads facilitate a match that would otherwise be lost to friction. |
+| **2. Lead / Lead Gen** | **Sales Funnel / Nurturing** | The ad serves as an **Information Subsidy** to the user, moving them from "Unaware" to "Aware" in the AIDA model (Attention, Interest, Desire, Action). |
+| **3. Changes Preference** | **Persuasive View** (Braithwaite, 1928) | Advertising alters consumer tastes (changing the utility function) rather than just informing them. |
+| **4. Doorway / Halo** | **Economies of Scope** | The cost of acquiring the customer (CAC) is paid once via the ad, but the revenue is generated across multiple products (the "basket"), increasing the **Customer Lifetime Value (CLV)**. |
+| **5. Word-of-Mouth** | **Network Effects** | Also known as the **Social Multiplier**. The value of the ad impression extends beyond the individual to their social graph. |
+
+[1](https://arxiv.org/pdf/2007.15769.pdf)
+[2](https://publikationen.ub.uni-frankfurt.de/opus4/frontdoor/deliver/index/docId/77701/file/1-s2.0-S0167811620300094-main.pdf)
+[3](http://glassyad.ir/journals/AMA_Journal_of_Marketing_Research/AMA_Journal_of_Marketing_Research_April_2016.pdf)
+[4](https://www.reddit.com/r/advertising/comments/1d40ys2/this_effect_used_in_marketing_is_so_crazy/)
+[5](https://onlinelibrary.wiley.com/doi/full/10.1002/mar.21960)
+[6](https://www.sciencedirect.com/science/article/abs/pii/S0167624504000794)
+[7](https://ilovetobeselling.com/Tips/promotedlistings.pdf)
+[8](https://www.zigpoll.com/content/what-are-the-most-effective-techniques-to-mitigate-position-bias-in-clickthrough-rate-data-when-developing-personalized-recommendation-systems)
+[9](https://econ.wisc.edu/wp-content/uploads/sites/89/2021/11/SSRN-id3903602.pdf)
+[10](https://www.sciencedirect.com/science/article/abs/pii/S0167811606000267)
+[11](https://www.linkedin.com/posts/bhavik-chokshi_are-the-current-breed-of-cas-good-enough-activity-7274308829494849536-oVnl)
+[12](https://www.billiondollarsellers.media/transcripts/don-t-make-this-keyword-harvesting-mistake/fe03854e-e830-4b6e-93a1-4baee8fbc63d)
+[13](http://papers.adkdd.org/2025/papers/adkdd25-nguyen-mitigating.pdf)
+[14](https://www.haas.berkeley.edu/wp-content/uploads/Targeted_advertising__consumer_inference_and_search-42.pdf)
+[15](https://www.sciencedirect.com/science/article/abs/pii/S074756322300242X)
+[16](https://news.ycombinator.com/item?id=45568613)
+[17](http://papers.adkdd.org/2017/paper-presentations/slides-adkdd17-chaudhuri-ranking.pdf)
+[18](https://research.google.com/pubs/archive/46485.pdf)
+[19](https://www.tse-fr.eu/sites/default/files/TSE/documents/ChaireJJL/Digital-Economics-Conference/Conference/simonov_andrey.pdf)
+[20](https://sponsors.marketingscience.info/wp-content/uploads/sites/2/_pda/2015/09/Taylor-2012-PhD-Abstract-Is-once-really-enough-measuring-the-advertising-response-function.pdf)

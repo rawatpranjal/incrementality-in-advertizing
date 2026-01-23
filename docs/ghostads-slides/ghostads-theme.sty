@@ -1,0 +1,279 @@
+% ghostads-theme.sty
+% Custom Beamer theme for Ghost Ads presentations
+% Keynote-ready corporate style with Gotham base
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ghostads-theme}[2025/10/25 Ghost Ads keynote theme]
+
+% =============================================================================
+% DEPENDENCIES
+% =============================================================================
+\RequirePackage{etoolbox}
+\RequirePackage{xcolor}
+\RequirePackage{fontawesome5}
+\RequirePackage{tikz}
+\RequirePackage{tcolorbox}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\usetikzlibrary{positioning,arrows.meta,shapes,shadows,fit,backgrounds,calc}
+
+% =============================================================================
+% THEME BASE: METROPOLIS (Gotham not compatible with current setup)
+% =============================================================================
+\usetheme{metropolis}
+\metroset{
+  progressbar=foot,        % Progress bar in footer for pacing
+  numbering=none,          % No slide numbers
+  sectionpage=progressbar, % Section pages with progress bar
+  block=fill              % Filled block backgrounds
+}
+
+% =============================================================================
+% TYPOGRAPHY: FIRA SANS (portable, works with pdfLaTeX)
+% =============================================================================
+% For XeLaTeX/LuaLaTeX, comment out these lines and use:
+% \usepackage{fontspec}
+% \setsansfont{Inter}[Scale=0.95, Weight=300, BoldFont={* SemiBold}]
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[sfdefault,light,semibold]{FiraSans}
+\renewcommand*\familydefault{\sfdefault}
+
+% =============================================================================
+% GEORGETOWN UNIVERSITY OFFICIAL COLOR PALETTE
+% =============================================================================
+% Based on Georgetown Visual Identity Guidelines
+% https://www.georgetown.edu/visual-identity/
+
+% Primary colors - Georgetown Blue and Gray
+\definecolor{BrandPrimary}{HTML}{041E42}      % Georgetown Blue (Pantone 282)
+\definecolor{BrandAccent}{HTML}{012169}       % Pantone 280 (secondary blue)
+\definecolor{BrandSecondary}{HTML}{003DA5}    % Pantone 293 (secondary blue)
+
+% Text and backgrounds - Georgetown Grays
+\definecolor{Ink}{HTML}{041E42}               % Georgetown Blue for primary text
+\definecolor{InkLight}{HTML}{63666A}          % Georgetown Gray (Cool Gray 10)
+\definecolor{Soft}{HTML}{D6D2C4}              % Pantone 7527 (putty) - light background
+\definecolor{SoftDark}{HTML}{BBBCBC}          % Cool Gray 4 - darker background
+
+% Semantic colors - Georgetown Tertiary Palette
+\definecolor{SuccessGreen}{HTML}{5FA343}      % Georgetown Green (Pantone 369)
+\definecolor{WarningOrange}{HTML}{F8E08E}     % Georgetown Yellow (Pantone 1205)
+\definecolor{ErrorRed}{HTML}{862633}          % Georgetown Red (Pantone 202)
+\definecolor{GhostPurple}{HTML}{00B5E2}       % Georgetown Cyan (Pantone 306)
+
+% =============================================================================
+% APPLY COLORS TO BEAMER ELEMENTS
+% =============================================================================
+\setbeamercolor{normal text}{fg=Ink}
+\setbeamercolor{frametitle}{fg=white, bg=BrandPrimary}
+\setbeamercolor{progress bar}{fg=BrandPrimary, bg=Soft}
+\setbeamercolor{progress bar in head/foot}{fg=BrandPrimary, bg=SoftDark}
+\setbeamercolor{structure}{fg=BrandPrimary}
+\setbeamercolor{title}{fg=Ink}
+\setbeamercolor{subtitle}{fg=InkLight}
+
+% Block colors (rounded, filled)
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamercolor{block title}{fg=white, bg=BrandPrimary}
+\setbeamercolor{block body}{fg=Ink, bg=Soft}
+\setbeamercolor{block title alerted}{fg=white, bg=BrandAccent}
+\setbeamercolor{block body alerted}{fg=Ink, bg=BrandAccent!10}
+
+% =============================================================================
+% TYPOGRAPHY SETTINGS
+% =============================================================================
+\setbeamerfont{title}{size=\LARGE, series=\bfseries}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+
+% =============================================================================
+% ICON-BASED BULLETS (keynote style)
+% =============================================================================
+\setbeamertemplate{itemize item}{\color{BrandAccent}\faCheckCircle}
+\setbeamertemplate{itemize subitem}{\color{BrandPrimary}\faAngleRight}
+\setbeamertemplate{itemize subsubitem}{\color{InkLight}\faCircle[regular]}
+
+% Enumeration with modern style
+\setbeamertemplate{enumerate item}{\color{BrandPrimary}\insertenumlabel.}
+\setbeamertemplate{enumerate subitem}{\color{BrandSecondary}\alph{enumii}.}
+
+% Instant reveals (no translucency)
+\setbeamercovered{invisible}
+
+% =============================================================================
+% SPACING & MARGINS (more canvas for visuals)
+% =============================================================================
+\setbeamersize{text margin left=8mm, text margin right=8mm}
+
+% =============================================================================
+% CUSTOM COLORED BOXES (modernized)
+% =============================================================================
+% Key insight box (primary brand color)
+\newtcolorbox{keybox}{
+  colback=BrandPrimary!10,
+  colframe=BrandPrimary,
+  boxrule=2.5pt,
+  arc=6pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt,
+  fontupper=\large\bfseries
+}
+
+% Insight box (secondary/informational)
+\newtcolorbox{insightbox}{
+  colback=BrandSecondary!10,
+  colframe=BrandSecondary,
+  boxrule=2.5pt,
+  arc=6pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt
+}
+
+% Warning/alert box
+\newtcolorbox{warningbox}{
+  colback=WarningOrange!35,
+  colframe=WarningOrange!80!Ink,
+  coltext=BrandPrimary,
+  boxrule=2.5pt,
+  arc=6pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt
+}
+
+% Success box
+\newtcolorbox{successbox}{
+  colback=SuccessGreen!10,
+  colframe=SuccessGreen,
+  boxrule=2.5pt,
+  arc=6pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt
+}
+
+% Ghost box (for ghost ads specific content)
+\newtcolorbox{ghostbox}{
+  colback=GhostPurple!10,
+  colframe=GhostPurple,
+  boxrule=2.5pt,
+  arc=6pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt
+}
+
+% =============================================================================
+% STANDOUT FRAMES (for big numbers, CTAs, key stats)
+% =============================================================================
+% Custom standout frame with modern look
+\defbeamertemplate{background canvas}{standout}{%
+  \color{BrandPrimary}\vrule width\paperwidth height\paperheight
+}
+
+% Make standout frames use white text on brand background
+\BeforeBeginEnvironment{frame}{%
+  \let\oldstandout\frame
+}
+
+% =============================================================================
+% CHECKMARKS AND SYMBOLS (updated for new colors)
+% =============================================================================
+\renewcommand{\checkmark}{\color{SuccessGreen}\faCheckCircle}
+\newcommand{\xmark}{\color{ErrorRed}\faTimesCircle}
+
+% Additional useful symbols
+\newcommand{\infomark}{\color{BrandSecondary}\faInfoCircle}
+\newcommand{\warningmark}{\color{WarningOrange}\faExclamationTriangle}
+\newcommand{\ghostmark}{\color{GhostPurple}\faGhost}
+
+% =============================================================================
+% SECTION PAGES (with progress indicator)
+% =============================================================================
+\setbeamertemplate{section page}[progressbar]
+
+% =============================================================================
+% TABLES (editorial style, not academic)
+% =============================================================================
+\renewcommand{\arraystretch}{1.3}
+
+% =============================================================================
+% NAVIGATION (clean, no symbols)
+% =============================================================================
+\setbeamertemplate{navigation symbols}{}
+
+% =============================================================================
+% OPTIONAL: DARK MODE VARIANT
+% =============================================================================
+% To enable dark mode, use \ghostadsdarkmode in your preamble
+\newcommand{\ghostadsdarkmode}{
+  \setbeamercolor{normal text}{fg=white, bg=Ink}
+  \setbeamercolor{frametitle}{fg=white, bg=black}
+  \setbeamercolor{block title}{fg=white, bg=BrandPrimary}
+  \setbeamercolor{block body}{fg=white, bg=Ink!80}
+  \setbeamercolor{progress bar}{fg=BrandAccent, bg=black!50}
+  \usebeamercolor[fg]{normal text}
+
+  % Update box colors for dark mode
+  \renewtcolorbox{keybox}{
+    colback=BrandPrimary!20,
+    colframe=BrandPrimary,
+    coltext=white,
+    boxrule=2.5pt,
+    arc=6pt,
+    left=12pt,
+    right=12pt,
+    top=10pt,
+    bottom=10pt
+  }
+}
+
+% =============================================================================
+% TIKZ STYLES (consistent with theme)
+% =============================================================================
+\tikzset{
+  box/.style={
+    draw,
+    rectangle,
+    rounded corners=4pt,
+    minimum width=2.5cm,
+    minimum height=1cm,
+    align=center,
+    line width=2.5pt,
+    font=\normalsize
+  },
+  arrow/.style={
+    -{Stealth[length=3mm]},
+    very thick
+  },
+  emphasis/.style={
+    draw=BrandAccent,
+    fill=BrandAccent!20,
+    line width=3pt
+  }
+}
+
+% =============================================================================
+% GEORGETOWN LOGO BACKGROUND
+% =============================================================================
+% Adds Georgetown University logo as a discreet watermark in bottom-right corner
+\setbeamertemplate{background}{
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east, inner sep=15pt, opacity=0.12] at (current page.south east) {
+      \includegraphics[width=2.5cm]{georgetown-logo.png}
+    };
+  \end{tikzpicture}
+}
+
+\endinput

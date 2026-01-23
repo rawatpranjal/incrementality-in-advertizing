@@ -1,0 +1,170 @@
+\section*{Implementation Example}
+
+\subsection*{Data Schema and Raw Logs}
+
+Ghost ads needs adding just one boolean flag to existing auction logs. The AUCTIONS\_RESULTS table records all bid outcomes including winning bids. Adding an IS\_GHOST\_AD field identifies control users who would have gotten impressions if they'd been in treatment:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Field & Description \\
+\midrule
+AUCTION\_ID & Links to AUCTIONS\_USERS table \\
+VENDOR\_ID & Advertiser ID \\
+PRODUCT\_ID & Product being advertised \\
+RANKING & Bid rank (1=highest) \\
+IS\_WINNER & Did bid win auction \\
+\textbf{IS\_GHOST\_AUCTION} & \textbf{TRUE if auction involves experimental vendor} \\
+\textbf{IS\_GHOST\_AD} & \textbf{TRUE if control user won but no ad shown} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+IS\_GHOST\_AUCTION marks any auction involving an experimental vendor, helping filter experimental data from logs. IS\_GHOST\_AD is TRUE only when IS\_GHOST\_AUCTION=TRUE, IS\_WINNER=TRUE, and the user is in control for that vendor—meaning no ad was shown despite winning. When IS\_GHOST\_AD is FALSE and IS\_WINNER is TRUE, the vendor won and an ad was shown to a treatment user. These two fields let you identify treatment and control groups for vendor-level analysis.
+
+\subsection*{Auction Log Example}
+
+Raw auction logs capture the randomization outcomes:
+
+\begin{small}
+\begin{verbatim}
+AUCTION_ID       VENDOR_ID  PRODUCT_ID  IS_WINNER  IS_GHOST_AD
+0670d37d45d0c7   vendor_A   prod_1847   TRUE       FALSE
+0670d3786028720  vendor_A   prod_2039   TRUE       TRUE
+0670d376a184e74  vendor_B   prod_5128   TRUE       FALSE
+0670d378f988708  vendor_A   prod_1847   TRUE       FALSE
+0670d37d4410878  vendor_B   prod_6241   TRUE       TRUE
+\end{verbatim}
+\end{small}
+
+Row 1: Vendor A won for product 1847 with IS\_GHOST\_AD=FALSE—this user-vendor pair was in treatment and an ad was shown. Row 2: Vendor A won for product 2039 with IS\_GHOST\_AD=TRUE—this pair was in control and no ad was shown despite winning the auction. Row 3: Vendor B won with IS\_GHOST\_AD=FALSE for a treatment user. Row 4: Vendor A won again for product 1847 with IS\_GHOST\_AD=FALSE, maybe the same user visiting again or a different user. Row 5: Vendor B won with IS\_GHOST\_AD=TRUE for a control user.
+
+\subsection*{Impression Log Example}
+
+Impression logs record only served impressions, not ghost ads:
+
+\begin{small}
+\begin{verbatim}
+INTERACTION_ID    AUCTION_ID       VENDOR_ID  USER_ID
+067aea309-abcb    0670d37d45d0c7   vendor_A   user_1024
+067aea30c-d703    0670d376a184e74  vendor_B   user_2871
+067aea701-d7c9    0670d378f988708  vendor_A   user_1024
+\end{verbatim}
+\end{small}
+
+These records are treatment users only. The auction IDs link to auction log entries with IS\_GHOST\_AD=FALSE. No impression log entry exists for auctions with IS\_GHOST\_AD=TRUE because no ad was shown to that control user.
+
+\subsection*{Purchase Log Example}
+
+Purchase logs record all purchases regardless of ad exposure:
+
+\begin{small}
+\begin{verbatim}
+PURCHASE_ID       PURCHASED_AT            PRODUCT_ID  USER_ID    VENDOR_ID
+17d13b70282b0b    2025-03-14T08:28:42Z    prod_1847   user_1024  vendor_A
+17d13c93a4c357    2025-03-14T08:27:52Z    prod_5128   user_2871  vendor_B
+17d137b266024a    2025-03-14T08:27:32Z    prod_7329   user_4182  vendor_A
+\end{verbatim}
+\end{small}
+
+First purchase: User 1024 bought vendor A's product 1847. Looking back at the auction and impression logs, this user saw impressions from vendor A, so they were in treatment for vendor A. Second purchase: User 2871 bought vendor B's product 5128, and also got impressions for vendor B. Third purchase: User 4182 bought vendor A's product 7329. If this user didn't appear in the impression log for vendor A, they might be in control for vendor A—this purchase is baseline conversion without ad exposure.
+
+\subsection*{Organic Engagement Logs}
+
+Beyond purchases, the platform tracks organic impressions and clicks on non-promoted listings. These outcomes capture spillover effects where ad exposure for one product increases engagement with the vendor's other products:
+
+\begin{small}
+\begin{verbatim}
+ORGANIC_IMP_ID      USER_ID    VENDOR_ID  PRODUCT_ID  OCCURRED_AT
+org_imp_1847_u24    user_1024  vendor_A   prod_1991   2025-03-14T08:15Z
+org_imp_5128_u71    user_2871  vendor_B   prod_5200   2025-03-14T08:20Z
+
+ORGANIC_CLICK_ID    USER_ID    VENDOR_ID  PRODUCT_ID  OCCURRED_AT
+org_clk_1991_u24    user_1024  vendor_A   prod_1991   2025-03-14T08:15Z
+\end{verbatim}
+\end{small}
+
+User 1024 in treatment for vendor A got promoted impressions for product 1847, then later viewed and clicked vendor A's non-promoted product 1991. This organic engagement might result from increased vendor awareness driven by ads. Comparing organic impression rates, organic click rates, and organic purchase rates between treatment and control users for each vendor reveals spillover effects beyond directly advertised products.
+
+\subsection*{Vendor-Level Analysis}
+
+The analysis identifies treatment and control users separately for each vendor by joining auction results, impressions, and purchases. For vendor A, the treatment group is all users with at least one auction where VENDOR\_ID=vendor\_A, IS\_WINNER=TRUE, and IS\_GHOST\_AD=FALSE. The control group is all users with at least one auction where VENDOR\_ID=vendor\_A, IS\_WINNER=TRUE, and IS\_GHOST\_AD=TRUE. These groups are mutually exclusive at the user-vendor level but a single user can be in treatment for vendor A and control for vendor B.
+
+Outcomes include multiple dimensions. Purchase conversion is the primary outcome—the fraction of users in each group who bought any product from the vendor during the attribution window. Purchase revenue is total spending on the vendor's products per user. Organic impressions count non-promoted views of the vendor's products. Organic clicks count non-promoted clicks. These organic outcomes isolate spillover effects you wouldn't capture by focusing only on purchases of advertised products.
+
+\subsection*{Example Results}
+
+\begin{table}[H]
+\centering
+\caption{Vendor A: Treatment Effect Estimates}
+\label{tab:vendor_a_analysis}
+\begin{tabular}{lrrr}
+\toprule
+Outcome & Treatment & Control & Difference \\
+\midrule
+Exposed Users & 12,450 & 1,380 & -- \\
+\addlinespace
+Purchase Conversion & 3.2\% & 1.9\% & 1.3pp \\
+Purchases per User & 0.038 & 0.022 & 0.016 \\
+Revenue per User & \$5.20 & \$3.10 & \$2.10 \\
+\addlinespace
+Organic Impressions per User & 2.8 & 2.1 & 0.7 \\
+Organic Clicks per User & 0.41 & 0.28 & 0.13 \\
+Organic Conversions & 0.8\% & 0.5\% & 0.3pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Vendor A shows a 1.3 percentage point increase in purchase conversion—a 68\% relative lift. Revenue per user increases by \$2.10 per exposed user. The organic outcomes reveal spillover effects: treatment users view more non-promoted products from vendor A, click more non-promoted products, and convert on non-promoted products at higher rates. These spillovers suggest ads increase overall vendor awareness rather than just shifting demand across the vendor's product portfolio. The total effect includes both direct purchases of advertised products and the extra organic engagement. The difference is statistically significant (p < 0.01). Standard errors can be computed using normal approximation for proportions or bootstrap resampling for revenue metrics.
+
+The vendor-specific estimate identifies the average treatment effect for vendor A's user-vendor pairs. This differs from the aggregate marketplace effect because the same users serve as treatment for some vendors and control for others. The vendor-level approach isolates each vendor's contribution, informing vendor-specific budget decisions while letting the marketplace operator aggregate across vendors to estimate platform-level incrementality.
+
+\subsection*{Multi-Vendor Numerical Example}
+
+Consider 1,000 users and 3 vendors (A, B, C) each running experiments with 5\% control. Each user-vendor pair is independently randomized using hash(user\_id, vendor\_id) mod 100. The same user can be in different experimental groups for different vendors:
+
+\begin{table}[H]
+\centering
+\caption{Sample User Assignments Across Vendors}
+\begin{tabular}{lccc}
+\toprule
+User & Vendor A & Vendor B & Vendor C \\
+\midrule
+user\_001 & Treatment & Control & Treatment \\
+user\_002 & Treatment & Treatment & Control \\
+user\_003 & Control & Treatment & Treatment \\
+user\_004 & Treatment & Treatment & Treatment \\
+user\_005 & Treatment & Control & Control \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+User 001 sees ads from vendors A and C but gets ghost ads for vendor B. User 004 sees ads from all three vendors. User 005 only sees vendor A's ads. With 1,000 users and 5\% control rate, each vendor expects roughly 950 treatment and 50 control users, but the exact users differ across vendors.
+
+After running for 30 days, the results show different incrementality for each vendor:
+
+\begin{table}[H]
+\centering
+\caption{Multi-Vendor Experiment Results}
+\begin{tabular}{lccc}
+\toprule
+Metric & Vendor A & Vendor B & Vendor C \\
+\midrule
+Treatment Users & 953 & 948 & 951 \\
+Control Users & 47 & 52 & 49 \\
+\addlinespace
+Treatment Conversion & 4.2\% & 8.5\% & 2.1\% \\
+Control Conversion & 2.8\% & 7.9\% & 1.2\% \\
+Lift & 1.4pp & 0.6pp & 0.9pp \\
+Relative Lift & 50\% & 7.6\% & 75\% \\
+\addlinespace
+Treatment Revenue/User & \$12.50 & \$45.20 & \$8.30 \\
+Control Revenue/User & \$8.10 & \$42.30 & \$4.90 \\
+Revenue Lift & \$4.40 & \$2.90 & \$3.40 \\
+\addlinespace
+Statistical Significance & p<0.01 & p=0.08 & p<0.05 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Vendor A shows strong incrementality with 50\% lift and \$4.40 additional revenue per exposed user. Vendor C has the highest relative lift (75\%) but lower absolute revenue impact. Vendor B has high baseline conversion but marginal incrementality—their ads might be reaching users who would buy anyway. Each vendor gets independent estimates despite sharing the same user base, letting the marketplace optimize vendor-specific decisions while vendors optimize their own campaigns.

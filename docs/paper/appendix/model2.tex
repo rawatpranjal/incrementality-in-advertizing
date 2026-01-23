@@ -1,0 +1,153 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\section*{Model 2: Adding Heterogeneity}
+
+The foundational model assumes a single, constant ad effect ($\beta$), implying all impressions are equally effective—demonstrably false in practice. This extended model disaggregates the total ad effect by incorporating observable characteristics of users, ads, and context, enabling granular impression-level valuation and precise attribution.
+
+\subsection*{Model Specification}
+The model extends the baseline framework by allowing both the baseline and treatment effects to vary based on observable characteristics. The total ad effect becomes a linear combination of constituent feature effects:
+
+\[ y_i = \alpha(W) + \sum_{k} \beta_k x_{ik} + \varepsilon_i \]
+
+This formulation transitions from a single average treatment effect to context-specific effects.
+
+\begin{table}[H]
+\centering
+\caption{Components of the Heterogeneous Model}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Component & Interpretation \\
+\midrule
+$W$ & A vector of characteristics describing the context, such as user features (e.g., geography, device) or temporal features (e.g., time of day). \\
+$\alpha(W)$ & The baseline conversion rate, now a function of the context $W$. This allows the baseline to differ, for example, between users in the USA and users in Canada. \\
+$k$ & An index for a specific characteristic of an ad impression. Examples include creative ID, ad size (e.g., 300x250), publisher domain, or ad placement (e.g., above-the-fold). \\
+$\beta_k$ & The incremental effect attributable to an ad possessing characteristic $k$. \\
+$x_{ik}$ & The count of impressions with characteristic $k$ shown to user $i$, defined as $x_{ik} = \sum_{j} \mathbb{1}[\text{impression } j \text{ has characteristic } k]$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Ad Characteristics}
+The index $k$ represents specific features derived from bid requests, used to estimate heterogeneous effects.
+
+\begin{table}[H]
+\centering
+\caption{Categorization of Ad Impression Characteristics}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Category & Example Characteristics \\
+\midrule
+Ad Creative & Creative ID (e.g., \texttt{creative\_1024}), Ad Format (e.g., \texttt{video}, \texttt{static\_banner}), Call-to-Action (e.g., \texttt{cta\_learn\_more}). \\
+\addlinespace
+Ad Placement & Publisher Domain (e.g., \texttt{domain\_nytimes.com}), Ad Size (e.g., \texttt{size\_300x250}), Position (e.g., \texttt{above\_fold}). \\
+\addlinespace
+Audience Context & Geographic Location (e.g., \texttt{country\_ca}), Device Type (e.g., \texttt{device\_mobile}), User Segment (e.g., \texttt{segment\_cart\_abandoners}). \\
+\addlinespace
+Auction Context & Ad Exchange (e.g., \texttt{exchange\_google}), Time of Day (e.g., \texttt{hour\_19}), Day of Week (e.g., \texttt{day\_saturday}). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For a single impression $j$, the term $x_{ijk}$ is an indicator. For example, an impression for a user in Canada on a mobile device, viewing a 300×250 ad on nytimes.com would have $x_{ijk}=1$ for:
+\[k \in \{\texttt{country\_ca}, \texttt{device\_mobile}, \texttt{size\_300x250}, \texttt{domain\_nytimes.com}\}\]
+and $x_{ijk}=0$ for all other characteristics.
+
+\subsection*{Implementation Details}
+We distinguish between data structures for model training versus real-time bidding:
+\begin{itemize}
+    \item \textit{For Model Training:} The variable $x_{ik}$ is a feature in the training data. It is an aggregate count of how many times user $i$ was exposed to an impression with characteristic $k$ over a given period.
+    \item \textit{For Bidding:} The variable $x_{ijk}$ is used to value a single, incoming impression $j$. It is a binary indicator. In practice, this is a one-hot encoded feature vector $\mathbf{x}_{ij}$ of length $K$ (the total number of characteristics), where the elements are 1 for the characteristics present in the impression and 0 otherwise.
+\end{itemize}
+The summation term for the value of a single impression can thus be written as a vector dot product: $\sum_{k=1}^{K} \beta_k x_{ijk} = \boldsymbol{\beta}^\top \mathbf{x}_{ij}$, where $\boldsymbol{\beta}$ is the vector of all estimated coefficients.
+
+\subsection*{Bidding with Heterogeneous Effects}
+The model enables valuation of individual impressions based on their specific characteristics. The bidding rule shifts from average effects to tailored, impression-specific valuations.
+
+The incremental value of a single impression $j$ shown to user $i$ is the sum of the incremental effects of all characteristics it possesses. The maximum bid for this impression is therefore:
+
+\[ \text{Maximum Bid}_{ij} = m_i v_i \cdot \sum_{k} \beta_k x_{ijk} = m_i v_i \cdot (\boldsymbol{\beta}^\top \mathbf{x}_{ij}) \]
+
+This allows an advertiser to bid more for high-value impressions and less for low-value ones, dramatically improving capital efficiency compared to the homogeneous model.
+
+\subsection*{Numerical Example}
+Consider an advertiser with economic parameters $v=\$500$ and $m=0.80$ running ads in two countries (USA, Canada) with two creatives (A, B). Experimental estimates yield:
+
+\begin{table}[H]
+\centering
+\caption{Estimated Incremental Effects ($\hat{\beta}_k$)}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Characteristic ($k$) & Estimated Effect ($\hat{\beta}_k$) \\
+\midrule
+Country = USA & 0.040 \\
+Country = Canada & 0.065 \\
+Creative = A & 0.010 \\
+Creative = B & -0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Consider two distinct bid opportunities:
+
+\begin{table}[H]
+\centering
+\caption{Valuation of Two Distinct Ad Impressions}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Scenario & Calculation and Interpretation \\
+\midrule
+Impression 1 & An ad opportunity arises for a user in the USA using Creative A. \\
+& \textit{Valuation:} The total incremental effect is the sum of the effects for its characteristics. \\
+& $\sum_k \hat{\beta}_k x_{ijk} = \hat{\beta}_{\text{USA}} + \hat{\beta}_{\text{Creative A}} = 0.040 + 0.010 = 0.050$. \\
+& \textit{Maximum Bid:} $0.050 \cdot (0.80 \cdot \$500) = 0.050 \cdot \$400 = \$20.00$. \\
+\addlinespace
+Impression 2 & An ad opportunity arises for a user in Canada using Creative A. \\
+& \textit{Valuation:} The total incremental effect is calculated for this new context. \\
+& $\sum_k \hat{\beta}_k x_{ijk} = \hat{\beta}_{\text{Canada}} + \hat{\beta}_{\text{Creative A}} = 0.065 + 0.010 = 0.075$. \\
+& \textit{Maximum Bid:} $0.075 \cdot (0.80 \cdot \$500) = 0.075 \cdot \$400 = \$30.00$. \\
+\addlinespace
+Insight & The model differentiates impression values: Canada opportunities are valued \$10 higher than USA ones, enabling sophisticated bidding. Creative B's negative effect suggests discontinuation. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsubsection*{ROAS and iROAS for the Heterogeneous Model}
+The heterogeneous model disaggregates iROAS from a user-level average to a characteristic-level metric, which is the primary tool for tactical optimization.
+
+\begin{table}[H]
+\centering
+\caption{iROAS Definitions}
+\begin{tabular}{@{}lp{5.5cm}p{5.5cm}@{}}
+\toprule
+Metric & Formula & Interpretation \\
+\midrule
+User iROAS & $ \frac{(\sum_k \beta_k x_{ik}) \cdot v_i}{\sum_j c_{ij}} $ & The user's average causal return, dependent on the mix of impressions seen. \\
+\addlinespace
+Characteristic iROAS$_k$ & $ \frac{\beta_k \cdot v_i}{c_k} $ & The causal return for characteristic $k$. Used to compare the efficiency of different tactics. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Numerical Example: Comparing Tactic Efficiency ($v=\$500$)}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Tactic & Incremental Effect ($\hat{\beta}_k$) & Avg. Cost ($c_k$) & iROAS$_k = \frac{\hat{\beta}_k \cdot v}{c_k}$ \\
+\midrule
+USA & 0.040 & \$0.020 & 1000 \\
+Canada & 0.065 & \$0.035 & $\approx$ 928.6 \\
+\bottomrule
+\multicolumn{4}{l}{\textit{Conclusion: The USA tactic is more efficient per dollar spent, despite having a lower causal effect.}}
+\end{tabular}
+\end{table}
+
+\end{document}

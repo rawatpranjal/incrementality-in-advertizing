@@ -1,0 +1,152 @@
+% Part 3: The Ghost Ads Solution
+
+% STANDOUT FRAME - The Big Reveal
+\begin{frame}[standout]
+\vspace{1.5cm}
+
+\Huge
+\ghostmark\quad \textbf{Ghost Ads}
+
+\vspace{1cm}
+
+\Large
+Simulate placebos, never serve them
+
+\vspace{1.5cm}
+
+\LARGE
+\textbf{Precision without contamination}
+
+\end{frame}
+
+\begin{frame}{Treatment users see real ads as usual}
+
+\textbf{\large When a treatment user visits...}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, rounded corners, minimum width=2.2cm, minimum height=0.7cm, align=center, line width=2.5pt},
+    arrow/.style={-{Stealth[length=2.5mm]}, very thick},
+    node distance=1.8cm
+]
+    \node (request) [box, fill=BrandSecondary!20] {\faUser\ User\\visits};
+
+    \node (auction) [box, fill=BrandSecondary!30, right=of request] {Run auction};
+    \draw [arrow, BrandSecondary] (request) -- (auction);
+
+    \node (wins) [box, fill=SuccessGreen!30, right=of auction] {\faCheckCircle\ Ad\\wins};
+    \draw [arrow, BrandSecondary] (auction) -- (wins);
+
+    \node (show) [box, fill=SuccessGreen!40, right=of wins] {\faBullhorn\ Show ad\\Log};
+    \draw [arrow, SuccessGreen] (wins) -- (show);
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.3cm}
+
+\visible{
+\begin{center}
+\textbf{Normal ad serving - nothing special}
+\end{center}
+}
+
+\end{frame}
+
+\begin{frame}{Control users trigger ghost auctions offline}
+
+\textbf{\large When a control user visits...}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, rounded corners, minimum width=1.8cm, minimum height=0.7cm, align=center, line width=2.5pt},
+    arrow/.style={-{Stealth[length=2.5mm]}, very thick},
+    node distance=1.4cm
+]
+    \node (request) [box, fill=BrandSecondary!20] {\faUser\ User\\visits};
+
+    \node (real) [box, fill=BrandAccent!25, above right=0cm and 1.8cm of request] {\textbf{Real Auction}\\- ad};
+    \node (ghost) [box, fill=GhostPurple!25, below right=0cm and 1.8cm of request] {\ghostmark\ \textbf{Ghost Auction}\\+ ad};
+    \draw [arrow, BrandAccent] (request) -- (real);
+    \draw [arrow, GhostPurple] (request) -- (ghost);
+
+    \node (show) [box, fill=BrandAccent!30, right=of real] {Show\\competitor};
+    \node (check) [box, fill=GhostPurple!30, right=of ghost] {Wins?};
+    \draw [arrow, BrandAccent] (real) -- (show);
+    \draw [arrow, GhostPurple] (ghost) -- (check);
+
+    \node (win) [box, fill=SuccessGreen!25, above right=-0.3cm and 1.4cm of check] {Win:\\Log ghost\\impression};
+    \node (lose) [box, fill=black!10, below right=-0.3cm and 1.4cm of check] {Lose:\\Do nothing};
+    \draw [arrow, SuccessGreen] (check) -- (win);
+    \draw [arrow, black!40] (check) -- (lose);
+\end{tikzpicture}
+\end{center}
+
+\vspace{-0.2cm}
+
+\visible{
+\begin{ghostbox}
+\centering
+\ghostmark\ Ghost auction tells you which control user would have seen the ad
+\end{ghostbox}
+}
+
+\end{frame}
+
+\begin{frame}{Same exposure patterns $\Rightarrow$ Similar users}
+
+\textbf{\large Ghost auctions identify which control users would have been exposed}
+
+\vspace{0.15cm}
+
+\begin{columns}
+\column{0.48\textwidth}
+\begin{center}
+{\small \textbf{Treatment}}\\
+\vspace{0.2cm}
+\begin{tikzpicture}[scale=0.8]
+    \node [draw, rectangle, rounded corners=4pt, fill=BrandSecondary!30, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, align=center] at (0,0) {
+        {\small \textbf{Saw ad}}\\
+        {\tiny 1,000 users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!10, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, dashed, opacity=0.6, align=center] at (0,-1.3) {
+        {\small \textbf{Never saw ad}}\\
+        {\tiny 9,000 users}
+    };
+\end{tikzpicture}
+\end{center}
+
+\column{0.48\textwidth}
+\begin{center}
+{\small \textbf{Control}}\\
+\vspace{0.2cm}
+\begin{tikzpicture}[scale=0.8]
+    \node [draw, rectangle, rounded corners=4pt, fill=GhostPurple!30, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, align=center] at (0,0) {
+        {\small \ghostmark\ \textbf{Ghost auction}}\\
+        {\small \textbf{would see ad}}\\
+        {\tiny 1,000 users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!10, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, dashed, opacity=0.6, align=center] at (0,-2.0) {
+        {\small \textbf{Would NOT see}}\\
+        {\tiny 9,000 users}
+    };
+\end{tikzpicture}
+\end{center}
+
+\end{columns}
+
+\vspace{0.2cm}
+
+\visible{
+\begin{center}
+{\large
+\faCalculator\ GA-ATT = Avg. outcomes in exposed\\[0.15cm]
+\hspace{2.5cm}$-$ Avg. outcomes in control with ghost impressions
+}
+\end{center}
+}
+
+\end{frame}

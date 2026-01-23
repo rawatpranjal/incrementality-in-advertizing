@@ -1,0 +1,61 @@
+\section*{Data}
+
+Our empirical analysis uses data from a large US-based online marketplace, spanning five months from March through July 2025. The data capture the lifecycle of sponsored advertising interactions: every ad auction triggered by a user search, every bid submitted by a vendor, every ad impression delivered, every click recorded, and every purchase transacted on the platform. On an average day, the platform processes over 7 million search events that generate more than 268 million bids across approximately 27 million ad impressions. These impressions yield nearly 900,000 clicks and over 110,000 purchase transactions totaling nearly \$5 million in daily revenue.
+
+\begin{table}[htbp!]
+\centering
+\caption{Data Sources}
+\label{tab:data_structure}
+\begin{tabular}{p{0.22\textwidth} p{0.75\textwidth}}
+\toprule
+Table & Description \\
+\midrule
+Auctions (Users) & Records of every ad auction triggered by a user search or browsing action. Links users to auction instances. \\
+Auctions (Results) & Bid-level records for each auction. Multiple vendors bid per auction; each observation represents one bid with its ranking and whether it won an impression slot. \\
+Impressions & Log of every promoted ad displayed to a user. \\
+Clicks & Log of every user click on a sponsored ad. \\
+Purchases & All purchase transactions on the platform, including both promoted and organic purchases. \\
+Catalog & Product metadata including names, text descriptions, categorical classifications, and listed prices. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The dataset comprises six tables capturing different stages of the user journey (Table \ref{tab:data_structure}). The structure enables tracking user behavior throughout the advertising funnel. Each search or browsing event triggers an ad auction in which multiple vendors bid for their products to appear in sponsored placements. A single auction typically generates dozens of competing bids. The platform's algorithm ranks these bids, and only the highest-ranked bids win impression slots. We observe every bid submitted, its rank relative to competing bids, and whether it secured an advertising placement.
+
+When served, a winning bid generates an impression record. Clicks on promoted listings are captured in the clicks data. The purchases table records all transactions regardless of whether they followed a promoted or organic pathway.
+
+The catalog data impose a measurement limitation. While product metadata—names, descriptions, categories, and prices—are available, these match only purchases from a promoted journey. Organic purchases cannot be linked to product characteristics because they lack corresponding entries in the impressions or clicks tables. This restricts our ability to characterize all transactions and creates selection issues when conditioning on product observables.
+
+Table \ref{tab:summary_stats} presents aggregate daily statistics summarizing platform activity.
+
+\begin{table}[htbp!]
+\centering
+\caption{Average Daily Platform Statistics}
+\label{tab:summary_stats}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Total Search Events & 7,420,764 \\
+Total Bids Submitted & 268,105,571 \\
+Total Impressions Delivered & 27,692,988 \\
+Total Clicks on Ads & 891,817 \\
+Total Unique Purchase Transactions & 111,910 \\
+Total Revenue & \$4,925,990 \\
+Click-Through Rate (CTR) & 3.22\% \\
+Conversion Rate (from Click to Purchase) & 12.55\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This dataset creates both opportunities and constraints for causal inference. We observe the complete sponsored advertising funnel from auction mechanics through final purchase outcomes, with millisecond-precise timestamps. Persistent user and vendor identifiers enable longitudinal panel constructions at multiple levels of aggregation. However, several data characteristics impose important limitations. Most importantly, the asymmetry between promoted and organic pathways: we observe all advertising interactions—impressions, clicks, and ad-exposed purchases—but no organic browsing behavior. A user's non-sponsored product views, wishlist additions, or social interactions with sellers are unrecorded. This creates a selection problem: users in our impression and click data are a non-random subset of all users who ultimately purchase. Any analysis comparing promoted users to "control" users must account for algorithmic targeting.
+
+The purchase data present another challenge. The Purchases table includes all transactions but contains no flag indicating whether a purchase followed an ad click or occurred organically. Reconstructing each user's advertising exposure history requires linking back through the clicks and impressions tables. The absence of campaign-level metadata further limits analysis. We observe campaign identifiers but not budgets, duration, or targeting rules. This prevents studying how advertisers adjust spending in response to performance signals or how budget constraints bind vendor behavior.
+
+\subsection*{Confounding Variables}
+
+When studying advertising effectiveness in this marketplace, several confounders simultaneously influence both ad exposure and purchase outcomes. Most importantly, we lack data on photo quality—a decisive factor in a visual marketplace centered on fashion and apparel. High-quality, well-lit images drive both click-through rates and conversion, yet our dataset contains only text and structured metadata. Similarly, while we observe product prices, their interpretation is complicated by sellers' strategic behavior: many list items above reservation prices to create negotiation room, meaning the posted price signals both market positioning and bargaining strategy. The product's category and brand strongly predict both algorithmic promotion and organic demand. Listings from popular brands attract more attention regardless of advertising. Other product attributes—whether an item is new with tags or used, photo count, and posting recency—also shape both the ad algorithm's prioritization and buyers' purchase propensities.
+
+User-level factors also confound the relationship. The platform's retargeting algorithms target frequent purchasers more aggressively, but these users also have intrinsically higher purchase rates. Users who spend more time browsing see more ads through exposure, and this session depth correlates with purchase likelihood. Search query specificity is particularly consequential: someone searching for a specific brand and size exhibits high purchase intent and triggers narrow, targeted ad placements. Yet we observe only the auction generated, not the query text itself. Users who save items to their favorites list receive retargeting for those products while already being further along in their consideration journey.
+
+On the seller side, vendors with larger inventories naturally have more items available for promotion and more products attributable under the platform's closet-wide model. This marketplace has distinctive confounding through social engagement. Vendors who actively share listings, participate in themed shopping events, and build follower bases gain organic visibility—visibility that operates independently of, and potentially competes with, paid advertising. A vendor's pricing strategy, particularly willingness to negotiate or offer discounts, affects both ad click-through rates and conversion. These seller-level factors interact with temporal patterns: shopping activity fluctuates predictably across days and times, affecting both when the platform delivers ads and when users purchase. Seasonal demand creates correlated surges in advertising and buying—winter apparel campaigns intensify as consumers seek cold-weather clothing. User-vendor relationships add a final dimension: buyers who previously purchased from a seller are both more likely to be retargeted with that seller's ads and more inclined toward repeat purchases due to established trust.

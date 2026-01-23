@@ -1,0 +1,98 @@
+\section*{From Measurement to Optimization}
+
+The measurement of treatment effects enables optimal allocation of advertising resources. Once platforms estimate heterogeneous treatment effects, these estimates inform bidding strategies, budget allocation, and impression selection. The optimization problem shifts from maximizing observed conversions to maximizing incremental conversions per dollar spent.
+
+This section demonstrates how causal inference improves four canonical advertising decisions through mixed-integer linear programming and convex optimization. The analysis reveals a consistent pattern: correlation-based methods select high-baseline users who would convert regardless of advertising, while causal methods identify high-lift users whose behavior changes due to ad exposure.
+
+\subsection*{Heterogeneous Effects and Selection}
+
+Consider $n$ impression opportunities with heterogeneous treatment effects. Let $p_{0i}$ denote user $i$'s baseline purchase probability absent advertising, $\tau_i$ the causal lift from ad exposure, and $c_i$ the cost per impression. The incremental value from showing an ad to user $i$ is $v \cdot \text{CTR}_i \cdot \tau_i$ where $v$ denotes value per conversion.
+
+Empirically, baseline probability and treatment effects exhibit negative correlation. Users with high organic purchase intent show minimal lift from advertising, while marginal customers demonstrate substantial treatment effects.\footnote{This pattern emerges because advertising provides information and persuasion. Users who already intend to purchase gain little from additional information, while undecided users may be persuaded.} Formally, $\text{Cor}(p_{0i}, \tau_i) < 0$ with typical values between $-0.7$ and $-0.9$ in marketplace settings.
+
+Standard optimization maximizes observed conversions: $\text{CTR}_i \cdot (p_{0i} + \tau_i) \cdot v$. This objective conflates baseline and incremental effects, leading to selection of high-baseline users. Causal optimization maximizes incremental value: $\text{CTR}_i \cdot \tau_i \cdot v$, selecting high-lift users instead.
+
+\subsection*{Bidding Under Budget Constraints}
+
+The canonical bidding problem allocates budget $B$ across impression opportunities to maximize incremental value. The optimization takes the form:
+
+\begin{align}
+\max_{x} \quad & \sum_{i=1}^n s_i x_i \\
+\text{s.t.} \quad & \sum_{i=1}^n c_i x_i \leq B \\
+& x_i \in \{0, 1\}
+\end{align}
+
+where $x_i$ indicates whether to bid on impression $i$ and $s_i$ represents the scoring function. Under correlation-based scoring, $s_i = \text{CTR}_i \cdot \text{CVR}_i^{\text{obs}} \cdot v$ where $\text{CVR}_i^{\text{obs}} = p_{0i} + \tau_i$. Under causal scoring, $s_i = \text{CTR}_i \cdot \hat{\tau}_i \cdot v$ where $\hat{\tau}_i$ estimates the heterogeneous treatment effect.
+
+\begin{table}[H]
+\centering
+\caption{Bidding Optimization Results}
+\begin{tabular}{lcccc}
+\toprule
+Method & Users Selected & Spend & Inc. Value & iROAS \\
+\midrule
+Correlation & 494 & \$20.00 & \$85.85 & 4.29 \\
+Causal (HTE) & 501 & \$20.00 & \$116.49 & 5.82 \\
+Oracle & 503 & \$19.96 & \$117.09 & 5.87 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The simulation uses 1,000 users with $p_{0i} \sim \text{Beta}(2, 8)$ and $\tau_i = 0.08/(1 + 10p_{0i}) + \epsilon_i$, yielding correlation $-0.84$. Causal optimization achieves 5.82× incremental return on ad spend versus 4.29× for correlation-based selection, a 36\% improvement. The methods select different users: correlation targets users with average baseline 0.248 and lift 0.026, while causal selection yields average baseline 0.166 and lift 0.035.
+
+\subsection*{Slate Ranking with Cannibalization}
+
+Search and recommendation systems must select $K$ items for promoted slots. The optimization accounts for position effects and cannibalization of organic results. Let $P_j = j^{-0.7}$ denote the position bias for slot $j$. The incremental value from promoting item $i$ in position $j$ equals:
+
+\begin{equation}
+\Delta_{ij} = P_j \cdot \text{CTR}_i \cdot \tau_i \cdot v - \lambda \cdot \text{Organic}_{ij}
+\end{equation}
+
+where $\lambda$ represents the cannibalization rate and $\text{Organic}_{ij}$ the expected organic conversions displaced by promotion. Correlation-based ranking uses observed metrics that include organic baseline, while causal ranking optimizes incremental value net of cannibalization.
+
+Simulation across 100 search queries with 5 promoted slots reveals differential cannibalization rates. Correlation-based ranking cannibalizes 28\% of promoted purchases, as it selects popular items users would discover organically. Causal ranking reduces cannibalization to 12\% by promoting items with genuine incremental impact.\footnote{The cannibalization rate $\lambda = 0.6$ reflects that 60\% of clicks on promoted items would have occurred organically if those items appeared in natural search results. This parameter can be estimated from randomized experiments that vary promoted slate composition.}
+
+\subsection*{Frequency Capping}
+
+Repeated ad exposure exhibits declining marginal returns. The marginal lift from the $n$-th impression follows:
+
+\begin{equation}
+\Delta(n, t) = \tau_0 \exp(-\alpha n) \exp(-\beta t)
+\end{equation}
+
+where $\tau_0$ denotes initial lift, $\alpha$ captures frequency decay, and $\beta$ represents temporal decay since last exposure. The optimal frequency cap occurs where marginal value equals marginal cost: $v \cdot \Delta(n^*, t) = c$.
+
+Correlation-based capping shows ads to high-CVR users until the budget exhausts, achieving 2.7× iROAS across 168 hours of simulated activity. Causal capping identifies users with high initial lift $\tau_0$ and adjusts frequency based on estimated decay parameters, achieving 5.1× iROAS. The causal approach serves 275\% more impressions by avoiding saturation of high-baseline users who show minimal incremental response.
+
+\subsection*{Eligibility Thresholds}
+
+Platforms must decide whether to enter auctions based on expected value. The eligibility criterion compares expected incremental value against expected cost:
+
+\begin{equation}
+\text{Show if: } \quad v \cdot \text{CTR}_i \cdot \tau_i \geq \theta \cdot E[c_i]
+\end{equation}
+
+where $\theta$ represents a platform-specific threshold. Correlation-based thresholds using observed CVR show 82\% of impression opportunities, achieving 0.45× iROAS—losing money on most impressions. Causal thresholds show only 9\% of opportunities, achieving 2.31× iROAS by avoiding low-lift impressions.
+
+\begin{table}[H]
+\centering
+\caption{Optimization Performance Summary}
+\begin{tabular}{lccc}
+\toprule
+Application & Correlation & Causal & Improvement \\
+\midrule
+Auction Bidding & 4.3× iROAS & 5.8× iROAS & +36\% \\
+Slate Ranking & 28\% cannibalization & 12\% cannibalization & -57\% \\
+Frequency Caps & 2.7× iROAS & 5.1× iROAS & +90\% \\
+Eligibility Gates & 82\% shown & 9\% shown & -89\% waste \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Implementation Considerations}
+
+These optimizations require heterogeneous treatment effect estimates at the user or segment level. Platforms can employ several estimation strategies. Double machine learning uses flexible models to estimate nuisance functions while maintaining valid inference \citep{chernozhukov2018double}. Causal forests partition users into subgroups with similar treatment effects \citep{athey2019generalized}. Meta-learners combine base models to estimate conditional average treatment effects \citep{kunzel2019metalearners}.\footnote{The choice of estimator depends on data dimensionality and the bias-variance tradeoff. Double ML excels with high-dimensional confounders, causal forests handle heterogeneity naturally, and meta-learners offer flexibility in base model selection.}
+
+The quality of HTE estimates directly impacts optimization performance. Even noisy estimates outperform correlation-based methods because they target the correct objective. As estimation improves through larger samples or better models, the gap between causal and correlation-based optimization widens. Platforms should view HTE estimation as infrastructure investment that improves all downstream decisions.
+
+Cross-validation prevents overfitting when the same data estimates effects and makes decisions. The recommended approach splits historical data into training and evaluation periods. Treatment effects estimated on training data inform bidding decisions evaluated on holdout outcomes. This separation ensures that optimization genuinely improves incremental metrics rather than exploiting estimation noise.

@@ -1,0 +1,96 @@
+\documentclass[aspectratio=169]{beamer}
+
+% =============================================================================
+% GHOST ADS KEYNOTE THEME
+% =============================================================================
+% All theme configuration, colors, fonts, and styling is in ghostads-theme.sty
+% To enable dark mode, uncomment: \ghostadsdarkmode
+\usepackage{ghostads-theme}
+
+% =============================================================================
+% ADDITIONAL PACKAGES
+% =============================================================================
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+% =============================================================================
+% PRESENTATION METADATA
+% =============================================================================
+\title{\textbf{Ghost Ads}}
+\subtitle{Measuring Advertising Incrementality Without Breaking Stuff}
+\author{}
+\institute{}
+\date{\today}
+
+% =============================================================================
+% DOCUMENT
+% =============================================================================
+\begin{document}
+
+% =============================================================================
+% KEYNOTE-STYLE TITLE SLIDE
+% =============================================================================
+% For image background, uncomment and add image:
+% {
+% \usebackgroundtemplate{%
+%   \includegraphics[width=\paperwidth,height=\paperheight]{hero-image.jpg}%
+% }
+\begin{frame}[plain]
+\vspace{2.5cm}
+
+\begin{center}
+\Huge\bfseries
+\textcolor{BrandPrimary}{Ghost Ads}
+\end{center}
+
+\vspace{0.8cm}
+
+\begin{center}
+\LARGE
+Measuring Advertising Incrementality\\
+Without Breaking Stuff
+\end{center}
+
+\vspace{2cm}
+
+\begin{center}
+\normalsize
+\color{InkLight}
+\today
+\end{center}
+
+\end{frame}
+% } % End background template
+
+% =============================================================================
+% CONTENT SECTIONS
+% =============================================================================
+
+% Part 1: The Problem
+\input{part1_problem_static.tex}
+
+% Part 2: Traditional Approaches
+\input{part2_traditional_static.tex}
+
+% Part 3: Ghost Ads
+\input{part3_ghostads_static.tex}
+
+% Part 4: Implementation
+\input{part4_implementation_static.tex}
+
+% Part 5: Extensions
+\input{part5_extensions_static.tex}
+
+% =============================================================================
+% BACKUP SLIDES
+% =============================================================================
+\appendix
+\input{backup_slides_static.tex}
+
+% =============================================================================
+% REFERENCES
+% =============================================================================
+% References now included in backup_slides.tex
+
+\end{document}

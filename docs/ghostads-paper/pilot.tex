@@ -1,0 +1,196 @@
+\section*{Practical Implementation Details}
+
+
+\subsection*{User Randomization}
+
+Ghost ads requires a treatment and control group for each advertiser (or campaign). The simplest way to do this is to use a hash function on user IDs. For example, we can use a function like SHA256 to hash the user ID, convert the hash to an integer, and then take modulo 100 to get a number between 0 and 99. If this number is less than the desired control percentage (e.g., 5 for 5\% control), assign the user to control; otherwise, assign them to treatment. This method ensures consistent assignment: a user assigned to treatment on Monday stays in treatment on Tuesday. Implicitly, this requires that user IDs are stable and persistent over time. 
+
+So the first table that we need is a user-level randomization table with columns: user\_id, experiment\_id, group\_id (treatment/control), vendor\_id, campaign\_id, treatment\_flag (1 for treatment, 0 for control). It may look like: 
+
+\begin{table}[H]
+\centering
+\caption{User Randomization Table}
+\label{tab:user_randomization}
+\begin{tabular}{lrrrrr}
+\toprule
+user\_id & experiment\_id & group\_id & vendor\_id & campaign\_id & treatment\_flag \\
+\midrule            
+12345 & exp001 & grpA & vendX & camp1 & 1 \\
+67890 & exp001 & grpA & vendX & camp1 & 0 \\
+54321 & exp001 & grpA & vendX & camp1 & 1 \\
+09876 & exp001 & grpA & vendX & camp1 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection*{Timing and Simulation Setting}
+
+For ghost ads to work, the ghost auction simulation needs to happen nearly in real-time and with exactly the same parameters as the actual auction. Anything different makes the comparison less accurate. The exact same configurations, algorithmic parameters, budgets, campaign settings, vendors, etc. must be used in the ghost auction as in the real auction. If we are using GA, we simply need to run this for control users (about 5\%). If we are using PGA-LATE, which is standard, then the ghost auction needs to be run for every user.
+
+\subsection*{Vendor vs. Campaign-Level Testing}
+
+The granularity of randomization determines the business questions the system can answer. While it is technically possible to measure incrementality at the campaign level (randomizing on (user\_id, campaign\_id)), such tests are often too short (e.g., 1-2 weeks) to yield statistically significant results due to sparse conversion data.
+
+For this reason, the recommended approach for strategic measurement is vendor-level testing, where the randomization unit is the (user\_id, vendor\_id) pair. This method aggregates data across all of a vendor's campaigns over a longer period (e.g., months), providing the statistical power needed for precise and stable estimates of the vendor's total incremental return on the platform. 
+
+\subsection*{Logging}
+
+Once the ghost auction is run, and the control user has won the auction, we need to log the results. This log should contain: user\_id, experiment\_id, group\_id (treatment/control), vendor\_id, campaign\_id, ad\_id, timestamp, ghost\_flag (1 for ghost ad, 0 for real ad), predicted\_impression ($\hat{D}$, i.e. did it win or not). the table will look like: 
+
+
+\begin{table}[H]
+\centering
+\caption{Ghost Ad Log Table}
+\label{tab:ghost_ad_log}
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+user\_id & timestamp & exp\_id & group & vendor & camp & ad & ghost & pred\_imp \\
+\midrule
+12345 & 2023-10-01 12:00 & exp001 & grpA & vendX & camp1 & ad001 & 0 & 1 \\
+67890 & 2023-10-01 12:05 & exp001 & grpA & vendX & camp1 & ad001 & 1 & 1 \\
+54321 & 2023-10-01 12:10 & exp001 & grpA & vendX & camp1 & ad002 & 0 & 0 \\
+09876 & 2023-10-01 12:15 & exp001 & grpA & vendX & camp1 & ad002 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Ad Serving}
+
+When the server receives an ad request, it processes the request through the Predicted Ghost Ads (PGA) measurement pipeline. First, the system identifies the user and retrieves their treatment assignment (Z) from the randomization table. Second, it runs a ghost auction simulation with the focal ad included using the current auction parameters. This simulation is identical for all users regardless of treatment assignment and predicts whether the focal ad would win ($\hat{D}$). The system logs this prediction along with the user's treatment status.
+
+After prediction logging, the request handling diverges by treatment group. For treatment users, the server runs the real auction with the focal ad included. If the focal ad wins, it is shown to the user and a real impression is logged (D=1). If it loses, an alternate ad is shown. For control users, the server runs the real auction with the focal ad excluded. The winning ad from this restricted auction is shown to the user, ensuring control users never see the focal ad. This creates the comparison: treatment users who saw the focal ad versus control users with predicted exposure who did not see it.
+
+\subsection*{Outcomes}
+
+Since purchases or revenue is sparse, it is common to use other outcomes like: clicks, page-visits, sign-ups, or add-to-carts.
+
+As recommended, Ghost Ads on marketplace platforms are designed to measure vendor-level incrementality. This approach provides stable, strategic insights by randomizing on the user-vendor pair using a hash of (user\_id, vendor\_id), allowing a user to be in treatment for some vendors and control for others. This produces vendor-specific estimates for each vendor's entire portfolio, aggregating across all campaigns a vendor runs during the experiment to find the average effect of the vendor's total advertising presence.
+
+\subsection*{Inference}
+
+The final step is to estimate incrementality. This requires the following tables: (1) user randomization table, (2) ghost ad log table, (3) outcome table. And the data needed are: user\_id, timestamp, outcome\_type (click/purchase), outcome\_value (1 for click, revenue for purchase). The formula is:
+
+\begin{equation}
+\hat{\tau}_{\text{PGA}} = \frac{\bar{Y}_{Z_i=1,\hat{D}_i=1} - \bar{Y}_{Z_i=0,\hat{D}_i=1}}{\hat{p}}
+\end{equation}
+where $\bar{Y}_{Z_i=1,\hat{D}_i=1}$ is the average outcome for treatment users who actually saw the ad, $\bar{Y}_{Z_i=0,\hat{D}_i=1}$ is the average outcome for control users with ghost ads, and $\hat{p} = P(D_i=1 \mid Z_i=1, \hat{D}_i=1)$ is the fraction of predicted-exposed treatment users who actually saw the ad.
+
+And its variance is: 
+
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{PGA}}) = \frac{\sigma^2_T}{N_T \hat{p}^2} + \frac{\sigma^2_C}{N_C \hat{p}^2} + \hat{\tau}_{\text{PGA}}^2 \frac{1 - \hat{p}}{N_T \hat{p}}
+\end{equation}
+
+\subsection*{Incremental Return on Ad Spend (iROAS)}
+
+Let $C$ denote total ad spend for the campaign by the advertiser and $N_{T,D=1}$ the number of treatment users who actually received impressions. The average cost per treated user is:
+
+\begin{equation}
+\bar{c} = \frac{C}{N_{T,D=1}}
+\end{equation}
+
+The iROAS is the ratio of incremental revenue per treated user to cost per treated user:
+
+\begin{equation}
+\text{iROAS} = \frac{\hat{\tau}_{\text{PGA}}}{\bar{c}}
+\end{equation}
+
+where $\hat{\tau}_{\text{PGA}}$ is the estimated incremental revenue per treated user. An iROAS of 1.32 indicates that each dollar spent on advertising generated \$1.32 in incremental revenue. The iROAS is only computable when the outcome $Y$ is measured in revenue; for binary outcomes (clicks, conversions), report $\hat{\tau}_{\text{PGA}}$ directly.
+
+\subsection*{Pilot}
+
+To choose vendors and campaigns for a pilot, consider factors like: (1) sufficient auction volume to get enough impressions in treatment and control, (2) Stable budgets and bidding strategies to avoid confounding changes during the experiment, (3) fast-converting products where users buy within days, not weeks, to measure outcomes quickly, (4) Minimal overlap with other vendors in the same auctions to reduce interference.
+
+The industry standard uses roughly 5\% of user-vendor pairs in control, keeping most ad delivery normal while getting adequate control samples. Before running real experiments, validate with A/A tests where both groups get identical treatment. Check that the observed treatment-control split matches the intended split (no sample ratio mismatch), that user characteristics are balanced across groups, and that no outcome metrics show significant differences.
+
+\subsection*{Process Flow}
+
+Figure \ref{fig:ghost_ads_flow} illustrates the millisecond-by-millisecond journey of a single ad request through the Ghost Ads infrastructure. The process is divided into a symmetric prediction phase (steps 1-5) followed by the divergent ad serving phase. The key feature is that prediction logging (step 5) happens for all users before the treatment/control divergence, creating a clean experimental cohort.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.15cm and 3.2cm,
+    every node/.style={font=\scriptsize,align=center},
+    arrow/.style={-{Stealth[length=2mm]}, thick},
+    box/.style={draw, rectangle, rounded corners=2pt, thick, minimum width=3.2cm, minimum height=0.9cm, align=center},
+    request/.style={box, draw=blue!70, fill=blue!10},
+    logic/.style={box, draw=purple!70, fill=purple!10},
+    decision/.style={draw, diamond, aspect=2.5, thick, minimum width=2.2cm, draw=orange!70, fill=orange!10},
+    control/.style={box, draw=red!70, fill=red!10},
+    treatment/.style={box, draw=green!70, fill=green!10},
+    serve/.style={box, draw=teal!70, fill=teal!10},
+    phase/.style={draw=gray!40, dashed, rounded corners=5pt, inner sep=0.3cm, fill=gray!5}
+]
+
+    % Phase 1 & 2: Request and Logic (vertical)
+    \node (user) [request] {1. User triggers\\ad request};
+    \node (receive) [logic, below=0.95cm of user] {2. Identify\\user\_id};
+    \node (randomize) [logic, below=0.95cm of receive] {3. Get/assign group\\(Z $\in$ \{T, C\})};
+    \node (predict) [logic, below=0.95cm of randomize] {4. Simulate auction\\(predict $\hat{D}$, same for all)};
+    \node (logpred) [logic, below=0.95cm of predict] {5. Log: (user, Z, $\hat{D}$)};
+
+    % Phase 3: Divergence (split)
+    \node (checkgroup) [decision, below=1.1cm of logpred] {Control?};
+
+    \node (excludead) [control, below left=1.25cm and 3.2cm of checkgroup] {6a. Exclude\\focal ad};
+    \node (includead) [treatment, below right=1.25cm and 3.2cm of checkgroup] {6b. Include\\focal ad};
+
+    \node (auctionC) [control, below=0.95cm of excludead] {7a. Run auction\\(restricted)};
+    \node (auctionT) [treatment, below=0.95cm of includead] {7b. Run auction\\(full)};
+
+    \node (checkwin) [decision, below=0.95cm of auctionT] {Focal\\wins?};
+
+    % Two distinct outcomes at same vertical level
+    \node (alt_outcome) [serve, below=0.95cm of auctionC] {8a. Alternate Outcome\\(Competitor/Blank)};
+    \node (focalwins) [treatment, below=0.95cm of checkwin, xshift=3.2cm] {8b. Focal Ad\\Wins};
+
+    % Phase 4: Converge to serving
+    \node (serve) [serve, below=1.25cm of alt_outcome, xshift=3.2cm] {9. Serve winning\\ad to user};
+    \node (logactual) [serve, below=0.95cm of serve] {10. Log impression\\(if focal \& T)};
+
+    % Phase background rectangles (drawn behind)
+    \begin{scope}[on background layer]
+        \node [phase, fit=(user)(logpred), label={[font=\small, gray]above:Phase 1-2: Symmetric Prediction}] {};
+        \node [phase, fit=(checkgroup)(excludead)(includead)(auctionC)(auctionT)(alt_outcome)(checkwin)(focalwins), label={[font=\small, gray]above:Phase 3: Experimental Divergence}] {};
+        \node [phase, fit=(serve)(logactual), label={[font=\small, gray]above:Phase 4: Serving \& Logging}] {};
+    \end{scope}
+
+    % Callout annotations
+    \node [font=\small\itshape, text width=4cm, align=left, gray!70] at ($(logpred.east)+(4,0)$)
+        {$\rightarrow$ Creates analysis cohort ($\hat{D}=1$); foundation of experiment};
+    \node [font=\small\itshape, text width=3.5cm, align=left, gray!70] at ($(logactual.east)+(3.5,0)$)
+        {$\rightarrow$ Data for LATE\\denominator ($\hat{p}$)};
+
+    % Arrows
+    \draw [arrow] (user) -- (receive);
+    \draw [arrow] (receive) -- (randomize);
+    \draw [arrow] (randomize) -- (predict);
+    \draw [arrow] (predict) -- (logpred);
+    \draw [arrow] (logpred) -- (checkgroup);
+
+    \draw [arrow] (checkgroup) -| node[above left, font=\footnotesize, pos=0.25] {Yes} (excludead);
+    \draw [arrow] (checkgroup) -| node[above right, font=\footnotesize, pos=0.25] {No} (includead);
+
+    \draw [arrow] (excludead) -- (auctionC);
+    \draw [arrow] (includead) -- (auctionT);
+
+    \draw [arrow] (auctionC) -- (alt_outcome);
+    \draw [arrow] (auctionT) -- (checkwin);
+
+    % Clean orthogonal paths for the two outcomes
+    \draw [arrow] (checkwin) -| node[above left, font=\footnotesize, pos=0.2] {No} (alt_outcome);
+    \draw [arrow] (checkwin) -| node[above right, font=\footnotesize, pos=0.25] {Yes} (focalwins);
+
+    % Both outcomes converge cleanly to serve
+    \draw [arrow] (alt_outcome) |- (serve);
+    \draw [arrow] (focalwins) |- (serve);
+
+    \draw [arrow] (serve) -- (logactual);
+
+\end{tikzpicture}
+\caption{Ghost Ads process flow showing symmetric prediction logging and asymmetric impression generation.}
+\label{fig:ghost_ads_flow}
+\end{figure}

@@ -1,0 +1,3 @@
+\beamer@sectionintoc {1}{Vendor Panels}{4}{0}{1}
+\beamer@sectionintoc {2}{User-Vendor Panel}{9}{0}{2}
+\beamer@sectionintoc {3}{Ad Impressions}{13}{0}{3}

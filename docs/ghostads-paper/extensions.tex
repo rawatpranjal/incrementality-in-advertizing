@@ -1,0 +1,23 @@
+\section*{Further Inference}
+
+\subsection*{Variance Reduction}
+
+Regression adjustment improves precision by controlling for pre-treatment covariates like user purchase history and browsing behavior. The specification is $Y_i = \theta D_i + X'_i \beta + \epsilon_i$ where covariates explain outcome variance. When covariates explain $R^2$ of variance, the adjusted estimator has approximately $(1 - R^2)$ times the variance of the unadjusted estimator. Common covariates include user-level historical purchase rates, session depth, product price, and time-of-day indicators.
+
+\subsection*{User Segmentation}
+
+Treatment effects may vary across user segments or product categories. Estimate heterogeneous effects by interacting treatment with covariates:
+
+\begin{equation}
+Y_i = \theta D_i + \sum_{k=1}^{K} \gamma_k D_i \times X_{ki} + X'_i \beta + \epsilon_i
+\end{equation}
+
+The coefficients $\gamma_k$ show how treatment effects differ across segments. For example, ads might be more effective for new users than returning users, or for low-priced versus high-priced products. This helps identify which user types or product categories benefit most from advertising, informing targeting and budget allocation decisions.
+
+\subsection*{Carryover Effects}
+
+The effect of ads may not be immediate--effects may be heterogeneous over time. There may be carryover effects (positive or negative). For instance, if ad campaigns ``pull forward" purchases, then the carryover will be negative (outcomes will fall after the campaign). If the ad campaign leaves goodwill, then there may be positive carryover. This effect is expected to vary accross campaigns, products and categories. We can track three metrics from the treatment and control well after the campaign is over: absolute lift (difference in conversions between treatment and control groups), cumulative lift (sum of difference in outcomes over time), and relative lift (ratio of absolute lift to baseline conversions). To get more precise results, we can fit ad-stock models that quantify the geometric decay of the impact. If we obtain the PGA-LATE estimate for each day $t$, we can model it as, 
+
+$$\tau(t)_{ATT} = \sum_{s=0}^{t} \delta^s \cdot \beta_{t-s} + \epsilon(t)$$
+
+where $\delta$ is the decay factor (between 0 and 1), and $\beta_{t-s}$ is the immediate effect at time $t-s$. This model captures how past ad exposures continue to influence outcomes over time, allowing us to estimate both immediate and carryover effects.

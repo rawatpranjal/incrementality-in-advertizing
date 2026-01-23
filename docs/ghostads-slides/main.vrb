@@ -1,0 +1,49 @@
+\frametitle{iROAS: Return on Ad Spend}
+
+\begin{insightbox}
+
+\centering
+\textbf{1-Week Campaign: Apparel Vendor}
+
+\pause
+
+\vspace{0.15cm}
+
+{\tiny
+\textbf{Exposed vs Unexposed Users}
+
+\begin{tabular}{lccc}
+\toprule
+& \textbf{Exposed} & \textbf{Unexposed} & \textbf{Lift} \\
+\midrule
+Conv. rate & 8.2\% & 5.1\% & \textbf{+3.1pp} \\
+\bottomrule
+\end{tabular}
+
+\pause
+
+\vspace{0.1cm}
+
+\textbf{Revenue}: AOV \$65 $\Rightarrow$ Inc. rev per imp: $0.031 \times \$65 = \$2.01$
+
+\pause
+
+\vspace{0.05cm}
+
+\textbf{Cost (CPC)}: CTR 5\%, CPC \$0.80 $\Rightarrow$ Cost per imp: $0.05 \times \$0.80 = \$0.04$
+
+\vspace{0.1cm}
+
+\pause
+
+\textcolor{successgreen}{\textbf{\large iROAS = \$2.01 / \$0.04 = \textbf{50.25}}}
+
+\vspace{0.08cm}
+
+\visible<6->{
+Campaign (25k impressions, 1,250 clicks): \$50,250 rev / \$1,000 spend
+}
+}
+
+\end{insightbox}
+

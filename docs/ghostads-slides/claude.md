@@ -1,0 +1,3 @@
+- always compile after an edit
+- no textbf, ever. 
+- title of slide is the "takeaway" from the slide not really a lable. 

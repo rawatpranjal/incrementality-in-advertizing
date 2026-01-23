@@ -1,0 +1,202 @@
+% Source Verification for Slides 2 and 2b
+% Generated: 2026-01-21
+
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\begin{document}
+
+\section*{Source Verification: Slides 2 and 2b}
+
+%===============================================================================
+\section{Slide 2: Vendor-Level Panel ($\beta = +0.64^{***}$)}
+%===============================================================================
+
+\subsection{Primary Source}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Item} & \textbf{Location} \\
+\midrule
+LaTeX Documentation & \texttt{latex/vendor\_week.tex}, lines 134--154 \\
+Analysis Notebook & \texttt{panel/vendor\_week.ipynb} \\
+\bottomrule
+\end{tabular}
+
+\subsection{Model Specification}
+
+\begin{equation}
+\log(\text{revenue}_{vt} + 1) = \alpha_v + \gamma_t + \beta \log(\text{clicks}_{vt} + 1) + \epsilon_{vt}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $\alpha_v$ = vendor fixed effect
+    \item $\gamma_t$ = week fixed effect
+    \item $\beta$ = elasticity of revenue w.r.t. clicks
+\end{itemize}
+
+\subsection{Verified Results}
+
+\begin{tabular}{lc}
+\toprule
+ & log(revenue + 1) \\
+\midrule
+log(clicks + 1) & \textbf{0.6422} \\
+ & (0.0028) \\
+\midrule
+Vendor Fixed Effects & Yes \\
+Week Fixed Effects & Yes \\
+Observations & 979,290 \\
+R-squared & 0.5574 \\
+Within R-squared & 0.0734 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\textit{Standard errors clustered at vendor level. Significant at $p < 0.001$.}
+
+\subsection{Data Dimensions}
+
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Total Observations & 979,290 \\
+Unique Vendors & 150,075 \\
+Unique Weeks & 26 \\
+\bottomrule
+\end{tabular}
+
+\subsection{Data Files}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{File} & \textbf{Status} \\
+\midrule
+\texttt{staggered-adoption/data/panel\_vendor\_week.parquet} & EXISTS (10.9 MB) \\
+\texttt{staggered-adoption/data/panel\_with\_cohorts.parquet} & EXISTS (11.9 MB) \\
+\bottomrule
+\end{tabular}
+
+%===============================================================================
+\section{Slide 2b: Vendor Heterogeneity}
+%===============================================================================
+
+\subsection{Primary Sources}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Estimate} & \textbf{Source} \\
+\midrule
+Mid-High Price +0.31\% & \texttt{staggered-adoption/results/12\_hte\_by\_segment.txt}, line 210 \\
+Budget Tier -0.10\% & \texttt{staggered-adoption/results/12\_hte\_by\_segment.txt}, line 212 \\
+Aggregated ATT +0.06\% & \texttt{staggered-adoption/results/12\_hte\_by\_segment.txt}, lines 39--44 \\
+Overall ROAS 0.0904 & \texttt{staggered-adoption/results/14\_segment\_roas.txt}, line 27 \\
+\bottomrule
+\end{tabular}
+
+\subsection{Analysis Code}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Script} & \textbf{Path} \\
+\midrule
+HTE by Segment & \texttt{staggered-adoption/archive/legacy\_v1/12\_hte\_by\_segment.py} \\
+Segment ROAS & \texttt{staggered-adoption/archive/legacy\_v1/14\_segment\_roas.py} \\
+\bottomrule
+\end{tabular}
+
+\subsection{Model Specification (TWFE DiD)}
+
+\begin{equation}
+Y_{it} = \beta \cdot \text{treated}_{it} + \alpha_i + \delta_t + \epsilon_{it}
+\end{equation}
+
+Run separately for each vendor segment (price quartiles, personas).
+
+\subsection{Verified Results: Price Quartile Segments}
+
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Segment} & \textbf{N Vendors} & \textbf{ATT} & \textbf{SE} & \textbf{p-value} & \textbf{\% Effect} \\
+\midrule
+P0\_Unknown & 131,834 & N/A & N/A & N/A & N/A \\
+P3\_MidHigh & 2,743 & 0.003145 & 0.001838 & 0.087 & \textbf{+0.31\%} \\
+P4\_Premium & 2,771 & 0.000000 & 0.000000 & N/A & 0.00\% \\
+P1\_Budget & 3,324 & -0.001036 & 0.001127 & 0.358 & \textbf{-0.10\%} \\
+P2\_MidLow & 2,248 & -0.000759 & 0.000764 & 0.321 & -0.08\% \\
+\bottomrule
+\end{tabular}
+
+\subsection{Verified Results: Overall ATT}
+
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Overall ATT (log\_promoted\_gmv) & 0.000584 \\
+Standard Error & 0.000273 \\
+t-statistic & 2.1376 \\
+p-value & 0.0325 \\
+N observations & 846,430 \\
+\textbf{Percentage Effect} & \textbf{+0.06\%} \\
+\bottomrule
+\end{tabular}
+
+\subsection{ROAS Metrics (Separate from ATT)}
+
+\begin{tabular}{lr}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Total Promoted GMV (treated) & \$774,500 \\
+Total Ad Spend (treated) & \$8,565,037 \\
+\textbf{Overall ROAS} & \textbf{0.0904} \\
+Interpretation & 9 cents per dollar spent \\
+\bottomrule
+\end{tabular}
+
+\subsection{Data Files}
+
+\begin{tabular}{lll}
+\toprule
+\textbf{File} & \textbf{Size} & \textbf{Status} \\
+\midrule
+\texttt{staggered-adoption/data/panel\_with\_segments.parquet} & 12.3 MB & EXISTS \\
+\texttt{staggered-adoption/data/hte\_by\_segment.parquet} & 7.0 KB & EXISTS \\
+\texttt{staggered-adoption/data/segment\_roas.parquet} & 4.4 KB & EXISTS \\
+\bottomrule
+\end{tabular}
+
+%===============================================================================
+\section{Statistical Significance Notes}
+%===============================================================================
+
+\begin{tabular}{llll}
+\toprule
+\textbf{Estimate} & \textbf{p-value} & \textbf{Significant?} & \textbf{Level} \\
+\midrule
+Slide 2: $\beta = 0.64$ & $<0.001$ & Yes & 0.1\% \\
+Slide 2b: Mid-High Price +0.31\% & 0.087 & Marginal & 10\% \\
+Slide 2b: Budget Tier -0.10\% & 0.358 & \textbf{No} & -- \\
+Slide 2b: Aggregated ATT +0.06\% & 0.033 & Yes & 5\% \\
+\bottomrule
+\end{tabular}
+
+%===============================================================================
+\section{Key Clarifications}
+%===============================================================================
+
+\begin{enumerate}
+    \item \textbf{Two Different Datasets:} Slide 2 uses the full vendor-week panel (979,290 obs, 150,075 vendors). The staggered DiD analysis uses a restricted panel (846,430 obs, 142,920 vendors) requiring cohort assignment.
+
+    \item \textbf{ATT vs ROAS Distinction:} The ``Aggregated +0.06\%'' is the ATT coefficient from the TWFE model (log-point effect). The ROAS of 0.0904 is a separate monetary metric (return per dollar of ad spend). These should not be conflated.
+
+    \item \textbf{Budget Tier Caveat:} The -0.10\% effect for budget vendors is \textit{not statistically significant} ($p = 0.358$).
+\end{enumerate}
+
+\end{document}

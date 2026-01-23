@@ -1,0 +1,342 @@
+% Part 4: Making It Real
+
+\begin{frame}{Hash-based randomization keeps assignments stable}
+
+\textbf{\large How to assign users consistently:}
+
+\vspace{0.5cm}
+
+\faHashtag\ Hash user ID: \texttt{SHA256(user\_id, campaign\_id)}\\[0.15cm]
+\faCalculator\ Convert to number: \texttt{num = hash mod 100}\\[0.15cm]
+\faRandom\ Assign: If num $<$ 5 $\rightarrow$ control, else $\rightarrow$ treatment\\[0.15cm]
+Guardrail: check pre-exposure metrics and counts across treatment/control
+
+\vspace{0.3cm}
+
+\visible{
+\begin{insightbox}
+\centering
+{\small
+\textbf{Key properties:}\\[0.1cm]
+\checkmark\ Deterministic and stable\\
+\checkmark\ Independent per campaign\\
+\checkmark\ Typical split: 5\% control, 95\% treatment
+}
+\end{insightbox}
+}
+
+\end{frame}
+
+\begin{frame}{Multiple controls create auction censoring}
+
+\textbf{\large What if user is in control for advertisers A and B?}
+
+\vspace{0.5cm}
+
+\faPlay\ Run one ghost auction with both A and B\\[0.2cm]
+\faTrophy\ Focal ad B wins\\[0.2cm]
+\faFile\ Log ghost impression for B\\[0.2cm]
+\faQuestion\ What about A? Without B, A might have won!
+
+\vspace{0.2cm}
+
+\begin{warningbox}
+\centering
+\textbf{Censoring problem:} Advertisers compete in ghost auctions,\\
+reducing ghost impressions for each
+\end{warningbox}
+
+\end{frame}
+
+\begin{frame}{Run separate ghost auctions per advertiser to avoid censoring}
+
+\textbf{\large Run separate ghost auctions per advertiser}
+
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, rounded corners=4pt, minimum width=2.8cm, minimum height=0.85cm, align=center, line width=2.5pt},
+    arrow/.style={-{Stealth[length=2mm]}, thick}
+]
+    \node (real) [box, fill=BrandAccent!20] {\textbf{Real Auction}\\Excludes A \& B\\C wins};
+
+    \node (ghostA) [box, fill=BrandSecondary!20, below left=1cm and 2cm of real] {\textbf{Ghost for A}\\Includes: A, C\\Excludes: B};
+    \node (ghostB) [box, fill=SuccessGreen!20, below right=1cm and 2cm of real] {\textbf{Ghost for B}\\Includes: B, C\\Excludes: A};
+
+    \draw [arrow] (real) -- (ghostA);
+    \draw [arrow] (real) -- (ghostB);
+
+    \node [below=0.2cm of ghostA, font=\small, text=BrandSecondary] {A wins $\rightarrow$ Log};
+    \node [below=0.2cm of ghostB, font=\small, text=SuccessGreen] {B wins $\rightarrow$ Log};
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Cap control groups at K per user, reweight for scale}
+
+\textbf{\large Problem:} If user in N control groups, need N ghost auctions
+
+\vspace{0.5cm}
+
+\textbf{\large Solution:} Cap at most K control groups per user
+
+\vspace{0.5cm}
+
+\faSortNumericDown\ For each user, compute priority per advertiser\\[0.2cm]
+\faCheckCircle\ Admit to first K control groups (e.g., K=5)\\[0.2cm]
+\faBalanceScale\ Use inverse-probability weighting to correct
+
+\vspace{0.2cm}
+
+\begin{keybox}
+\centering
+Scales to many advertisers with controlled cost
+\end{keybox}
+
+\end{frame}
+
+\begin{frame}{Ghost ads apply to a variety of outcome metrics}
+
+\vspace{0.3cm}
+
+\textbf{For each user-campaign we track:}
+
+\vspace{0.3cm}
+
+\faDollarSign\ \textbf{Spend} - Product spend (GMV)\\[0.15cm]
+\faShoppingCart\ \textbf{Conversions} - Purchases, signups, downloads\\[0.15cm]
+\faEye\ \textbf{Page visits} - Product detail page views\\[0.15cm]
+\faCartPlus\ \textbf{Add-to-cart} - Shopping cart additions\\[0.15cm]
+\faClock\ \textbf{Time on site} - Engagement duration\\[0.15cm]
+\faSearch\ \textbf{Search activity} - Product searches
+
+\vspace{0.3cm}
+
+\begin{insightbox}
+\centering
+{\small Filter out outcomes before first ad exposure}
+\end{insightbox}
+
+\end{frame}
+
+\begin{frame}{Campaign spend vs halo spend}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, rounded corners=6pt, align=center, line width=2.5pt},
+    arrow/.style={-{Stealth[length=2.5mm]}, very thick},
+    dot/.style={circle, fill, minimum size=3pt, inner sep=0pt}
+]
+    % Outer box - All vendor products
+    \node (outer) [box, fill=BrandSecondary!15, minimum width=7.5cm, minimum height=5.5cm] {};
+
+    % Label for outer box at top with more padding
+    \node [anchor=north, font=\large] at ([yshift=-0.4cm]outer.north) {
+        \textcolor{BrandSecondary}{\faStore\ All Advertiser Products}
+    };
+
+    % Inner box - Campaign products
+    \node (inner) [box, fill=BrandPrimary!30, minimum width=4.5cm, minimum height=2.5cm] at (0, -0.5) {};
+
+    % Label for inner box with more padding
+    \node [font=\large] at ([yshift=0.6cm]inner.center) {
+        \textcolor{BrandPrimary}{\faBullhorn\ Campaign Products}
+    };
+
+    % Campaign Spend label on right
+    \node (campaign) [right=2.8cm of inner, align=left] {
+        \Large \textcolor{BrandPrimary}{\faDollarSign}\\[0.1cm]
+        \large Campaign\\[-0.05cm]
+        \large Spend
+    };
+    \draw [arrow, BrandPrimary] (campaign.west) -- (inner.east);
+
+    % Halo Spend label on right
+    \node (halo) [right=2.8cm of outer, align=left, yshift=1cm] {
+        \Large \textcolor{BrandSecondary}{\faDollarSign}\\[0.1cm]
+        \large Halo\\[-0.05cm]
+        \large Spend
+    };
+    \draw [arrow, BrandSecondary] (halo.west) -- (outer.east |- halo.west);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Two new tables track experiments and ghost exposures}
+
+\vspace{0.2cm}
+
+\begin{center}
+
+% Experiment_Assignments table
+\textcolor{BrandPrimary}{\faTable\ \large Experiment\_Assignments} {\small \itshape (Tracks experiment assignments)}
+
+\vspace{0.1cm}
+
+{\scriptsize\ttfamily
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\rowcolor{BrandPrimary!30}\textbf{exp\_id} & \textbf{user\_id} & \textbf{campaign\_id} & \textbf{assign\_group} & \textbf{assign\_ts} \\
+\hline
+exp\_001 & user\_123 & nike\_shoes\_42 & treatment & 2025-10-15 10:23 \\
+\hline
+exp\_001 & user\_456 & nike\_shoes\_42 & control & 2025-10-15 10:24 \\
+\hline
+exp\_002 & user\_789 & apple\_watch\_10 & treatment & 2025-10-16 08:15 \\
+\hline
+\end{tabular}
+}
+
+\vspace{0.5cm}
+
+% Ghost_Impressions table
+\textcolor{GhostPurple}{\ghostmark\ \large Ghost\_Impressions} {\small \itshape (Logs control user exposures)}
+
+\vspace{0.1cm}
+
+{\scriptsize\ttfamily
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\rowcolor{GhostPurple!30}\textbf{ghost\_imp\_id} & \textbf{impression\_id} & \textbf{exp\_id} & \textbf{user\_id} & \textbf{timestamp} \\
+\hline
+ghost\_001 & imp\_5432 & exp\_001 & user\_456 & 2025-10-15 14:30 \\
+\hline
+ghost\_002 & imp\_5478 & exp\_001 & user\_456 & 2025-10-15 16:45 \\
+\hline
+ghost\_003 & imp\_6821 & exp\_002 & user\_890 & 2025-10-16 11:20 \\
+\hline
+\end{tabular}
+}
+
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Analytical data model: Joining for incrementality}
+
+\vspace{0.1cm}
+
+{\small Calculate lift by joining experiment assignments with exposures and outcomes}
+
+\vspace{0.2cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    tablebox/.style={draw, rectangle, rounded corners=3pt, minimum width=2.2cm, minimum height=1.8cm, line width=1.5pt, align=left},
+    centerbox/.style={draw, rectangle, rounded corners=5pt, minimum width=3cm, minimum height=1.5cm, line width=2pt, align=left},
+    field/.style={font=\fontsize{5}{6}\ttfamily},
+    arrow/.style={-{Stealth[length=1.5mm]}, thick}
+]
+    % Central Analysis Layer
+    \node (center) [centerbox, fill=SuccessGreen!15] at (0, 0) {};
+    \node [anchor=north, font=\fontsize{7}{8}\selectfont] at ([yshift=-0.15cm]center.north) {
+        \textcolor{SuccessGreen}{\faCalculator\ Analysis Layer}
+    };
+    \node [anchor=center, font=\large, text width=2.8cm, align=center] at (center.center) {
+        GA-ATT
+    };
+
+    % Top Left: Experiment_Assignments
+    \node (exp) [tablebox, fill=BrandPrimary!20] at (-3.2, 2) {};
+    \node [anchor=north, font=\fontsize{6}{7}\selectfont] at ([yshift=-0.1cm]exp.north) {
+        \textcolor{BrandPrimary}{\faTable\ Exp\_Assignments}
+    };
+    \node [field, anchor=north west, text width=2cm] at ([xshift=0.08cm, yshift=-0.4cm]exp.north west) {
+        experiment\_id\\
+        user\_id\\
+        assign\_group
+    };
+    \node [anchor=south, font=\fontsize{5}{6}\selectfont\itshape, text width=2cm, align=center] at ([yshift=0.08cm]exp.south) {
+        Assignments
+    };
+
+    % Top Right: Purchases
+    \node (outcomes) [tablebox, fill=BrandAccent!20] at (3.2, 2) {};
+    \node [anchor=north, font=\fontsize{6}{7}\selectfont] at ([yshift=-0.1cm]outcomes.north) {
+        \textcolor{BrandAccent}{\faTable\ Purchases}
+    };
+    \node [field, anchor=north west, text width=2cm] at ([xshift=0.08cm, yshift=-0.4cm]outcomes.north west) {
+        purchase\_id\\
+        user\_id\\
+        order\_id\\
+        purchase\_value
+    };
+    \node [anchor=south, font=\fontsize{5}{6}\selectfont\itshape, text width=2cm, align=center] at ([yshift=0.08cm]outcomes.south) {
+        Outcomes
+    };
+
+    % Bottom Left: Impressions
+    \node (imp) [tablebox, fill=BrandSecondary!20] at (-3.2, -2) {};
+    \node [anchor=north, font=\fontsize{6}{7}\selectfont] at ([yshift=-0.1cm]imp.north) {
+        \textcolor{BrandSecondary}{\faTable\ Impressions}
+    };
+    \node [field, anchor=north west, text width=2cm] at ([xshift=0.08cm, yshift=-0.4cm]imp.north west) {
+        impression\_id\\
+        user\_id\\
+        ad\_id\_served
+    };
+    \node [anchor=south, font=\fontsize{5}{6}\selectfont\itshape, text width=2cm, align=center] at ([yshift=0.08cm]imp.south) {
+        Real ads
+    };
+
+    % Bottom Right: Ghost_Impressions
+    \node (ghost) [tablebox, fill=GhostPurple!20] at (3.2, -2) {};
+    \node [anchor=north, font=\fontsize{6}{7}\selectfont] at ([yshift=-0.1cm]ghost.north) {
+        \textcolor{GhostPurple}{\ghostmark\ Ghost\_Imp}
+    };
+    \node [field, anchor=north west, text width=2cm] at ([xshift=0.08cm, yshift=-0.4cm]ghost.north west) {
+        ghost\_imp\_id\\
+        experiment\_id\\
+        user\_id
+    };
+    \node [anchor=south, font=\fontsize{5}{6}\selectfont\itshape, text width=2cm, align=center] at ([yshift=0.08cm]ghost.south) {
+        Control ads
+    };
+
+    % Arrows pointing to center
+    \draw [arrow, BrandPrimary] (exp.south east) -- (center.north west);
+    \draw [arrow, BrandAccent] (outcomes.south west) -- (center.north east);
+    \draw [arrow, BrandSecondary] (imp.north east) -- (center.south west);
+    \draw [arrow, GhostPurple] (ghost.north west) -- (center.south east);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% STANDOUT FRAME - iROAS Example
+\begin{frame}[standout]
+\vspace{0.5cm}
+
+\Large
+\faDollarSign\quad \textbf{ROAS vs iROAS}
+
+\vspace{0.8cm}
+
+\textbf{Revenue attributed to campaign:} \$50,000
+
+\vspace{0.2cm}
+
+\textbf{Incremental revenue:} \$12,500 (GA-ATT)
+
+\vspace{0.2cm}
+
+\textbf{Cost:} \$10,000 (for clicks)
+
+\vspace{0.8cm}
+
+\large
+\textbf{ROAS} = \$50,000 / \$10,000 = \textcolor{white}{\textbf{5.0}}
+
+\vspace{0.3cm}
+
+\textbf{iROAS} = \$12,500 / \$10,000 = \textcolor{white}{\textbf{1.25}}
+
+\end{frame}
+

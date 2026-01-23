@@ -1,0 +1,60 @@
+\section{Autobidding Optimization}
+
+\subsection{Autobidding Formulations}
+
+The agent allocates impressions $j \in \{1, \ldots, J\}$ with value $v_j$, cost $c_j$, budget $B$, and target ROAS $R$.\footnote{ROAS is the ratio of revenue to advertising spend. $R=5$ requires \$5 revenue per \$1 spend.} Decision $x_j \in \{0,1\}$ indicates participation in auction $j$. The standard formulation is \citep{aggarwal2019autobidding}:
+\begin{align}
+\max_{x} \quad & \sum_{j=1}^J v_j x_j \label{eq:canonical_obj} \\
+\text{s.t.} \quad & \sum_{j=1}^J c_j x_j \leq B, \quad \sum_{j=1}^J (v_j - R \cdot c_j) x_j \geq 0 \label{eq:constraints}
+\end{align}
+
+The dual solution yields a bidding rule with Lagrange multipliers $\alpha \geq 0$ (budget) and $\beta \geq 0$ (ROAS):\footnote{The shadow prices adjust dynamically: $\alpha$ rises with overspending, and $\beta$ rises when ROAS falls below target.}
+\begin{equation}
+b_j = v_j \cdot \frac{1 + \beta}{\alpha + \beta R} \label{eq:canonical_bid}
+\end{equation}
+
+An alternative formulation for first-price auctions uses win probability $G_t(b) = P(c_t \leq b)$ \citep{conitzer2022pacing}:
+\begin{align}
+\max_{b_1, \ldots, b_T} \quad & \mathbb{E} \left[ \sum_{t=1}^T (v_t - b_t) \cdot \mathbb{1}(b_t > c_t) \right] \quad \text{s.t.} \quad \mathbb{E} \left[ \sum_{t=1}^T b_t \cdot \mathbb{1}(b_t > c_t) \right] \leq B \label{eq:fp_obj}
+\end{align}
+
+Lagrangian relaxation with pacing multiplier $\lambda \geq 0$ yields:\footnote{The effective value is $v_t/(1+\lambda)$, and $\lambda$ increases with spending.}
+\begin{equation}
+\max_{b_t} \quad \left( v_t - (1 + \lambda) b_t \right) \cdot G_t(b_t) \label{eq:fp_per_auction}
+\end{equation}
+
+\subsection{Value Construction}
+
+Standard practice uses observational conversion rates. Let $I_j$ denote impression, $C_j$ click, $Y_j$ conversion, $p_j$ price, $\text{pCTR}_j = P(C_j = 1 \mid I_j)$, and $\text{pCVR}_j = P(Y_j = 1 \mid C_j = 1)$.
+\begin{equation}
+v_j = \text{pCTR}_j \cdot \text{pCVR}_j \cdot p_j \label{eq:standard_value}
+\end{equation}
+
+The causal approach substitutes treatment effect $\tau_j$ for pCVR$_j$:\footnote{The $do(\cdot)$ operator represents causal intervention \citep{pearl2009causality}. $P(Y_j = 1 \mid do(C_j = 1))$ is the conversion probability if the click is forced to occur.}
+\begin{equation}
+\tau_j = P(Y_j = 1 \mid do(C_j = 1)) - P(Y_j = 1 \mid do(C_j = 0)) \label{eq:tau}
+\end{equation}
+\begin{equation}
+v_j^{\text{causal}} = \text{pCTR}_j \cdot \tau_j \cdot p_j \label{eq:causal_value}
+\end{equation}
+
+Using $v_j^{\text{causal}}$ in \eqref{eq:canonical_obj} and \eqref{eq:fp_per_auction} changes $R$ from observational to incremental ROAS.
+
+\subsection{Selection Bias Decomposition}
+
+The observational CVR conflates treatment effect and selection. Let $Y_j(1)$ and $Y_j(0)$ denote potential outcomes; the observed outcome is $Y_j = Y_j(1)$ when $C_j=1$.
+\begin{align}
+\text{pCVR}_j &= \mathbb{E}[Y_j(1) \mid C_j=1] \nonumber \\
+&= \underbrace{\mathbb{E}[Y_j(1) \mid C_j=1] - \mathbb{E}[Y_j(0) \mid C_j=1]}_{\text{iCVR}_j \text{ (incremental CVR)}} + \underbrace{\mathbb{E}[Y_j(0) \mid C_j=1]}_{\text{oCVR}_j \text{ (organic CVR of clickers)}} \label{eq:decomp}
+\end{align}
+
+\begin{equation}
+\text{pCVR}_j = \text{iCVR}_j + \text{oCVR}_j \label{eq:cvr_decomp}
+\end{equation}
+
+The value decomposes into causal and bias components:
+\begin{equation}
+v_j = \text{pCTR}_j \cdot \text{iCVR}_j \cdot p_j + \text{pCTR}_j \cdot \text{oCVR}_j \cdot p_j = v_j^{\text{causal}} + v_j^{\text{bias}} \label{eq:value_decomp}
+\end{equation}
+
+Using $v_j$ instead of $v_j^{\text{causal}}$ yields $\lambda^{\text{obs}} > \lambda^{\text{causal}}$. This inflated shadow cost causes overspending on high-oCVR low-iCVR impressions and underbidding on low-oCVR high-iCVR impressions.\footnote{The value destruction magnitude depends on the correlation between iCVR$_j$ and oCVR$_j$. Negative correlation maximizes misallocation: high-intent users show low treatment effects while marginal users show high effects.}

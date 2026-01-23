@@ -1,0 +1,85 @@
+\section*{Notation}
+
+\subsection*{Units and Indices}
+
+\begin{tabular}{ll}
+$i$ & Index for individual users \\
+$t$ & Index for time periods \\
+$k$ & Index for user or auction characteristics; also index for experimental arms \\
+$j$ & Index for control group users \\
+\end{tabular}
+
+\subsection*{Treatment Assignment and Exposure}
+
+\begin{tabular}{ll}
+$Z_i$ & Treatment assignment indicator: $Z_i = 1$ if user $i$ assigned to treatment, $Z_i = 0$ if control \\
+$D_i$ & Actual ad exposure indicator: $D_i = 1$ if user $i$ received impression, $D_i = 0$ otherwise \\
+$P_i$ & Placebo exposure indicator: $P_i = 1$ if user $i$ received placebo ad, $P_i = 0$ otherwise \\
+$\hat{D}_i$ & Predicted exposure indicator: $\hat{D}_i = 1$ if ghost auction predicts user $i$ would win, $\hat{D}_i = 0$ otherwise \\
+$G_i$ & Ghost ad indicator: $G_i = 1$ if control user $i$ would have been exposed under treatment \\
+$W_i$ & Predicted probability that control user $i$ would have received impression under treatment \\
+\end{tabular}
+
+\subsection*{Outcomes and Potential Outcomes}
+
+\begin{tabular}{ll}
+$Y_i$ & Observed outcome for user $i$ (e.g., revenue, purchases) \\
+$Y_i(1)$ & Potential outcome for user $i$ under treatment (ad exposure) \\
+$Y_i(0)$ & Potential outcome for user $i$ under control (no ad exposure) \\
+$Y_{it}$ & Outcome for user $i$ in time period $t$ (panel notation) \\
+\end{tabular}
+
+\subsection*{Groups and Sample Sizes}
+
+\begin{tabular}{ll}
+$T$ & Set of treatment group users who received impressions \\
+$C$ & Set of control group users (ghost ads) \\
+$N_T$ & Number of users in treatment group: $N_T = |T|$ \\
+$N_C$ & Number of users in control group: $N_C = |C|$ \\
+$n$ & Generic sample size or number of users \\
+\end{tabular}
+
+\subsection*{Parameters and Estimands}
+
+\begin{tabular}{ll}
+$\tau_{\text{ITT}}$ & Intent-to-treat effect: average effect of treatment assignment \\
+$\tau_{\text{ATT}}$ & Average treatment effect on the treated: average effect on exposed users \\
+$\tau_{\text{PSA}}$ & Treatment effect from PSA design \\
+$\hat{\tau}_{\text{ATT}}$ & Sample estimate of $\tau_{\text{ATT}}$ \\
+$\theta$ & Treatment effect coefficient in regression specifications \\
+$\gamma_k$ & Coefficient on interaction $D_{it} \times X_{kit}$, measuring heterogeneous treatment effects \\
+\end{tabular}
+
+\subsection*{Summary Statistics}
+
+\begin{tabular}{ll}
+$\bar{Y}_T$ & Sample mean outcome in treatment group: $\bar{Y}_T = \frac{1}{N_T}\sum_{i \in T} Y_i$ \\
+$\bar{Y}_C$ & Sample mean outcome in control group: $\bar{Y}_C = \frac{1}{N_C}\sum_{j \in C} Y_j$ \\
+$\sigma^2_T$ & Population variance of outcomes in treatment group \\
+$\sigma^2_C$ & Population variance of outcomes in control group \\
+$s^2_T$ & Sample variance of outcomes in treatment group \\
+$s^2_C$ & Sample variance of outcomes in control group \\
+\end{tabular}
+
+\subsection*{Platform and Auction Variables}
+
+\begin{tabular}{ll}
+$\pi$ & Probability of winning auction conditional on user visit: $\pi = P(\text{win} \mid \text{visit})$ \\
+$c$ & Cost per impression \\
+$B$ & Total experimental budget \\
+$X_{it}$ & Vector of covariates for user $i$ at time $t$ \\
+$X_{kit}$ & Covariate $k$ for user $i$ at time $t$ \\
+$\alpha_i$ & User fixed effect in panel regression \\
+$\delta_t$ & Time fixed effect in panel regression \\
+$\beta$ & Vector of covariate coefficients \\
+$\epsilon_{it}$ & Error term for user $i$ at time $t$ \\
+\end{tabular}
+
+\subsection*{Operators}
+
+\begin{tabular}{ll}
+$E[\cdot]$ & Expectation operator (over randomization distribution or population) \\
+$\text{Var}(\cdot)$ & Variance operator \\
+$\text{SE}(\cdot)$ & Standard error \\
+$P(\cdot)$ & Probability \\
+\end{tabular}

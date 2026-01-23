@@ -1,0 +1,379 @@
+\documentclass{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{amsfonts}
+
+% Custom command for the expectation operator for consistency
+\newcommand{\E}{\mathbb{E}}
+
+\title{Appendix: Foundational Concepts of Confounding and Bias in Causal Inference}
+%\author{A Synthesis of Core Principles}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction and Formal Setup}
+
+This appendix provides a formal, step-by-step introduction to the modern counterfactual framework for defining confounding and bias.
+
+\subsection{The Potential Outcomes Framework}
+
+The basis for modern causal inference is the potential outcomes or counterfactual model.
+
+Let $i$ be an index for an individual unit in a population. Let $D$ be a binary variable representing the treatment, where $D_i=1$ if unit $i$ is treated and $D_i=0$ if unit $i$ is untreated (control).
+
+For each unit $i$, we define two potential outcomes:
+\begin{itemize}
+    \item $Y_i^1$: The outcome that would be observed if unit $i$ were to receive the treatment ($D_i=1$).
+    \item $Y_i^0$: The outcome that would be observed if unit $i$ were to receive the control ($D_i=0$).
+\end{itemize}
+The observed outcome for unit $i$, denoted $Y_i$, can be expressed as $Y_i = D_i Y_i^1 + (1-D_i) Y_i^0$.
+
+The individual causal effect for unit $i$ is the difference between its two potential outcomes.
+\begin{equation}
+\delta_i = Y_i^1 - Y_i^0
+\end{equation}
+The fundamental problem of causal inference is that for any given unit $i$, we can only observe one of the two potential outcomes, either $Y_i^1$ or $Y_i^0$, but never both. Therefore, the individual causal effect $\delta_i$ is unobservable.
+
+\paragraph{Example 1.1: Potential Outcomes and the Fundamental Problem}
+Consider five individuals (A--E) where we hypothetically know both potential outcomes for illustrative purposes:
+
+\begin{center}
+\begin{tabular}{cccccc}
+\hline
+Individual & $D$ & $Y^1$ & $Y^0$ & $Y_{\text{obs}}$ & $\delta = Y^1 - Y^0$ \\
+\hline
+A & 1 & 120 & 100 & 120 & 20 \\
+B & 1 & 100 & 90  & 100 & 10 \\
+C & 0 & 150 & 140 & 140 & 10 \\
+D & 0 & 130 & 115 & 115 & 15 \\
+E & 1 & 110 & 105 & 110 & 5 \\
+\hline
+\end{tabular}
+\end{center}
+
+In reality, individual A (treated) only has $Y_{\text{obs}}=120$ (their $Y^1$); the value $Y^0=100$ is counterfactual and unobservable. Similarly, individual C (control) only has $Y_{\text{obs}}=140$ (their $Y^0$); the value $Y^1=150$ is counterfactual. The individual causal effects $\delta$ shown in the table cannot be computed in practice because one potential outcome is always missing. \textit{Interpretation:} Individual causal effects range from 5 to 20, but we can never observe both potential outcomes for any single individual, making individual-level causal inference impossible.
+
+\subsection{Population-Level Causal Estimands}
+
+Since individual effects are unobservable, causal inference focuses on estimating average effects at the population level.
+
+The Average Treatment Effect (ATE) is the expected causal effect over the entire population.
+\begin{equation}
+\text{ATE} = \E[Y^1 - Y^0]
+\end{equation}
+The Average Treatment Effect on the Treated (TT) is the expected causal effect specifically for the subpopulation that was actually treated.
+\begin{equation}
+\text{TT} = \E[Y^1 - Y^0 | D=1]
+\end{equation}
+The Average Treatment Effect on the Untreated (TUT) is the expected causal effect for the subpopulation that was actually untreated.
+\begin{equation}
+\text{TUT} = \E[Y^1 - Y^0 | D=0]
+\end{equation}
+
+\paragraph{Example 1.2: Computing Population-Level Estimands}
+Using the data from Example 1.1, we compute the three population-level estimands:
+
+\textbf{ATE (entire population):}
+\begin{align*}
+\text{ATE} &= \E[Y^1 - Y^0] = \frac{1}{5}\sum_{i=1}^{5} (Y_i^1 - Y_i^0) \\
+&= \frac{20 + 10 + 10 + 15 + 5}{5} = \frac{60}{5} = 12
+\end{align*}
+
+\textbf{TT (treated group only: A, B, E):}
+\begin{align*}
+\text{TT} &= \E[Y^1 - Y^0 | D=1] = \frac{20 + 10 + 5}{3} = \frac{35}{3} \approx 11.67
+\end{align*}
+
+\textbf{TUT (untreated group only: C, D):}
+\begin{align*}
+\text{TUT} &= \E[Y^1 - Y^0 | D=0] = \frac{10 + 15}{2} = \frac{25}{2} = 12.5
+\end{align*}
+
+We can verify that $\text{ATE} = p \cdot \text{TT} + q \cdot \text{TUT}$ where $p=0.6$ (proportion treated) and $q=0.4$ (proportion untreated): $12 = 0.6(11.67) + 0.4(12.5) = 7 + 5 = 12$. \textit{Interpretation:} The population average effect (ATE = 12) is a weighted average of the effect in the treated group (11.67) and untreated group (12.5), showing that treatment effects can vary across subpopulations.
+
+\section{The Counterfactual Definition of Confounding}
+
+We now formalize the concept of confounding as a bias in effect estimation, following the framework laid out by Greenland, Robins, and Pearl (1999).
+
+\subsection{Defining the Causal Effect versus the Observed Association}
+
+Consider the causal effect on the treated group (TT).
+The true causal effect for this group is a comparison of their outcomes under treatment and what their outcomes \textit{would have been} under control.
+\begin{equation}
+\text{TT} = \E[Y^1 | D=1] - \E[Y^0 | D=1]
+\end{equation}
+The first term, $\E[Y^1 | D=1]$, is observable from the data as the average outcome among the treated. The second term, $\E[Y^0 | D=1]$, is a counterfactual quantity; it is the average outcome we would have seen in the treated group had they not been treated.
+
+In an observational study, we cannot observe this counterfactual. Instead, we substitute the observed outcome in the untreated group, $\E[Y^0 | D=0]$, as a proxy. This gives the observed association, or the naive estimator.
+\begin{equation}
+\text{Observed Association} = \E[Y^1 | D=1] - \E[Y^0 | D=0]
+\end{equation}
+
+\paragraph{Example 2.1: True Causal Effect vs. Observed Association}
+Continuing with Example 1.1, suppose we want to estimate the causal effect on the treated.
+
+\textbf{True TT (includes the unobservable counterfactual):}
+
+For treated individuals (A, B, E):
+\begin{align*}
+\E[Y^1 | D=1] &= \frac{120 + 100 + 110}{3} = 110 \quad \text{[Observable]} \\
+\E[Y^0 | D=1] &= \frac{100 + 90 + 105}{3} = 98.33 \quad \text{[Counterfactual - NOT observable]} \\
+\text{TT} &= 110 - 98.33 = 11.67
+\end{align*}
+
+\textbf{Observed Association (naive estimator):}
+
+Since we cannot observe $\E[Y^0 | D=1]$, we substitute $\E[Y^0 | D=0]$ from the untreated group (C, D):
+\begin{align*}
+\E[Y^0 | D=0] &= \frac{140 + 115}{2} = 127.5 \quad \text{[Observable]} \\
+\text{Obs. Assoc.} &= \E[Y^1 | D=1] - \E[Y^0 | D=0] = 110 - 127.5 = -17.5
+\end{align*}
+
+\textbf{Bias:} The observed association is $-17.5$, but the true TT is $11.67$. The bias is $-17.5 - 11.67 = -29.17$. This bias arises precisely because the untreated group is not a valid counterfactual for the treated group: $\E[Y^0 | D=1] = 98.33 \neq 127.5 = \E[Y^0 | D=0]$. \textit{Interpretation:} The naive comparison falsely suggests the treatment has a negative effect ($-17.5$) when the true effect is positive ($11.67$), demonstrating how severe confounding can completely reverse the apparent direction of a treatment effect.
+
+\subsection{The Formal Definition of Confounding and Exchangeability}
+
+Confounding is formally defined as the bias that arises when the observed association is not equal to the true causal effect. This occurs precisely when our proxy is not a valid substitute for our counterfactual.
+
+Confounding is present if and only if:
+\begin{equation}
+\E[Y^0 | D=1] \neq \E[Y^0 | D=0]
+\end{equation}
+This condition states that the treated and untreated groups are not \textit{exchangeable}. Even in the absence of treatment, their baseline outcomes would have been different. The difference between these two quantities is the source of confounding bias.
+
+\paragraph{Example 2.2: Demonstrating Non-Exchangeability}
+From Example 2.1, we showed that confounding is present because:
+\begin{align*}
+\E[Y^0 | D=1] &= 98.33 \quad \text{(baseline for treated group)} \\
+\E[Y^0 | D=0] &= 127.5 \quad \text{(baseline for untreated group)} \\
+\text{Difference} &= 98.33 - 127.5 = -29.17 \neq 0
+\end{align*}
+The treated group would have had substantially lower outcomes than the untreated group even in the absence of treatment. The groups are not exchangeable, and this baseline heterogeneity is precisely the magnitude of confounding bias ($-29.17$) observed in Example 2.1. \textit{Interpretation:} The $-29.17$ difference in baseline outcomes directly equals the bias in Example 2.1, showing that confounding is fundamentally about baseline incomparability of groups, not treatment effects.
+
+\subsection*{Implications}
+This formalization establishes that confounding is fundamentally a causal concept, defined by a comparison between a factual and a counterfactual quantity. It is a statement about the comparability of the groups, not a statistical property of a third variable.
+
+\section{Distinguishing Confounding from Related Statistical Concepts}
+
+The counterfactual framework allows us to clearly separate confounding from other related, but distinct, statistical phenomena.
+
+\subsection{The Concept of Collapsibility}
+
+Collapsibility is a mathematical property of a measure of association, describing whether its value changes upon stratification over a third variable.
+
+Let $M(Y,D)$ be a measure of association between an outcome $Y$ and a treatment $D$. Let $X$ be a third variable. The measure $M$ is strictly collapsible over $X$ if the marginal (crude) measure is equal to the common conditional (stratum-specific) measure.
+\begin{equation}
+M(Y,D) = M(Y,D | X=x) \quad \text{for all } x
+\end{equation}
+If the equality does not hold, the measure is non-collapsible. The odds ratio (OR) is a classic example of a non-collapsible measure. The risk ratio and risk difference are collapsible under different conditions.
+
+\paragraph{Example 3.1: Demonstrating Collapsibility vs. Non-Collapsibility}
+Consider data stratified by a third variable $X$:
+
+\textbf{Stratum X=0:}
+\begin{center}
+\begin{tabular}{lcc}
+& $D=1$ & $D=0$ \\
+\hline
+$Y=1$ & 40 & 20 \\
+$Y=0$ & 60 & 80 \\
+Total & 100 & 100 \\
+\end{tabular}
+\end{center}
+Risk Difference: $0.40 - 0.20 = 0.20$; Odds Ratio: $(40/60) / (20/80) = 2.67$
+
+\textbf{Stratum X=1:}
+\begin{center}
+\begin{tabular}{lcc}
+& $D=1$ & $D=0$ \\
+\hline
+$Y=1$ & 50 & 30 \\
+$Y=0$ & 50 & 70 \\
+Total & 100 & 100 \\
+\end{tabular}
+\end{center}
+Risk Difference: $0.50 - 0.30 = 0.20$; Odds Ratio: $(50/50) / (30/70) = 2.33$
+
+\textbf{Marginal (Combined):}
+\begin{center}
+\begin{tabular}{lcc}
+& $D=1$ & $D=0$ \\
+\hline
+$Y=1$ & 90 & 50 \\
+$Y=0$ & 110 & 150 \\
+Total & 200 & 200 \\
+\end{tabular}
+\end{center}
+Risk Difference: $0.45 - 0.25 = 0.20$; Odds Ratio: $(90/110) / (50/150) = 2.45$
+
+The \textbf{risk difference} is constant across strata ($0.20 = 0.20$) and equals the marginal value ($0.20$), demonstrating collapsibility. The \textbf{odds ratio} varies across strata ($2.67 \neq 2.33$) and differs from the marginal ($2.45$), demonstrating non-collapsibility. This non-collapsibility is a mathematical property of the OR, not evidence of confounding. \textit{Interpretation:} The same data yield different conclusions depending on the measure used: the risk difference suggests no adjustment is needed (collapsible), while the odds ratio changes across strata (non-collapsible), highlighting that collapsibility is a property of the measure, not the data.
+
+\subsection{The Divergence of Confounding and Non-Collapsibility}
+
+As demonstrated with numerical examples by Greenland, Robins, and Pearl (1999), these two concepts are not equivalent.
+It is possible to construct a scenario where there is no confounding ($\E[Y^0 | D=1] = \E[Y^0 | D=0]$), but the odds ratio is non-collapsible. In this case, the crude OR is the true causal effect, but the adjusted OR differs from it.
+Conversely, it is possible to construct a scenario where confounding is present ($\E[Y^0 | D=1] \neq \E[Y^0 | D=0]$), but the odds ratio is collapsible. In this case, both the crude and adjusted ORs are biased, and their equality does not imply the absence of confounding.
+
+\paragraph{Example 3.2: Confounding and Non-Collapsibility Are Distinct}
+\textbf{Scenario A: No confounding, but non-collapsible OR.} Suppose $X$ is distributed identically across treatment groups (not a confounder). Marginal data:
+\begin{center}
+\begin{tabular}{lcc}
+& $D=1$ & $D=0$ \\
+\hline
+$Y=1$ & 80 & 40 \\
+$Y=0$ & 120 & 160 \\
+Total & 200 & 200 \\
+\end{tabular}
+\quad Marginal OR: $(80/120) / (40/160) = 2.67$
+\end{center}
+
+When stratified by $X$, suppose stratum-specific ORs are $3.50$ (X=0) and $2.25$ (X=1). The marginal OR ($2.67$) lies between them but equals neither. This difference arises from non-collapsibility, not confounding. The crude OR is the true causal effect.
+
+\textbf{Scenario B: Confounding present, but estimate appears stable.} Suppose $X$ is strongly associated with baseline risk: $P(Y=1|D=0, X=0) = 0.70$ vs. $P(Y=1|D=0, X=1) = 0.23$. If treatment assignment correlates with $X$, confounding exists. Yet the OR might appear stable across crude and stratified analyses due to offsetting biases. Such stability does \emph{not} imply absence of confounding. \textit{Interpretation:} Scenario A shows that a change in estimate after adjustment can occur without confounding (non-collapsibility), while Scenario B shows that no change in estimate can occur despite confounding (offsetting biases), proving that the ``change-in-estimate'' criterion is unreliable for detecting confounders.
+
+\subsection*{Implications}
+The common practice of identifying confounders by checking for a ``change-in-estimate'' upon adjustment is a flawed heuristic. For non-collapsible measures like the odds ratio, a change in estimate can occur due to the mathematical properties of the measure itself, even in the absence of any confounding bias.
+
+\subsection{The Distinction Between Ignorability and No Confounding}
+
+As clarified by Greenland and Robins (2009), there is a crucial distinction between the statistical assumption of ignorability and the epidemiological concept of no confounding.
+
+Ignorability refers to the treatment \textit{assignment mechanism}. The mechanism is ignorable if treatment assignment $D$ is independent of the potential outcomes $(Y^1, Y^0)$.
+\begin{equation}
+(Y^1, Y^0) \perp D
+\end{equation}
+This is a property of the \textit{process} that generates the data, such as simple randomization.
+
+No Confounding, as defined earlier, refers to the \textit{realized sample}. There is no confounding in the actual data if the groups created by the assignment mechanism are, in fact, exchangeable.
+\begin{equation}
+\E[Y^0 | D=1] = \E[Y^0 | D=0]
+\end{equation}
+This is a property of the \textit{product} of the assignment process.
+
+An ignorable mechanism does not guarantee a non-confounded product. For example, a fair coin flip (an ignorable mechanism) can, by chance, result in a sample where the treated group has a higher average baseline risk than the control group. In this case, the process was ignorable, but the resulting study is confounded.
+
+\paragraph{Example 3.3: Chance Confounding in a Randomized Trial}
+Consider a small randomized trial with 10 subjects. The true causal effect is $\delta_i = 20$ for all subjects. Subjects have varying baseline outcomes: $Y^0 \in \{50, 55, 60, 65, 70, 75, 80, 85, 90, 95\}$.
+
+By random chance, the last 6 subjects (with higher baseline risk) are assigned to treatment:
+\begin{align*}
+\E[Y^0 | D=1] &= \text{mean}(70, 75, 80, 85, 90, 95) = 82.5 \\
+\E[Y^0 | D=0] &= \text{mean}(50, 55, 60, 65) = 57.5 \\
+\text{Difference} &= 82.5 - 57.5 = 25
+\end{align*}
+
+The naive estimator yields: $\E[Y|D=1] - \E[Y|D=0] = 102.5 - 57.5 = 45$, but the true ATE is $20$. Bias is $25$, exactly equal to the baseline imbalance. The assignment mechanism was ignorable (random), but the realized sample exhibits confounding. Adjusting for baseline covariates in the analysis would correct this chance imbalance. \textit{Interpretation:} Random assignment guarantees unbiasedness \emph{on average} across all possible randomizations, but any single randomization can produce imbalanced groups; the bias ($25$) exceeds the true effect ($20$), inflating the estimate by 125\%.
+
+\subsection*{Implications}
+This distinction provides the formal justification for adjusting for baseline covariates even in a perfectly executed randomized trial. The adjustment is not correcting a flaw in the randomization process, but rather correcting for the ``chance confounding'' that occurred in the specific sample generated by that process.
+
+\section{The Structure and Dynamics of Selection Bias}
+
+The framework can be extended to further decompose the nature of bias, as shown by Xie (2011).
+
+\subsection{Decomposing Selection Bias into Two Types}
+
+The total bias in the naive estimator can be decomposed into two distinct sources.
+The total bias is the difference between the naive estimator and the true ATE.
+\begin{align*}
+\text{Total Bias} &= \left( \E[Y^1|D=1] - \E[Y^0|D=0] \right) - \text{ATE} \\
+&= \left( \E[Y^1|D=1] - \E[Y^0|D=0] \right) - \left( p \cdot \text{TT} + q \cdot \text{TUT} \right)
+\end{align*}
+where $p=P(D=1)$ and $q=P(D=0)$. Using the derivation shown in the main text, this simplifies to:
+\begin{equation}
+\text{Total Bias} = \underbrace{\left( \E[Y^0|D=1] - \E[Y^0|D=0] \right)}_{\text{Type I: Baseline Heterogeneity}} + \underbrace{q \cdot (\text{TT} - \text{TUT})}_{\text{Type II: Treatment-Effect Heterogeneity}}
+\end{equation}
+Type I bias arises from differences in baseline risk between the groups. Type II bias arises when individuals sort into treatment based on the magnitude of the effect they expect to receive.
+
+\paragraph{Example 4.1: Decomposing Selection Bias}
+Consider a population of 10 individuals where both baseline outcomes and treatment effects vary, and the first 5 (with higher baseline and larger treatment effects) select into treatment:
+
+\begin{center}
+\begin{tabular}{cccccc}
+\hline
+Individual & $Y^0$ & $\delta$ & $Y^1$ & $D$ & Group \\
+\hline
+1--5 & 100--120 & 22--30 & 130--142 & 1 & Treated \\
+6--10 & 80--100 & 10--18 & 90--118 & 0 & Control \\
+\hline
+\end{tabular}
+\end{center}
+
+Calculations: TT $= 26$, TUT $= 14$, ATE $= 20$, $p = q = 0.5$.
+
+Naive estimator: $\E[Y|D=1] - \E[Y|D=0] = 136 - 90 = 46$.
+
+Total Bias $= 46 - 20 = 26$, decomposed as:
+\begin{align*}
+\text{Type I (Baseline Heterogeneity):} \quad & \E[Y^0|D=1] - \E[Y^0|D=0] = 110 - 90 = 20 \\
+\text{Type II (Treatment Effect Heterogeneity):} \quad & q \cdot (\text{TT} - \text{TUT}) = 0.5(26 - 14) = 6 \\
+\text{Total:} \quad & 20 + 6 = 26 \quad \checkmark
+\end{align*}
+
+The treated group has both higher baseline outcomes (Type I) and larger treatment effects (Type II), both contributing to upward bias. \textit{Interpretation:} Of the total bias (26), most (77\%) comes from baseline differences that fixed-effects methods can address, while 23\% comes from individuals self-selecting based on expected treatment gains, which is harder to correct without instruments or other advanced methods.
+
+\subsection*{Implications}
+This decomposition shows that selection bias is not a monolithic concept. It can arise from simple differences in baseline risk (which methods like fixed-effects models can address) or from more complex sorting based on heterogeneous treatment effects (which are harder to address).
+
+\subsection{Dynamic Selection and Composition Bias}
+
+Consider a dynamic process where individuals are recruited into treatment over time, indexed by $t$.
+Let $F(t)$ be the cumulative proportion of the population treated by time $t$. Let $ITE(u)$ be the Average Treatment Effect for the infinitesimal group of individuals who are newly recruited into treatment at time $u$.
+
+The Treatment on the Treated at time $t$, $TT(t)$, is the average treatment effect for all individuals who have been treated at any point up to time $t$. It is a backward-looking average of all past ITEs.
+\begin{equation}
+TT(t) = \frac{1}{F(t)} \int_0^t ITE(u) \,dF(u)
+\end{equation}
+The Treatment on the Untreated at time $t$, $TUT(t)$, is the average treatment effect for all individuals who remain untreated at time $t$. It is a forward-looking average of all future ITEs.
+\begin{equation}
+TUT(t) = \frac{1}{1-F(t)} \int_t^\infty ITE(u) \,dF(u)
+\end{equation}
+Composition bias arises because the composition of the treated and untreated groups, and thus the values of $TT(t)$ and $TUT(t)$, systematically change over time as a function of who is recruited at each stage. Typically, early adopters have higher treatment effects, so $ITE(t)$ is a decreasing function of $t$.
+
+\paragraph{Example 4.2: Dynamic Selection and Changing Composition}
+Consider a population of 10 individuals recruited sequentially, where early adopters have higher treatment effects. Individual treatment effects are $ITE = \{50, 45, 40, 35, 30, 25, 20, 15, 10, 5\}$ for individuals 1--10. Population ATE $= 27.5$.
+
+\textbf{Time $t=2$ (20\% adopted):}
+\begin{align*}
+TT(2) &= \text{mean}(50, 45) = 47.5 \\
+TUT(2) &= \text{mean}(40, 35, \ldots, 5) = 22.5
+\end{align*}
+Type II Bias $= 0.8 \times (47.5 - 22.5) = 20.0$
+
+\textbf{Time $t=5$ (50\% adopted):}
+\begin{align*}
+TT(5) &= \text{mean}(50, 45, 40, 35, 30) = 40.0 \\
+TUT(5) &= \text{mean}(25, 20, 15, 10, 5) = 15.0
+\end{align*}
+Type II Bias $= 0.5 \times (40.0 - 15.0) = 12.5$
+
+\textbf{Time $t=8$ (80\% adopted):}
+\begin{align*}
+TT(8) &= \text{mean}(50, 45, \ldots, 15) = 32.5 \\
+TUT(8) &= \text{mean}(10, 5) = 7.5
+\end{align*}
+Type II Bias $= 0.2 \times (32.5 - 7.5) = 5.0$
+
+As adoption progresses, $TT(t)$ declines from $47.5 \to 40.0 \to 32.5$, converging toward ATE $= 27.5$. Early pilot studies ($t=2$) drastically overestimate population impact. The treated group's composition becomes less favorable over time as individuals with smaller effects join. \textit{Interpretation:} Early adopters experience effects 73\% larger than the population average (47.5 vs. 27.5), meaning pilot studies will systematically overstate benefits; by 80\% adoption, the measured effect (32.5) is still 18\% above the true population parameter, showing composition bias persists even at high penetration.
+
+\subsection*{Implications}
+This formalizes a critical warning about generalizability. The causal effect measured in a pilot study or among early adopters of a technology ($TT(t)$ when $t$ is small) may not be representative of the effect in the broader population (ATE) or among those who will adopt later. Extrapolating from early results in a dynamic system is fraught with potential for composition bias.
+
+\vspace{1cm}
+
+\section*{References}
+
+\noindent Greenland, S., Robins, J. M., \& Pearl, J. (1999). Confounding and Collapsibility in Causal Inference. \textit{Statistical Science}, 14(1), 29-46.
+
+\vspace{0.2cm}
+
+\noindent Greenland, S., \& Robins, J. M. (2009). Identifiability, exchangeability and confounding revisited. \textit{Epidemiologic Perspectives \& Innovations}, 6(1), 4.
+
+\vspace{0.2cm}
+
+\noindent Xie, Y. (2013). Population heterogeneity and causal inference. \textit{Proceedings of the National Academy of Sciences}, 110(16), 6262-6268.
+
+\end{document}

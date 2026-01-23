@@ -1,0 +1,45 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{cancel}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{adjustbox}
+\usetikzlibrary{positioning,arrows.meta,shapes,shadows,fit,backgrounds,calc}
+
+% Formatting
+\onehalfspacing
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=black
+}
+
+\title{Ghost Ads: A Methodology for Measuring Advertising Incrementality\footnote{Pranjal Rawat, Georgetown University, pp712@georgetown.edu.}}
+%\author{Pranjal Rawat}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\input{introduction.tex}
+\input{approaches.tex}
+\input{ghostads.tex}
+\input{pilot.tex}
+\input{extensions.tex}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\appendix
+\input{appendix/derivations.tex}
+
+\end{document}

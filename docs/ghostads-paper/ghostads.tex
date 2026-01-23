@@ -1,0 +1,108 @@
+\section*{Ghost Ads}
+
+Ghost ads solve the dilution problem without PSA costs or competitor contamination. The method finds \textit{control users who would have seen ads if they'd been in treatment}, then compares them to treatment users who actually saw ads. By focusing only on users who crossed the exposure threshold, ghost ads remove the would-have-never-been-exposed users from both groups without serving fake ads. 
+
+Just like PSA, it is a way of pruning the control group of users who were never \textit{destined} to see ads. The solution is remarkably simple: \textit{just run an auction simulation to see if the control user would have won the auction if they'd been eligible for the ad}. If yes, this control user is a valid comparision case. If not, discard them. It is like a PSA design where instead of serving a placebo ($P_i$), we simulate one ($\hat{D}_i$). PSA compares actual focal exposure ($D_i$) vs placebo exposure ($P_i$). Ghost Ads compares actual focal exposure ($D_i$) vs predicted exposure ($\hat{D}_i$). 
+
+First, users are randomly assigned to treatment or control using a hash function on user IDs. This keeps assignment consistent—a user assigned to treatment on Monday stays in treatment on Tuesday. 
+
+Second, the ad platform handles each group differently. When a treatment user wins an auction, the ad is shown and logged normally. When a control user triggers an auction; there are two auctions that are run, the first is a regular auction without the ad in question and the second is a ghost auction with the focal ad included where if the ad wins we only log a ghost impression and no ad is shown in reality. 
+
+Another way to do it is to just run one auction and if the focal ad wins an auction, no ad is shown. Instead, the platform logs a "ghost ad" record saying this user would have seen an ad if they'd been in treatment. The impression slot either stays empty or gets filled by the second-place bidder.
+
+The ghost ad log creates a subset of control users whose ad exposure pattern matches the treatment group. These users are the right counterfactual. They went through the same auction process, competed against the same advertisers, and would have gotten the same impressions except for random assignment. It is very likely that their user attributes are similar (at least in terms of what the platform observes). Their outcomes estimate what would have happened to treatment users without ads.
+
+The causal effect we're measuring is the average treatment effect on the treated:
+\begin{equation}
+\tau_{\text{ATT}} = E[Y_i(1) - Y_i(0) | D_i(1) = 1]
+\end{equation}
+
+The estimator compares outcomes between treatment users who saw ads and control users with ghost ads:
+\begin{equation}
+\hat{\tau}_{\text{GA}} = E[Y_i|Z_i=1, D_i = 1] - E[Y_i|Z_i=0, \tilde{D}_i = 1]
+\end{equation}
+
+In practice: $\hat{\tau}_{\text{GA}} = \frac{1}{N_T} \sum_{i: Z_i=1, D_i=1} Y_i - \frac{1}{N_C} \sum_{j: Z_j=0, \tilde{D}_j=1} Y_j$ where $N_T$ is the count of treatment users with impressions and $N_C$ is the count of control users with ghost ads. Under random assignment, this estimator is unbiased for $\tau_{\text{ATT}}$. The variance is $\text{Var}(\hat{\tau}_{\text{GA}}) = \sigma^2_T/N_T + \sigma^2_C/N_C$. With equal groups, this is $2\sigma^2/N$—the same as PSA variance but serving impressions to only the treatment group. All the benefits of placebo ads without any of the contamination or cost.
+
+\subsection*{Predicted Ghost Ads}
+
+One problem with Ghost Ads is that publishers (those who ultimately show the ads) can reject the focal ad (based on some exclusion or inclusion criteria). Of course, this would not be a problem if publishers could also ``reject the ghost ad" when we did the ghost auction (so this rejection effect would be felt equally in both arms). But since we have no control over what the publishers do; the ghost auction simulation is thus an ``incomplete'' simulation. This is a fundamental asymmetry. Hence, we find that some treatment users still do not see the ads because the publisher rejected the ad. This creates a small dilution problem again.
+
+The solution is to \textit{run a similar ghost auction for the treatment users too}; and log if that treated user would have won the auction. This is our best guess if So this means we run one ghost auction for each treatment and control user. This creates a symmetric, pre-assignment prediction of exposure $\hat{D}_i$ for all users (treated and control).
+
+Let the actual ad-exposure be $D_i$ (1 if the user actually saw the ad, 0 otherwise). We now use $\hat{D}_i$ as an instrument for $D_i$, which is to say, we apply a LATE style correction. The new "ITT" is the old Ghost Ads estimate, and the new "LATE" estimate is the Ghost Ads estimate scaled up by the fraction of treated users who ``complied". Thankfully, this compliance is generally very high (close to 1) because the simulator is quite accurate.
+
+The final estimator is:
+\begin{equation}
+\hat{\tau}_{\text{PGA}} = \frac{\bar{Y}_{Z_i=1,\hat{D}_i=1} - \bar{Y}_{Z_i=0,\hat{D}_i=1}}{\hat{p}}
+\end{equation}
+where $\hat{p} = P(D_i=1 \mid Z_i=1, \hat{D}_i=1)$ is the fraction of predicted-exposed treatment users who actually saw the ad. 
+
+The key assumption is that $\hat{D}_i$ must be determined before randomization and independent of treatment assignment—the simulation can't peek at which arm a user will be in. This assumption (A8 in the appendix) ensures the predicted exposure flag doesn't introduce bias.
+
+\subsection*{Auction Isolation}
+
+The problem with running one single ghost ad simulation for multiple advertizers is the problem of censoring. Consider advertizer A and advertizer B, both running ghost ads. Lets say the user is a potential candidate for both ads, but they are in the control group for both ads. Now, the user will not be able to see an ad from either A or B. Now, lets say user comes online and searches for something. We run ghost ads simulation to see which ads wins (we include both ads A and B). Suppose ad B wins, and the ghost impression is logged for ad B. But what about ad A? We don't know if ad A would have won the auction if ad B was not present. It might be the case that without ad B, ad A could have won. So ad A loses a ghost impression from control users that they would have received. With many advertizers, we could see a sharp reduction in number of ghost impressions logged per advertizer. 
+
+One solution is to run separate, independent simulations for each advertizer. Recall, that user is in control group for both ads. So when we run the simulation for ad A, \textit{we leave ad B out}. And when we run the simulation for ad B, \textit{we leave ad A out}. So now we are running one auction for each vendor, per user. Thus there can be up to two ghost impressions logged for the same user (one for each advertizer). So if there are N advertizer (which the user belongs to a control group of), for each ad opportunity we need to run 1 real auction and N ghost auctions. Figure \ref{fig:auction_isolation} illustrates this approach. Note that this struggles to scale when many users belong to many control groups.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 2cm,
+    every node/.style={font=\small,align=center},
+    arrow/.style={-{Stealth[length=2mm]}, thick},
+    box/.style={draw, rectangle, rounded corners=3pt, thick, minimum width=3cm, minimum height=1cm, align=center, drop shadow},
+    real/.style={box, draw=teal!70, fill=teal!10},
+    ghostA/.style={box, draw=blue!70, fill=blue!10},
+    ghostB/.style={box, draw=green!70, fill=green!10},
+    result/.style={font=\small\bfseries}
+]
+
+    % Top: Real auction
+    \node (real) [real] {Real Auction\\(online)\\[2pt]\scriptsize Excludes A \& B\\Competitor C wins};
+
+    % Bottom left: Ghost auction for A
+    \node (ghostA) [ghostA, below left=1.5cm and 2cm of real] {Ghost Auction\\for Advertiser A\\(offline)\\[2pt]\scriptsize Includes: A, C, others\\Excludes: B};
+
+    % Bottom right: Ghost auction for B
+    \node (ghostB) [ghostB, below right=1.5cm and 2cm of real] {Ghost Auction\\for Advertiser B\\(offline)\\[2pt]\scriptsize Includes: B, C, others\\Excludes: A};
+
+    % Results below each ghost auction
+    \node (resultA) [result, below=0.4cm of ghostA, text=blue!80] {Ad A wins\\{\scriptsize\checkmark} Log ghost for A};
+    \node (resultB) [result, below=0.4cm of ghostB, text=green!70!black] {Ad B wins\\{\scriptsize\checkmark} Log ghost for B};
+
+    % Arrows
+    \draw [arrow] (real) -| node[above left, pos=0.25, font=\scriptsize] {simulate} (ghostA);
+    \draw [arrow] (real) -| node[above right, pos=0.25, font=\scriptsize] {simulate} (ghostB);
+    \draw [arrow, dashed] (ghostA) -- (resultA);
+    \draw [arrow, dashed] (ghostB) -- (resultB);
+
+    % Annotation
+    \node [draw=orange!70, fill=orange!5, rounded corners=2pt, thick, font=\scriptsize\itshape, text width=5.5cm, align=center] at ($(real.south)+(0,-4.2)$)
+        {User in control for both A \& B\\Each advertiser gets independent counterfactual check\\Both ghost impressions can be logged};
+
+\end{tikzpicture}
+\caption{Independent ghost auctions eliminate censoring across multiple advertisers.}
+\label{fig:auction_isolation}
+\end{figure}
+
+To implement this approach, split the online and offline pipelines. The online pipeline runs the real auction and logs the real impressions. A "real event" is logged here. This entry is passed onto a separate, offline pipeline. They do not need to talk to the online pipeline, or even each other (since they are separate, independent). The simulated auctions are made slightly simpler, so they run faster and run in parallel. 
+
+Dumping the N simulation auctions' impressions into the main table would cause the main table to bloat; so we create a separate "ghost impressions" table. This table has the same schema as the main table, but is much smaller (since it only has ghost impressions). For inference, we join the main table with the ghost impressions table on user ID and time window. This gives us the predicted exposure $\hat{D}$ for all users and all advertizers.
+
+This kind of a parallel system is expensive, but it offers a clean way to scale to many advertizers without censoring. Keep in mind, that we run N auctions for all N control groups (not treatment groups) that the user belongs to. There are very few users who will belong to many control groups. Note, that a universal holdout group, which is excluded from all ads, does not help. This group simply does not see any ads. This is not the same as seeing a ghost ad. This group only provides a control group for the impact of all ads together, not for any individual ad or campaign. This is still a useful metric, but not the one we want.
+
+\subsection*{Limiting Users in Multiple Control Groups}
+
+The first solution approach is to prevent users from being in multiple control groups in the randomization process itself. The simplest implementation is to cap each user at most $K$ control groups. For each user $i$ eligible for $N$ advertisers, we compute a priority key $k_{iv} = \text{Hash}(i,v)$ for each advertiser $v$. We sort advertisers by ascending priority key and admit the first $K$ where a random gate $c_{iv} = \text{Hash2}(i,v)$ is less than the inclusion probability $\pi_{iv}$.
+
+Note that the inclusion probability scales down when many advertisers compete: $\pi_{iv} = p_v \cdot s(i)$ where $p_v$ is advertiser $v$'s target control rate and $s(i) = \min(1, K / \sum_{v} p_v)$. This ensures each user joins at most $K$ controls deterministically.
+
+We also store the inclusion probability $\pi_{iv}$ for each admitted control pair. During offline simulation, we run separate ghost auctions only for the $K$ admitted controls—not all $N$ eligible advertisers. This cuts ghost simulations from $N$ to $K$ per ad opportunity. Now that we have artificially limited the number of ghost impressions, use inverse-probability weighting to correct for the capped assignment. The estimator for advertiser $v$ is:
+
+\begin{equation}
+\hat{\tau}_v = \frac{1}{N_T} \sum_{i: T_{iv}=1} Y_{iv} - \frac{\sum_{i: T_{iv}=0} w_{iv} Y_{iv}}{\sum_{i: T_{iv}=0} w_{iv}}
+\end{equation}
+
+where $w_{iv} = \mathbf{1}[\hat{D}_{iv}=1] / \pi_{iv}$ and $\hat{D}_{iv}$ indicates predicted ghost exposure in control. The stored $\pi_{iv}$ corrects for the fact that not all eligible users were admitted to control, making the estimate unbiased. 

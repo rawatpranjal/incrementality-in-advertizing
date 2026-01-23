@@ -1,0 +1,262 @@
+\section{Identification and Variance}
+
+\subsection{Notation}
+
+We use the potential outcomes framework. Let $i$ index individual users.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Core Variables}
+\begin{tabular}{p{2cm}p{11cm}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$Z_i$ & Treatment assignment: $Z_i=1$ if assigned to treatment, $Z_i=0$ if control \\
+\midrule
+$Y_i(1)$ & Potential outcome under focal ad exposure \\
+$Y_i(0)$ & Potential outcome under no ad exposure (baseline) \\
+$Y_i(P)$ & Potential outcome under placebo ad exposure \\
+\midrule
+$D_i(1)$ & Potential focal ad exposure under treatment assignment \\
+$D_i(0)$ & Potential focal ad exposure under control assignment. For ITT, GA, and PGA: $D_i(0) = 0$ \\
+\midrule
+$Y_i$ & Observed outcome \\
+$D_i$ & Observed focal ad exposure. Under consistency: $D_i = Z_i D_i(1)$ \\
+$P_i(z)$ & Potential placebo exposure under assignment $z$. Under perfect blind: $P_i(0)=1 \iff D_i(1)=1$. Observed: $P_i = P_i(Z_i)$ \\
+$\tilde{D}_i$ & Ghost auction counterfactual exposure for control users. For $Z_i=0$: $\tilde{D}_i=1 \iff D_i(1)=1$ \\
+$\hat{D}_i$ & Predicted exposure from ghost auction. Key property: $\hat{D}_i \perp Z_i$ (pre-randomization) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Groups and Sample Sizes}
+\begin{tabular}{p{2cm}p{11cm}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$T$ & Set of treated-exposed users. Context-dependent: \newline
+For LATE/PSA/GA: $T = \{i \mid Z_i=1, D_i=1\}$ \newline
+For PGA: $T = \{i \mid Z_i=1, \hat{D}_i=1, D_i=1\}$ \\
+\midrule
+$C$ & Set of control users. Context-dependent: \newline
+For ITT: $C = \{i \mid Z_i=0\}$ (all control users) \newline
+For PSA: $C = \{i \mid Z_i=0, P_i=1\}$ (placebo-exposed) \newline
+For GA/PGA: $C = \{i \mid Z_i=0, \hat{D}_i=1\}$ (predicted-exposed) \\
+\midrule
+$N_T$ & Number of users in set $T$: $N_T = |T|$ \\
+$N_C$ & Number of users in set $C$: $N_C = |C|$ \\
+$n$ & Generic total sample size \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Treatment Effects and Estimators}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$\tau_{\text{ATT}}$ & Average treatment effect on the treated (primary estimand): $E[Y_i(1) - Y_i(0) \mid D_i(1)=1]$ \\
+$\tau_{\text{ITT}}$ & Intent-to-treat effect: $E[Y_i \mid Z_i=1] - E[Y_i \mid Z_i=0]$ \\
+$\hat{\tau}_{\text{LATE}}$ & LATE estimator: $\hat{\tau}_{\text{ITT}}/\hat{\pi}$ \\
+$\hat{\tau}_{\text{PSA}}$ & Placebo ads estimator \\
+$\hat{\tau}_{\text{GA}}$ & Ghost ads estimator \\
+$\hat{\tau}_{\text{PGA}}$ & Predicted ghost ads estimator \\
+\midrule
+$\pi$ & Compliance rate: $P(D_i(1)=1)$ (probability of exposure under treatment) \\
+$\hat{p}$ & Compliance rate within predicted-exposed stratum: $P(D_i=1 \mid Z_i=1, \hat{D}_i=1)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ITT Dilution}
+
+Claim: Under (A1) randomization $Z_i \perp (Y_i(0), Y_i(1), D_i(1))$, (A2) one-sided noncompliance $D_i = 0$ for all $Z_i = 0$, and (A3) SUTVA, we have $\tau_{\text{ITT}} = \pi \cdot \tau_{\text{ATT}}$.
+
+\begin{proof}
+Write the observed outcome as $Y_i = Y_i(0) + D_i \tau_i$. Then:
+\begin{align}
+\tau_{\text{ITT}} &= E[Y_i \mid Z_i=1] - E[Y_i \mid Z_i=0] \nonumber \\
+&= E[Y_i(0) + D_i \tau_i \mid Z_i=1] - E[Y_i(0) \mid Z_i=0] \nonumber \\
+&= E[D_i \tau_i \mid Z_i=1]
+\end{align}
+where the second equality uses (A1) to cancel $E[Y_i(0) \mid Z_i=1] = E[Y_i(0) \mid Z_i=0]$. Apply the law of iterated expectations with $D_i \in \{0,1\}$:
+\begin{align}
+E[D_i \tau_i \mid Z_i=1] &= E\big[D_i \cdot E[\tau_i \mid D_i, Z_i=1] \mid Z_i=1\big] \nonumber \\
+&= P(D_i=1 \mid Z_i=1) \cdot E[\tau_i \mid D_i=1, Z_i=1]
+\end{align}
+By (A2), if $D_i=1$ then $Z_i=1$, so $E[\tau_i \mid D_i=1, Z_i=1] = E[\tau_i \mid D_i=1] = \tau_{\text{ATT}}$. Therefore $\tau_{\text{ITT}} = \pi \cdot \tau_{\text{ATT}}$.
+\end{proof}
+
+\subsection{ITT Variance}
+
+Under complete randomization with $n_1$ treated and $n_0$ control units, treat the finite population $\{Y_i(1), Y_i(0)\}_{i=1}^N$ as fixed. Let $\bar Y_1 = \frac{1}{n_1}\sum_{Z_i=1} Y_i(1)$ and $\bar Y_0 = \frac{1}{n_0}\sum_{Z_i=0} Y_i(0)$. Define finite-population variances $S_Y^2(d) = \frac{1}{N-1}\sum (Y_i(d) - \bar Y(d))^2$ and $S_\tau^2 = S_Y^2(1) + S_Y^2(0) - 2S_{Y(1),Y(0)}$. Then:
+\begin{equation}
+\text{Var}(\hat\tau_{\text{ITT}}) = \frac{S_Y^2(1)}{n_1} + \frac{S_Y^2(0)}{n_0} - \frac{S_\tau^2}{N}
+\end{equation}
+
+The $-S_\tau^2/N$ term is not identified from observed data, so the conservative estimator drops it, yielding $s_{Y,1}^2/n_1 + s_{Y,0}^2/n_0$ where $s_{Y,z}^2$ are within-arm sample variances.
+
+\subsection{LATE and the Weak First-Stage Problem}
+
+With two-sided noncompliance, define the first stage $\Delta_D := P(D_i=1 \mid Z_i=1) - P(D_i=1 \mid Z_i=0)$ and compliers $C_i := D_i(1) - D_i(0) \in \{0,1\}$. Under monotonicity $D_i(1) \geq D_i(0)$, compliers are the only units moved by the instrument, and:
+\begin{equation}
+\text{LATE} = \frac{\tau_{\text{ITT}}}{\Delta_D}
+\end{equation}
+
+The Wald estimator is $\hat{\tau}_{\text{LATE}} = \hat\beta / \hat\pi$ where $\hat\beta = \bar Y_1 - \bar Y_0$ and $\hat\pi = \bar D_1 - \bar D_0$. By a first-order expansion at $(\beta, \pi)$:
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{LATE}}) \approx \frac{\text{Var}(\hat\beta) + \tau^2 \text{Var}(\hat\pi) - 2\tau \text{Cov}(\hat\beta, \hat\pi)}{\pi^2}
+\end{equation}
+
+The $1/\pi^2$ factor amplifies everything when the first stage is small.\footnote{Only compliers (fraction $\pi$) carry signal, so the effective sample size for $\tau$ is roughly $N\pi$, but outcome noise comes from nearly everyone. This is the weak-IV problem: small $\pi$ inflates variance and makes LATE noisy even with large $N$.} Under complete randomization:
+\begin{align}
+\text{Var}(\hat\beta) &= \frac{S_Y^2(1)}{n_1} + \frac{S_Y^2(0)}{n_0} - \frac{S_\tau^2}{N} \nonumber \\
+\text{Var}(\hat\pi) &= \frac{S_D^2(1)}{n_1} + \frac{S_D^2(0)}{n_0} - \frac{S_C^2}{N} \nonumber \\
+\text{Cov}(\hat\beta, \hat\pi) &= \frac{S_{Y(1),D(1)}}{n_1} + \frac{S_{Y(0),D(0)}}{n_0} - \frac{S_{\tau,C}}{N}
+\end{align}
+
+With one-sided noncompliance, $D_i(0)=0$ so $C_i = D_i(1)$, $\Delta_D = \pi$, and $\text{LATE} = \text{ATT}$.
+
+\subsection{Placebo Design Identification}
+
+The target is:
+\begin{equation}
+\tau_{\text{ATT}} = E[Y_i(1) - Y_i(0) \mid D_i(1) = 1]
+\end{equation}
+
+Assumptions: (A1) random assignment, SUTVA, consistency; plus:
+\begin{enumerate}
+\item[(A4)] Perfect blind: $P_i(0) = 1 \iff D_i(1) = 1$. The placebo is shown to user $i$ if and only if the focal ad would have been shown under treatment. Implication: $\{i: P_i(0)=1\} = \{i: D_i(1)=1\}$ and $P(D_i=1 \mid Z_i=1) = P(P_i=1 \mid Z_i=0)$.
+\item[(A5)] No placebo effect: $Y_i(P) = Y_i(0)$. The placebo produces the same outcome as no ad. If violated, the control group is contaminated.
+\end{enumerate}
+
+The placebo-ads estimator is $\hat{\tau}_{\text{PSA}} = E[Y_i \mid Z_i=1, D_i=1] - E[Y_i \mid Z_i=0, P_i=1]$.
+
+\begin{proof}
+By (A4), consistency, and randomization:
+\begin{equation}
+E[Y_i \mid Z_i=0, P_i=1] = E[Y_i(P) \mid D_i(1)=1]
+\end{equation}
+By (A5): $E[Y_i(P) \mid D_i(1)=1] = E[Y_i(0) \mid D_i(1)=1]$. For treatment, by consistency and randomization: $E[Y_i \mid Z_i=1, D_i=1] = E[Y_i(1) \mid D_i(1)=1]$. Therefore:
+\begin{equation}
+E[\hat{\tau}_{\text{PSA}}] = E[Y_i(1) - Y_i(0) \mid D_i(1)=1] = \tau_{\text{ATT}}
+\end{equation}
+\end{proof}
+
+\subsection{PSA Variance}
+
+Let $N_T$ be the number of exposed users in treatment ($Z_i=1, D_i=1$) and $N_C$ the number of placebo-exposed users in control ($Z_i=0, P_i=1$). With sample variances $s^2_T$ and $s^2_C$ within these groups, the conservative variance estimator is:
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{PSA}}) = \frac{s^2_T}{N_T} + \frac{s^2_C}{N_C}
+\end{equation}
+
+Under perfect blind, $N_T \approx N_C \approx N\pi/2$. If within-group variances are comparable ($\sigma^2_e$), then $\text{Var}(\hat{\tau}_{\text{PSA}}) \approx 4\sigma^2_e/(N\pi)$, so $\text{SD}(\hat{\tau}_{\text{PSA}}) \propto (N\pi)^{-1/2}$.
+
+\subsection{Ghost Ads Identification}
+
+The target is:
+\begin{equation}
+\tau_{\text{ATT}} = E[Y_i(1) - Y_i(0) \mid D_i(1) = 1]
+\end{equation}
+
+Assumptions: (A1) random assignment, SUTVA, consistency; plus:
+\begin{enumerate}
+\item[(A6)] Counterfactual exposure prediction: $\tilde{D}_i = 1 \iff D_i(1) = 1$ for $Z_i=0$. The ghost auction correctly predicts which control users would have been exposed under treatment. This identifies the counterfactual exposed in control.
+\item[(A7)] Correct control baseline: Control users see the platform's normal allocation excluding the focal advertiser. The ghost ads control equals the ITT control baseline.
+\end{enumerate}
+
+The ghost ads estimator is $\hat{\tau}_{\text{GA}} = E[Y_i \mid Z_i=1, D_i=1] - E[Y_i \mid Z_i=0, \tilde{D}_i=1]$.
+
+\begin{proof}
+By (A6), consistency, and randomization: $E[Y_i \mid Z_i=0, \tilde{D}_i=1] = E[Y_i(0) \mid D_i(1)=1]$. For treatment, by consistency and randomization: $E[Y_i \mid Z_i=1, D_i=1] = E[Y_i(1) \mid D_i(1)=1]$. Therefore:
+\begin{equation}
+E[\hat{\tau}_{\text{GA}}] = E[Y_i(1) - Y_i(0) \mid D_i(1)=1] = \tau_{\text{ATT}}
+\end{equation}
+\end{proof}
+
+\subsection{Ghost Ads Variance}
+
+Let $N_T$ be the number of exposed users in treatment ($Z_i=1, D_i=1$) and $N_C$ the number of counterfactual-exposed users in control ($Z_i=0, \tilde{D}_i=1$). With sample variances $s^2_T$ and $s^2_C$ within these groups, the conservative variance estimator is:
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{GA}}) = \frac{s^2_T}{N_T} + \frac{s^2_C}{N_C}
+\end{equation}
+
+Under balanced assignment with $N_T \approx N_C \approx N\pi/2$ and comparable within-group variances ($\sigma^2_e$), $\text{Var}(\hat{\tau}_{\text{GA}}) \approx 4\sigma^2_e/(N\pi)$, so $\text{SD}(\hat{\tau}_{\text{GA}}) \propto (N\pi)^{-1/2}$.
+
+\subsection{Predicted Ghost Ads Identification}
+
+Assumption (A8):
+\begin{enumerate}
+\item[(A8)] Predetermined prediction: $\hat{D}_i$ is a binary, pre-randomization prediction of exposure with $\hat{D}_i \perp Z_i$. The prediction is set before randomization and independent of assignment.
+\end{enumerate}
+
+Under (A1) randomization, (A2) exclusion, (A3) SUTVA, and (A8), the difference-in-means within $\hat{D}_i=1$ identifies a LATE. For stratum $S = \{\hat{D}_i=1\}$:
+\begin{align}
+E[Y_i \mid Z_i=1, S] - E[Y_i \mid Z_i=0, S] &= \underbrace{E[Y_i(0) \mid Z_i=1, S] - E[Y_i(0) \mid Z_i=0, S]}_{=0 \text{ by } Z_i \perp (Y_i(0), S)} + E[D_i \tau_i \mid Z_i=1, S] \nonumber \\
+&= E[D_i \tau_i \mid Z_i=1, \hat{D}_i=1]
+\end{align}
+
+Let $\hat{p} := P(D_i=1 \mid Z_i=1, \hat{D}_i=1)$. Then:
+\begin{equation}
+E[D_i \tau_i \mid Z_i=1, \hat{D}_i=1] = \hat{p} \cdot E[\tau_i \mid Z_i=1, \hat{D}_i=1, D_i=1] =: \hat{p} \cdot \tau_{\text{PGA}}
+\end{equation}
+
+Rearranging yields the PGA estimator:
+\begin{equation}
+\hat{\tau}_{\text{PGA}} = \frac{E[Y_i \mid Z_i=1, \hat{D}_i=1] - E[Y_i \mid Z_i=0, \hat{D}_i=1]}{P(D_i=1 \mid Z_i=1, \hat{D}_i=1)}
+\end{equation}
+
+The PGA estimator identifies the ATT within the predicted stratum:
+\begin{equation}
+\tau_{\text{ATT}}^S = E[Y_i(1) - Y_i(0) \mid \hat{D}_i=1, D_i(1)=1]
+\end{equation}
+
+This equals the overall $\tau_{\text{ATT}}$ under either: (1) perfect prediction ($\hat{D}_i = D_i(1)$ almost surely), or (2) homogeneous treatment effects across prediction strata.
+
+Under (A8), $\tau_{\text{ATT}}$ decomposes as a weighted sum of LATEs:
+\begin{equation}
+\tau_{\text{ATT}} = \tau_{\text{PGA}} \cdot P(\hat{D}_i=1 \mid Z_i=1, D_i=1) + \tau_{\hat{D}=0} \cdot P(\hat{D}_i=0 \mid Z_i=1, D_i=1)
+\end{equation}
+
+Under negligible under-prediction (empirically $\approx 3\%$) and approximate effect homogeneity, $\tau_{\text{ATT}} \approx \tau_{\text{ATT}}^S$.
+
+\subsection{Predicted Ghost Ads Variance}
+
+Let $\hat{\beta}_{\text{PGA}} := \bar{Y}_{T,\hat{D}=1} - \bar{Y}_{C,\hat{D}=1}$, $\hat{p} := P_n(D=1 \mid Z=1, \hat{D}=1)$, and $\hat{\tau}_{\text{PGA}} := \hat{\beta}_{\text{PGA}}/\hat{p}$. By the delta method:
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{PGA}}) = \frac{\text{Var}(\hat{\beta}_{\text{PGA}}) + \hat{\tau}_{\text{PGA}}^2 \text{Var}(\hat{p}) - 2\hat{\tau}_{\text{PGA}} \text{Cov}(\hat{\beta}_{\text{PGA}}, \hat{p})}{\hat{p}^2}
+\end{equation}
+
+Within the $\hat{D}=1$ stratum:
+\begin{align}
+\text{Var}(\hat{\beta}_{\text{PGA}}) &= \frac{s^2_{Y,T,\hat{D}=1}}{n_{T,\hat{D}=1}} + \frac{s^2_{Y,C,\hat{D}=1}}{n_{C,\hat{D}=1}} \nonumber \\
+\text{Var}(\hat{p}) &= \frac{\hat{p}(1-\hat{p})}{n_{T,\hat{D}=1}} \nonumber \\
+\text{Cov}(\hat{\beta}_{\text{PGA}}, \hat{p}) &= \frac{s_{Y,D;T,\hat{D}=1}}{n_{T,\hat{D}=1}}
+\end{align}
+
+Randomness in the denominator comes only from the treated, predicted-exposed cell. If $\hat{p} \approx 1$, the covariance term is negligible and variance approaches a straight difference-in-means.
+
+\subsection{Precision Comparison: LATE, PSA, Ghost Ads, and PGA}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Method & Variance Scaling & SD Scaling & Relative Precision \\
+\midrule
+ITT-LATE & $\frac{\text{const}}{N\pi^2}$ & $N^{-1/2}\pi^{-1}$ & Baseline \\
+PSA & $\frac{\text{const}}{N\pi}$ & $(N\pi)^{-1/2}$ & $\pi \times$ ITT-LATE \\
+Ghost Ads & $\frac{\text{const}}{N\pi}$ & $(N\pi)^{-1/2}$ & $\pi \times$ ITT-LATE \\
+PGA & $\frac{\text{const}}{N\pi}$ & $(N\pi)^{-1/2}$ & $\pi \times$ ITT-LATE (when $\hat{p} \approx 1$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+PSA, Ghost Ads, and PGA achieve precision gains of factor $1/\pi$ over ITT-LATE by avoiding the weak first-stage penalty.

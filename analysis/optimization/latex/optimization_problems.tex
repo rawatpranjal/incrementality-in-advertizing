@@ -1,0 +1,517 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{microtype}
+
+\geometry{margin=1in}
+
+\title{Canonical Optimization Problems in Advertising}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+This document provides a systematic catalog of canonical optimization formulations arising in advertising platforms and autobidding systems. Each section presents a core optimization problem from the literature, including the problem context, mathematical formulation, solution approach, and key theoretical results. The objective is to document the fundamental optimization structures that underpin modern advertising technology, providing a reference for researchers and practitioners working on auction design, budget management, automated bidding, and revenue optimization.
+
+\section{Notation}
+
+Throughout, we denote time indices by $t \in [T]$, advertisers by $i \in [N]$, impressions by $j \in [M]$, and arms or platforms by $k \in [K]$. Budget constraints are denoted $B_i$ with remaining budget $B_i^{\text{rem}}(t)$ at time $t$. Bid, value, and payment at time $t$ are $b_t$, $v_t$, $p_t$ respectively. Allocation variables $x_{ij} \in \{0,1\}$ indicate assignment of impression $j$ to advertiser $i$. The pacing multiplier $\lambda_i$ serves as the Lagrange multiplier for advertiser $i$'s budget constraint. Expectations are taken with respect to the underlying stochastic process unless otherwise specified. 
+
+\section{Online Budgeted Allocation}
+
+In sponsored search and display advertising, a platform must allocate arriving impressions to advertisers with limited budgets under sequential arrivals and uncertainty about future inventory. The challenge is to maximize total value extracted from allocations while respecting per-advertiser budget constraints, without knowledge of which impressions will arrive later. The primal-dual framework provides competitive algorithms by maintaining shadow prices (dual variables) that adjust allocation priorities based on remaining budgets. The optimization problem is:
+\begin{align}
+\max_{x_{ij}} \quad & \sum_{i=1}^N \sum_{j=1}^M v_{ij} x_{ij} \\
+\text{s.t.} \quad & \sum_{j=1}^M c_{ij} x_{ij} \leq B_i \quad \forall i \in [N] \\
+& \sum_{i=1}^N x_{ij} \leq 1 \quad \forall j \in [M] \\
+& x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align}
+where the objective maximizes the total value from allocating impressions to advertisers, the first constraint ensures no advertiser $i$ exceeds their budget $B_i$, the second constraint ensures each impression $j$ is allocated to at most one advertiser, and $x_{ij} = 1$ if impression $j$ is assigned to advertiser $i$.
+
+The fractional relaxation admits $x_{ij} \in [0,1]$ with dual variables $\lambda_i$ for budget constraints and $\mu_j$ for allocation constraints. The complementary slackness conditions yield $x_{ij} > 0$ only if $v_{ij} - \lambda_i c_{ij} = \mu_j$, motivating the online algorithm that allocates arriving impression $j$ to
+\[
+i^* = \arg\max_{i \in \mathcal{A}_j: B_i^{\text{rem}} \geq c_{ij}} v_{ij} \cdot \Psi\left(\frac{B_i^{\text{rem}}}{B_i}\right)
+\]
+where $\Psi(u) = 1 - e^{u-1}$ is the competitive function derived from the primal-dual framework \citep{mehta2007adwords,mehta2013online}. This achieves competitive ratio $1 - 1/e \approx 0.632$ under random arrival order.\footnote{Under adversarial arrivals, no deterministic algorithm exceeds $1/2$-competitive, while randomized algorithms achieve at best $1 - 1/e$ \citep{karp1990optimal}.}
+
+Extensions handle complex budget structures. \citet{devanur2016budgets} consider hierarchical budgets where advertiser $i$ has multiple budget tiers $B_i^{(1)}, \ldots, B_i^{(L)}$ with nested constraints $\sum_j c_{ij}^{(\ell)} x_{ij} \leq B_i^{(\ell)}$ for $\ell \in [L]$, maintaining competitive ratio $1-1/e$ via generalized dual variables. When budgets are unknown ex ante, \citet{zhou2021unknown} show hardness results and approximation guarantees under partial budget revelation, where advertisers reveal budget only after winning impressions.
+
+\section{Pacing in Repeated Auctions}
+
+An advertiser participating in thousands of auctions per day must decide how aggressively to bid to maximize value subject to a daily budget constraint. The challenge is to avoid exhausting the budget too early (missing valuable late-day auctions) or too conservatively (leaving budget unspent). The Lagrangian approach introduces a pacing multiplier $\lambda \in [0,1]$ that scales bids uniformly across auctions, balancing spend rate and value extraction. The pacing optimization problem is:
+\begin{align}
+\max_{\lambda \in [0,1]} \quad & \mathbb{E}\left[\sum_{t=1}^T q_t(\lambda v) \cdot (v - p_t(\lambda v))\right] \\
+\text{s.t.} \quad & \mathbb{E}\left[\sum_{t=1}^T p_t(\lambda v)\right] \leq B
+\end{align}
+where the objective maximizes expected utility (value from conversions minus payments), $q_t(b)$ denotes the probability of winning the auction at time $t$ with bid $b$, $p_t(b)$ denotes the expected payment conditional on winning, and the constraint ensures expected total spend does not exceed budget $B$.
+
+The Lagrangian relaxation with multiplier $\mu$ yields
+\[
+\mathcal{L}(\lambda, \mu) = \mathbb{E}\left[\sum_{t=1}^T q_t(\lambda v) v - (1+\mu) p_t(\lambda v)\right]
+\]
+The first-order condition $\partial \mathcal{L}/\partial \lambda = 0$ characterizes the optimal pacing multiplier $\lambda^*$ as the solution to $\mathbb{E}[\sum_t q_t'(\lambda^* v) v^2] = (1+\mu^*) \mathbb{E}[\sum_t p_t'(\lambda^* v) v]$ where $\mu^*$ satisfies the complementary slackness condition.\footnote{In the fluid limit as $T \to \infty$, the optimal multiplier converges to a constant $\lambda^* = B/(Tv\bar{q})$ where $\bar{q}$ is the average win rate \citep{balseiro2015repeated}.}
+
+\citet{balseiro2019learning} analyze regret minimization in this setting, showing that an agent learning $\lambda_t$ via online gradient descent achieves regret $O(\sqrt{T})$ when auction distributions are stationary. For first-price auctions, \citet{conitzer2022pacing} characterize the pacing equilibrium where all budget-constrained bidders simultaneously optimize their pacing multipliers, deriving existence conditions and equilibrium bid shading formulas. The equilibrium bid for advertiser $i$ is $b_i^* = \lambda_i v_i$ where $\lambda_i \in (0,1)$ solves the market-clearing condition balancing supply and demand across all advertisers.
+
+\section{Optimal Spend-Rate Estimation}
+
+A campaign manager must determine how quickly to spend a fixed budget over a time period (e.g., month) to maximize conversions, where conversion rate is a concave function of spend rate due to diminishing returns and market saturation. The problem combines forecasting (estimating the conversion response curve) with control (selecting the optimal spend rate). When the response function is unknown, multi-armed bandit algorithms balance exploration of different spend rates against exploitation of the estimated optimum. The spend-rate optimization problem determines the optimal rate of spending to maximize conversions over a time horizon:
+\begin{align}
+\max_{s \geq 0} \quad & C(s) \cdot T \\
+\text{s.t.} \quad & s \cdot T = B
+\end{align}
+where the objective maximizes total conversions over horizon $T$, $C(s)$ is the conversion rate function (conversions per unit time) at spend rate $s$, and the constraint ensures the total spend equals budget $B$.
+
+Under the concavity assumption $C''(s) < 0$, the first-order condition $C'(s^*) = C(s^*)/s^*$ characterizes the optimal rate.\footnote{This coincides with the elasticity condition $\epsilon_C(s^*) = 1$ where $\epsilon_C(s) = sC'(s)/C(s)$ is the elasticity of conversions with respect to spend.} When $C(s)$ is unknown, the online learning variant maintains estimates $\hat{C}_k$ for discretized rates $s_k$ and selects
+\[
+k_t = \arg\max_k \left[\hat{C}_k(t-1) + \sqrt{\frac{2\log t}{n_k(t-1)}}\right]
+\]
+following the UCB principle, achieving regret $O(\sqrt{KT\log T})$ where $K$ is the discretization granularity \citep{agarwal2014bandits}.
+
+\citet{karande2022pacing} formulate pacing as a joint forecasting and control problem, minimizing pacing error $\mathbb{E}[(\sum_t c_t - B)^2]$ plus deviation penalties. \citet{chen2024ebay} describe the production deployment at eBay comparing two approaches: throttling, where the system skips a fraction $(1-\rho_t)$ of auctions to control spend, versus bid shading, where bids are scaled by $\lambda_t < 1$. The optimization selects $\rho_t$ or $\lambda_t$ via model predictive control to hit budget targets while maximizing conversions, with empirical results showing bid shading dominates throttling in conversion efficiency.
+
+\section{Autobidding via Constrained MDPs}
+
+An automated bidding system must learn a policy that selects bids in real-time based on auction context (user features, time of day, remaining budget) to maximize conversions while satisfying budget or CPA constraints. The sequential decision problem with state-dependent rewards and costs naturally formulates as a constrained Markov decision process. Lagrangian relaxation decouples the constraint, yielding a dual problem where the optimal policy maximizes a weighted combination of reward and cost value functions. The autobidding problem formulates as a Constrained Markov Decision Process (CMDP):
+\begin{align}
+\max_{\pi} \quad & \mathbb{E}_\pi\left[\sum_{t=1}^T r(s_t, a_t)\right] \\
+\text{s.t.} \quad & \mathbb{E}_\pi\left[\sum_{t=1}^T c(s_t, a_t)\right] \leq B \\
+& a_t = \pi(s_t) \quad \forall t
+\end{align}
+where the objective maximizes expected total reward (e.g., conversions), the constraint limits expected total cost (spending) to budget $B$, $s_t$ is the state at time $t$, $a_t$ is the action (bid), and $\pi$ is the policy mapping states to actions.
+
+The Bellman equations for the unconstrained and cost value functions are
+\begin{align}
+Q^r(s,a) &= r(s,a) + \gamma \mathbb{E}_{s'}[V^r(s')] \\
+Q^c(s,a) &= c(s,a) + \gamma \mathbb{E}_{s'}[V^c(s')]
+\end{align}
+The constrained optimal policy satisfies
+\[
+\pi^*(s) \in \arg\max_{a} \left[Q^r(s,a) - \lambda^* Q^c(s,a)\right]
+\]
+where the Lagrange multiplier $\lambda^*$ solves $\mathbb{E}_{\pi(\lambda^*)}[\sum_t c(s_t, a_t)] = B$.
+
+For CPA-constrained autobidding, the optimization problem is:
+\begin{align}
+\max_{\pi} \quad & \mathbb{E}_\pi\left[\sum_{t=1}^T y_t\right] \\
+\text{s.t.} \quad & \frac{\mathbb{E}_\pi[\sum_{t=1}^T p_t]}{\mathbb{E}_\pi[\sum_{t=1}^T y_t]} \leq \tau
+\end{align}
+where the objective maximizes expected conversions $y_t$, and the constraint ensures the cost per acquisition does not exceed target $\tau$.
+
+\citet{cai2017rtb} pioneer RL for real-time bidding in display advertising, formulating state as $(B_t^{\text{rem}}, t)$ and action as bid amount. \citet{wu2018budget} extend to model-free Q-learning with budget constraints. \citet{zhou2025ocpc} describe industrial OCPC (optimized cost per click) deployment at scale, implementing Lagrangian Q-learning where the multiplier $\lambda$ adapts based on observed CPA violations, with production results showing 15-20\% efficiency gains over heuristic bidding.
+
+\section{Bandits with Knapsacks}
+
+An advertiser must allocate budget across multiple uncertain advertising channels (e.g., search, display, social) where the reward and cost per impression from each channel are initially unknown and must be learned through experimentation. The challenge is to balance exploration (trying different channels to estimate returns) against exploitation (spending more on channels with high estimated ROI) while respecting budget constraints. Primal-dual algorithms maintain confidence bounds for rewards and costs, using dual variables to penalize resource-intensive arms. The bandits with knapsacks problem selects arms sequentially to maximize rewards subject to resource constraints:
+\begin{align}
+\max_{\{k_t\}_{t=1}^T} \quad & \mathbb{E}\left[\sum_{t=1}^T r_{k_t}\right] \\
+\text{s.t.} \quad & \mathbb{E}\left[\sum_{t=1}^T c_{k_t}^{(d)}\right] \leq B^{(d)} \quad \forall d \in [D]
+\end{align}
+where the objective maximizes expected total reward from pulling arms $k_t \in [K]$, and constraints ensure expected consumption of each resource type $d$ does not exceed budget $B^{(d)}$.
+
+The fractional relaxation benchmark is:
+\begin{align}
+\text{OPT} = \max_{x \in \Delta_K} \quad & \sum_{k=1}^K x_k \mu_k^r T \\
+\text{s.t.} \quad & \sum_{k=1}^K x_k \mu_k^{c,d} T \leq B^{(d)} \quad \forall d \in [D] \\
+& \sum_{k=1}^K x_k = 1, \quad x_k \geq 0
+\end{align}
+where $x_k$ is the fraction of time arm $k$ is pulled, $\mu_k^r = \mathbb{E}[r_k]$ is the expected reward, and $\mu_k^{c,d} = \mathbb{E}[c_k^{(d)}]$ is the expected consumption of resource $d$.
+
+The primal-dual algorithm maintains confidence bounds and selects
+\[
+k_t = \arg\max_k \left[\text{UCB}_k^r(t) - \sum_{d=1}^D \lambda_t^{(d)} \cdot \text{LCB}_k^{c,d}(t)\right]
+\]
+achieving regret $O(\sqrt{KDT\log T})$ \citep{badanidiyuru2013focs,badanidiyuru2018bandits}. The JACM result establishes this bound is tight up to logarithmic factors.
+
+\citet{agrawal2016linear} extend to linear contextual bandits with knapsacks, where rewards and costs are linear in context features $x_t$: $r_k(x_t) = \theta_k^r \cdot x_t$ and $c_k^{(d)}(x_t) = \theta_k^{c,d} \cdot x_t$. The algorithm maintains confidence ellipsoids for $\theta_k$ parameters and selects arms via optimistic estimates, achieving regret $O(\sqrt{dKDT})$ where $d$ is the feature dimension.
+
+\section{CPA and ROI Constraints}
+
+Performance advertisers often specify target constraints on cost-per-acquisition (CPA) or return-on-investment (ROI) rather than absolute budgets, requiring the platform to maximize conversions (or revenue) while maintaining average efficiency metrics within specified bounds. The non-linear ratio constraint (spend divided by conversions) can be handled via Lagrangian relaxation or reformulated as a linear constraint on the dual problem. Extensions to multi-channel settings introduce global ROI constraints that couple budget allocation decisions across platforms. The CPA-constrained optimization problem maximizes conversions subject to a cost-per-acquisition limit:
+\begin{align}
+\max_{q_j} \quad & \sum_{j=1}^M q_j \alpha_j \beta_j \\
+\text{s.t.} \quad & \frac{\sum_{j=1}^M p_j}{\sum_{j=1}^M q_j \alpha_j \beta_j} \leq \tau \\
+& q_j \in [0,1] \quad \forall j
+\end{align}
+where the objective maximizes total conversions, $q_j$ is the probability of allocating impression $j$, $\alpha_j$ is the click-through rate, $\beta_j$ is the conversion rate given click, $p_j$ is the expected payment, and the constraint ensures the average cost per acquisition does not exceed $\tau$.
+
+\citet{despotovic2018cpa} formalize CPA-constrained auctions, showing truthful mechanisms exist under standard assumptions. For ROI constraints, the problem becomes:
+\begin{align}
+\max_{q_j} \quad & \sum_{j=1}^M q_j \alpha_j \beta_j \\
+\text{s.t.} \quad & \frac{\sum_{j=1}^M v_j q_j \alpha_j \beta_j}{\sum_{j=1}^M p_j} \geq \rho \\
+& q_j \in [0,1] \quad \forall j
+\end{align}
+where $v_j$ is the value per conversion and the constraint ensures return on investment is at least $\rho$. \citet{deng2023multichannel} extend to multi-channel settings with global ROI constraints across platforms.
+
+\section{Lift-Based Bidding}
+
+Standard bidding strategies value impressions based on predicted conversion probability, but this conflates baseline conversions (users who would convert without seeing the ad) with incremental conversions (causal effect of the ad). Lift-based bidding aims to maximize incremental value by bidding proportional to estimated treatment effects rather than predicted outcomes. The challenge is estimating conditional average treatment effects from observational auction data where treatment assignment is non-random, requiring inverse propensity scoring or doubly robust estimators to debias lift estimates. The lift-based bidding problem maximizes incremental (causal) conversions:
+\begin{align}
+\max_{q_j} \quad & \sum_{j=1}^M q_j \tau_j \\
+\text{s.t.} \quad & \sum_{j=1}^M p_j q_j \leq B \\
+& q_j \in [0,1] \quad \forall j
+\end{align}
+where the objective maximizes total lift (incremental conversions), $\tau_j = \mathbb{E}[Y_j^{(1)} - Y_j^{(0)}|X_j]$ is the conditional average treatment effect for impression $j$, and the constraint limits total spend to budget $B$.
+
+The optimal bid in a second-price auction equals $b_j^* = v \cdot \tau_j$ where $v$ is the value per incremental conversion.\footnote{Standard bidding uses $b_j = v \cdot \mathbb{E}[Y_j^{(1)}|X_j]$, which overvalues users with high baseline conversion probability $\mathbb{E}[Y_j^{(0)}|X_j]$.} \citet{moriwaki2020lift} introduce debiased lift estimation via inverse propensity scoring, while \citet{moriwaki2022realworld} describe production deployment challenges. \citet{dikkala2019causal} formalize online causal optimization in RTB auctions with doubly robust estimators.
+
+\section{Multi-Platform Budget Optimization}
+
+An advertiser running campaigns across multiple platforms (Google, Facebook, Amazon) must allocate a fixed total budget to maximize aggregate conversions, where each platform's conversion function exhibits diminishing returns. The challenge is that platform response curves are heterogeneous and initially unknown, requiring both learning and optimization. The first-order optimality condition implies equalized marginal returns across platforms at the optimum, motivating bandit algorithms that estimate platform-specific conversion functions and rebalance budgets accordingly. The multi-platform allocation problem distributes budget across advertising platforms:
+\begin{align}
+\max_{b_1,\ldots,b_K} \quad & \sum_{k=1}^K C_k(b_k) \\
+\text{s.t.} \quad & \sum_{k=1}^K b_k \leq B \\
+& b_k \geq 0 \quad \forall k
+\end{align}
+where the objective maximizes total conversions across all platforms, $C_k(b_k)$ is the conversion function for platform $k$ given budget $b_k$, and the constraint limits total spend across platforms to $B$.
+
+The first-order conditions yield $C_k'(b_k^*) = \lambda^*$ for all $k$ with $b_k^* > 0$, implying equalized marginal returns across active platforms.\footnote{Under power-law responses $C_k(b) = \theta_k b^{\alpha_k}$ with $\alpha_k \in (0,1)$, the optimal allocation is $b_k^* = B \cdot \theta_k^{1/(1-\alpha_k)}/\sum_j \theta_j^{1/(1-\alpha_j)}$ \citep{agarwal2021multi}.} \citet{hasu2021multiplatform} formulate this as a stochastic bandit problem when platform response functions are unknown, achieving regret bounds that scale with the number of platforms.
+
+\section{Guaranteed Delivery}
+
+Display advertising platforms sell guaranteed contracts promising to deliver a specified number of impressions to target audiences (e.g., "1M impressions to women aged 25-34") at a fixed price per impression. The challenge is to allocate arriving impressions across contracts to maximize total value while ensuring each contract meets its delivery guarantee, despite uncertainty in future inventory supply. Flow-based LP relaxations yield dual prices that prioritize contracts falling behind their delivery schedules, while compact allocation plans enable scalable online algorithms. The guaranteed delivery problem allocates impressions to satisfy contractual obligations:
+\begin{align}
+\max_{x_{ij}} \quad & \sum_{i=1}^N \sum_{j=1}^M v_i x_{ij} \\
+\text{s.t.} \quad & \sum_{i=1}^N x_{ij} \leq 1 \quad \forall j \in [M] \\
+& \sum_{j=1}^M x_{ij} \geq G_i \quad \forall i \in [N] \\
+& x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align}
+where the objective maximizes total value from allocations, the first constraint ensures each impression is allocated to at most one contract, the second constraint ensures each contract $i$ receives at least $G_i$ guaranteed impressions, and $v_i$ is the value per impression for contract $i$.
+
+The dual formulation introduces $\mu_j$ for capacity constraints and $\lambda_i$ for delivery constraints. The online algorithm allocates impression $j$ to $i^* = \arg\max_{i \in \mathcal{C}_j} (v_i + \lambda_i)$ where $\lambda_i$ increases when contract $i$ falls behind its delivery schedule \citep{feldman2009online}. \citet{vee2010gd} develop compact allocation plans for GD via flow formulations, while \citet{hojjat2017reach} provide unified frameworks for reach and frequency requirements. \citet{chakrabarti2012traffic} address traffic shaping when contracts risk underdelivery.
+
+\section{Frequency Capping}
+
+Advertisers seek to limit the number of times a user sees the same ad (frequency cap) to avoid ad fatigue and diminishing returns, where the marginal value of the $k$-th impression to a user decays geometrically. The platform must allocate limited impressions to maximize total value while respecting per-user frequency caps across advertisers. Multiplicative weight updates provide online algorithms with competitive ratios, balancing immediate value extraction against preserving future allocation flexibility. The frequency-capped allocation problem limits repeated exposure to the same user:
+\begin{align}
+\max_{x_{iuk}} \quad & \sum_{i=1}^N \sum_{u=1}^U \sum_{k=1}^{f_i} v_i^{(k)} x_{iuk} \\
+\text{s.t.} \quad & \sum_{k=1}^{f_i} x_{iuk} \leq f_i \quad \forall i,u \\
+& \sum_{i=1}^N \sum_{k=1}^{f_i} x_{iuk} \leq M_u \quad \forall u \\
+& x_{iuk} \in \{0,1\} \quad \forall i,u,k
+\end{align}
+where the objective maximizes total value accounting for diminishing returns, $v_i^{(k)} = v_i \delta_i^{k-1}$ is the value of the $k$-th impression to user $u$ from advertiser $i$ with decay factor $\delta_i \in (0,1)$, the first constraint limits each user to at most $f_i$ impressions from advertiser $i$, and the second constraint limits total impressions per user to $M_u$. \citet{buchbinder2011frequency} show competitive algorithms via multiplicative weights, while \citet{gao2025reach} extend reach optimization to settings with k-anonymity privacy constraints.
+
+\section{Reserve Price Optimization}
+
+An auction platform can increase revenue by setting a reserve price (minimum bid) that excludes low-value bidders, trading off the probability of sale against extracting higher prices from remaining bidders. The optimal reserve balances the revenue gain from higher prices against the risk of no sale when all bids fall below the reserve. Myerson's virtual value characterization provides the optimal reserve as a function of the bidder value distribution, which must be estimated from historical auction data in practice. The revenue-maximizing reserve price problem for a second-price auction is:
+\begin{align}
+\max_{r \geq 0} \quad R(r) = r \cdot (1-F(r))^N + N \int_r^\infty (1-F(v))^{N-1} v f(v) dv
+\end{align}
+where the objective maximizes expected revenue, $r$ is the reserve price, $F$ is the distribution of bidder values, $N$ is the number of bidders, the first term is revenue when the highest bid equals the reserve, and the second term is revenue when the highest bid exceeds the reserve.
+
+The first-order condition yields Myerson's virtual value condition $\phi(r^*) = r^* - (1-F(r^*))/f(r^*) = 0$.\footnote{For uniform $F \sim U[0,1]$, the optimal reserve is $r^* = 1/2$ regardless of $N$ \citep{myerson1981optimal}.} \citet{feng2021reserve} develop learning algorithms for first-price auction reserve optimization, while \citet{choi2020reserve} estimate value distributions for NYOP auctions.
+
+\section{Bid Shading in First-Price Auctions}
+
+In first-price auctions, the winner pays their bid rather than the second-highest bid, creating incentive to bid below true value ("shade" the bid) to maximize surplus. The optimal bid trades off win probability (higher bids win more often) against surplus conditional on winning (lower bids yield higher profit margins). The shading strategy depends on the distribution of competing bids, which advertisers must estimate from historical data, with recent work addressing distributional robustness. The bid shading problem in first-price auctions maximizes bidder surplus:
+\begin{align}
+\max_{b \in [0,v]} \quad (v-b) \cdot \mathbb{P}(\text{win}|b)
+\end{align}
+where the objective maximizes expected surplus (value minus payment times probability of winning), $v$ is the bidder's true value, $b$ is the bid, and $\mathbb{P}(\text{win}|b) = F_{(N-1)}(b)$ is the probability that bid $b$ exceeds all competing bids.
+
+The first-order condition yields
+\[
+b^* = v - \frac{F_{(N-1)}(b^*)}{f_{(N-1)}(b^*)}
+\]
+where the optimal bid shades below true value by the inverse hazard rate of the highest competing bid distribution. \citet{chen2021deep} develop deep distribution networks for estimating the competing bid distribution in display advertising, while \citet{wang2024robust} extend to distributionally robust shading under model uncertainty.
+
+\section{DSP Profit Maximization}
+
+A demand-side platform (DSP) acts as an intermediary, bidding in ad exchanges on behalf of multiple advertisers with heterogeneous CPA targets and budgets. The DSP's profit is the spread between what it charges advertisers (based on their CPA targets) and what it pays in auctions. The challenge is joint optimization over impression-to-advertiser assignment and bid amounts, decomposable via Lagrangian relaxation into per-advertiser subproblems coupled through dual variables for budget constraints. The demand-side platform's profit maximization problem is:
+\begin{align}
+\max_{i^*(j), b_j} \quad & \sum_{j=1}^M (\tau_{i^*(j)} \alpha_j \beta_{i^*(j)j} - p_j) q_j(b_j) \\
+\text{s.t.} \quad & \sum_{j:i^*(j)=i} p_j q_j(b_j) \leq B_i \quad \forall i \in [N]
+\end{align}
+where the objective maximizes DSP profit (margin between what advertisers pay and what DSP pays to exchanges), $i^*(j)$ assigns impression $j$ to an advertiser, $\tau_i$ is the CPA charged to advertiser $i$, $p_j$ is the payment to the exchange, $q_j(b_j)$ is the win probability, and constraints ensure each advertiser's budget is respected. \citet{grigas2017profit} formulate this as a Lagrangian decomposition problem, deriving closed-form bidding rules that optimize DSP margins under campaign-level budget constraints.
+
+\section{Robust and Delay-Aware Optimization}
+
+Real-world advertising systems face distributional uncertainty (auction landscapes shift due to competitor entry, seasonal effects) and delayed feedback (conversions observed hours or days after clicks). Robust optimization addresses the first challenge via worst-case objectives over uncertainty sets, while delay-aware algorithms use predictive models for pending conversions or introduce auxiliary constraints on faster-feedback metrics. Both extensions aim to maintain performance guarantees under imperfect information. The robust pacing problem handles distributional uncertainty:
+\begin{align}
+\max_{\lambda(\cdot)} \min_{\mathcal{D} \in \mathcal{U}} \quad & \mathbb{E}_{\mathcal{D}}\left[\sum_{t=1}^T q_t(\lambda_t) v_t\right] \\
+\text{s.t.} \quad & \mathbb{P}_{\mathcal{D}}\left(\sum_{t=1}^T p_t(\lambda_t) \leq B\right) \geq 1-\delta \quad \forall \mathcal{D} \in \mathcal{U}
+\end{align}
+where the objective maximizes worst-case expected value over uncertainty set $\mathcal{U}$, and the constraint ensures the budget is satisfied with high probability for all distributions in $\mathcal{U}$.
+
+For delay-aware bidding with conversion delays, the problem is:
+\begin{align}
+\max_{\{b_t\}} \quad & \mathbb{E}\left[\sum_{t=1}^T y_t \cdot \omega_t(b_t)\right] \\
+\text{s.t.} \quad & \mathbb{E}\left[\sum_{t=1}^T p_t \cdot \omega_t(b_t)\right] \leq B \\
+& y_t \text{ observed at time } t + \Delta_t
+\end{align}
+where conversions $y_t$ are observed with delay $\Delta_t$, requiring predictive estimation of pending conversions.
+
+\section{Online Causal Optimization}
+
+An advertiser seeks to identify and target users for whom ad exposure has the largest causal effect on conversions, learning optimal treatment policies from observational data where past treatment assignments were based on suboptimal or exploratory policies. The challenge is policy learning under covariate shift and confounding, requiring inverse propensity weighting or doubly robust estimators to construct unbiased estimates of policy value. The optimal policy treats users with estimated treatment effects above a threshold determined by the budget constraint's shadow price. The causal optimization problem maximizes treatment effects:
+\begin{align}
+\max_{T_t \in \{0,1\}} \quad & \sum_{t=1}^T \tau(x_t) \cdot T_t \\
+\text{s.t.} \quad & \sum_{t=1}^T p_t T_t \leq B
+\end{align}
+where the objective maximizes total incremental impact, $\tau(x_t) = \mathbb{E}[Y_t^{(1)} - Y_t^{(0)}|X_t=x_t]$ is the conditional average treatment effect, $T_t = 1$ indicates treatment (show ad), and the constraint limits total treatment cost to budget $B$.
+
+The optimal policy treats when $\tau(x) \geq \lambda^*$ where $\lambda^*$ is the shadow price of the budget constraint.
+
+\section{Dynamic Pricing and Bidding}
+
+A platform managing campaigns for multiple advertisers must jointly set the prices charged to advertisers (e.g., cost-per-click rates) and the bids submitted to external ad exchanges, balancing the margin-volume tradeoff where higher prices reduce advertiser demand but increase per-unit profit. The coupled optimization accounts for demand elasticity with respect to pricing and win-rate sensitivity to bidding, subject to respecting each advertiser's budget across the planning horizon. The joint pricing-bidding problem optimizes both the price charged to advertisers and the bids placed in auctions:
+\begin{align}
+\max_{\{p_i, b_{it}\}} \quad & \sum_{i=1}^N \sum_{t=1}^T (p_i - c_{it}) D_i(p_i) q_{it}(b_{it}) \\
+\text{s.t.} \quad & \sum_{t=1}^T c_{it} D_i(p_i) q_{it}(b_{it}) \leq B_i \quad \forall i
+\end{align}
+where the objective maximizes total platform profit, $p_i$ is the price charged to advertiser $i$, $D_i(p_i)$ is demand as a function of price, $c_{it}$ is the auction cost, $q_{it}(b_{it})$ is the win probability at bid $b_{it}$, and constraints ensure each advertiser's budget is respected. The platform jointly sets prices to extract surplus while selecting bids to win valuable impressions, balancing the margin-volume tradeoff. \citet{agarwal2025pricing} analyze this joint problem in display campaign settings, deriving optimal dynamic pricing policies under demand uncertainty.
+
+\section{Robust Pacing with Distributional Uncertainty}
+
+When auction value and cost distributions are estimated from limited historical data, point estimates of optimal pacing multipliers may perform poorly under distribution shift. Distributionally robust pacing optimizes worst-case expected value over an ambiguity set of plausible distributions, constructed via statistical distance bounds (e.g., Wasserstein balls) around empirical distributions. The framework provides performance guarantees that hold with high probability even when the true distribution differs from the training distribution, at the cost of conservative pacing policies. The distributionally robust pacing problem maximizes worst-case performance over an uncertainty set of distributions:
+\begin{align}
+\max_{\lambda(\cdot)} \min_{\mathbb{P} \in \mathcal{U}} \quad & \mathbb{E}_{\mathbb{P}}\left[\sum_{t=1}^T q_t(\lambda_t) v_t\right] \\
+\text{s.t.} \quad & \mathbb{P}\left(\sum_{t=1}^T p_t(\lambda_t) \leq B\right) \geq 1-\delta \quad \forall \mathbb{P} \in \mathcal{U}
+\end{align}
+where the objective maximizes the minimum expected value over uncertainty set $\mathcal{U}$, and the constraint ensures budget feasibility holds with probability at least $1-\delta$ for all distributions in $\mathcal{U}$.
+
+\citet{balseiro2023robust} show that with a single sample from the true distribution, a conservative pacing policy achieves $(1-\epsilon)$-approximation to the optimal value with high probability by constructing an ambiguity set $\mathcal{U}$ around the empirical distribution. The key insight is that under Lipschitz continuity, pacing errors concentrate, enabling single-sample guarantees without strong distributional assumptions.
+
+\section{Delay-Aware Bidding and Conversion Prediction}
+
+Conversion events (purchases, sign-ups) often occur hours or days after ad clicks, creating a cold-start problem where recently-clicked impressions have incomplete conversion labels. Delay-aware bidding addresses this via survival models that estimate time-dependent conversion probabilities or by introducing auxiliary constraints on intermediate metrics (add-to-cart events, page views) with shorter feedback loops. The challenge is maintaining bidding performance while learning from censored and delayed observations. The delay-aware bidding problem accounts for delayed conversion labels:
+\begin{align}
+\max_{\{b_t\}} \quad & \mathbb{E}\left[\sum_{t=1}^T y_t \cdot \mathbb{1}(\text{win at } b_t)\right] \\
+\text{s.t.} \quad & \mathbb{E}\left[\sum_{t=1}^T p_t \cdot \mathbb{1}(\text{win at } b_t)\right] \leq B \\
+& y_t \text{ observed at time } t + \Delta_t
+\end{align}
+where conversions $y_t$ are observed with random delays $\Delta_t$, requiring predictive models to estimate pending conversions from partially observed outcomes.
+
+\citet{zhao2022mcmf} propose multi-constraint formulations that stabilize bid control under delayed feedback, introducing auxiliary constraints on intermediate metrics (clicks, add-to-carts) that have shorter delays, enabling faster feedback loops. \citet{liu2024delay} extend to very long delays using survival analysis, modeling conversion probability as a function of elapsed time since click, $P(Y=1|t_{\text{elapsed}})$, and updating bids based on expected ultimate conversions rather than observed conversions.
+
+\section{Learning to Bid in First-Price Auctions with Budgets}
+
+The combination of first-price payment rules and budget constraints creates a coupled learning problem: the bidder must simultaneously estimate the distribution of competing bids (to determine optimal shading) and learn the appropriate pacing multiplier (to spread budget across time). Primal-dual algorithms address this by maintaining distribution estimates and adjusting the pacing multiplier via gradient updates on the budget constraint violation. Convergence guarantees require balancing the learning rates for distribution estimation and multiplier adaptation. The budget-constrained bidding problem in first-price auctions combines bid shading with pacing:
+\begin{align}
+\max_{b_t} \quad & \mathbb{E}\left[\sum_{t=1}^T (v - b_t) \cdot \mathbb{1}(b_t \geq \max_{j \neq i} b_{jt})\right] \\
+\text{s.t.} \quad & \mathbb{E}\left[\sum_{t=1}^T b_t \cdot \mathbb{1}(b_t \geq \max_{j \neq i} b_{jt})\right] \leq B
+\end{align}
+where the objective maximizes expected surplus accounting for first-price payment rule, and the constraint limits total spend to budget $B$.
+
+\citet{balseiro2023learning} develop a primal-dual learning algorithm that simultaneously learns the distribution of competing bids and the optimal pacing multiplier. The algorithm maintains estimates $\hat{F}_t(b)$ of the CDF of the highest competing bid and selects $b_t = \arg\max_b (v - b) F_t(b) - \lambda_t b$ where $\lambda_t$ is updated via projected gradient ascent on the budget constraint. They prove convergence to equilibrium with rate $O(1/\sqrt{T})$ under standard regularity conditions.
+
+\bibliographystyle{abbrvnat}
+\begin{thebibliography}{99}
+
+\bibitem[Agarwal et al.(2014)]{agarwal2014bandits}
+Agarwal, A., Dekel, O., and Xiao, L. (2014).
+\newblock Optimal algorithms for online convex optimization with multi-point bandit feedback.
+\newblock In \emph{COLT}.
+
+\bibitem[Agarwal et al.(2021)]{agarwal2021multi}
+Agarwal, D., Ghosh, S., and Wei, K. (2021).
+\newblock Budget pacing in repeated auctions: Regret and efficiency without convergence.
+\newblock In \emph{ITCS}.
+
+\bibitem[Agarwal et al.(2025)]{agarwal2025pricing}
+Agarwal, D., Chen, Y., and Elmagarmid, A. (2025).
+\newblock Dynamic pricing and bidding for display campaigns in online advertising.
+\newblock \emph{Manufacturing \& Service Operations Management}.
+
+\bibitem[Agrawal and Devanur(2016)]{agrawal2016linear}
+Agrawal, S. and Devanur, N. (2016).
+\newblock Linear contextual bandits with knapsacks.
+\newblock In \emph{NeurIPS}.
+
+\bibitem[Badanidiyuru et al.(2013)]{badanidiyuru2013focs}
+Badanidiyuru, A., Kleinberg, R., and Slivkins, A. (2013).
+\newblock Bandits with knapsacks.
+\newblock In \emph{FOCS}, pages 207--216.
+
+\bibitem[Badanidiyuru et al.(2018)]{badanidiyuru2018bandits}
+Badanidiyuru, A., Kleinberg, R., and Slivkins, A. (2018).
+\newblock Bandits with knapsacks.
+\newblock \emph{Journal of the ACM}, 65(3):1--55.
+
+\bibitem[Balseiro and Gur(2019)]{balseiro2019learning}
+Balseiro, S. and Gur, Y. (2019).
+\newblock Learning in repeated auctions with budgets: Regret minimization and equilibrium.
+\newblock \emph{Management Science}, 65(9):3952--3968.
+
+\bibitem[Balseiro et al.(2015)]{balseiro2015repeated}
+Balseiro, S., Besbes, O., and Weintraub, G. (2015).
+\newblock Repeated auctions with budgets in ad exchanges.
+\newblock \emph{Management Science}, 61(4):864--884.
+
+\bibitem[Balseiro et al.(2023a)]{balseiro2023learning}
+Balseiro, S., Deng, Y., Mao, J., Mirrokni, V., and Zuo, S. (2023).
+\newblock Learning to bid in first-price auctions with budgets.
+\newblock arXiv preprint arXiv:2304.13477.
+
+\bibitem[Balseiro et al.(2023b)]{balseiro2023robust}
+Balseiro, S., Golrezaei, N., Mahdian, M., Mirrokni, V., and Schneider, J. (2023).
+\newblock Robust budget pacing with a single sample.
+\newblock arXiv preprint arXiv:2302.02006.
+
+\bibitem[Cai et al.(2017)]{cai2017rtb}
+Cai, H., Ren, K., Zhang, W., Malialis, K., Wang, J., Yu, Y., and Guo, D. (2017).
+\newblock Real-time bidding by reinforcement learning in display advertising.
+\newblock In \emph{WSDM}, pages 661--670.
+
+\bibitem[Chakrabarti and Vee(2012)]{chakrabarti2012traffic}
+Chakrabarti, D. and Vee, E. (2012).
+\newblock Traffic shaping to optimize ad delivery.
+\newblock In \emph{EC}, pages 130--147.
+
+\bibitem[Chapelle(2014)]{chapelle2014modeling}
+Chapelle, O. (2014).
+\newblock Modeling delayed feedback in display advertising.
+\newblock In \emph{KDD}.
+
+\bibitem[Chen et al.(2021)]{chen2021deep}
+Chen, J., Sun, B., Li, H., Lu, H., and Hua, X. (2021).
+\newblock Deep distribution network for bid shading in first-price auctions.
+\newblock In \emph{KDD}, pages 85--95.
+
+\bibitem[Choi and Mela(2020)]{choi2020reserve}
+Choi, H. and Mela, C. (2020).
+\newblock Optimizing reserve prices in display advertising.
+\newblock \emph{Marketing Science}, 39(6):1069--1089.
+
+\bibitem[Chen et al.(2024)]{chen2024ebay}
+Chen, J., Yang, L., Zhu, H., Zhang, R., and Liu, Z. (2024).
+\newblock Optimization-based budget pacing for online advertising with eBay sponsored search.
+\newblock In \emph{WWW}, pages 3589--3599.
+
+\bibitem[Conitzer et al.(2022)]{conitzer2022pacing}
+Conitzer, V., Kroer, C., Panigrahi, D., Schrijvers, O., Stier-Moses, N., Wilkens, C., and Zhang, H. (2022).
+\newblock Pacing equilibrium in first-price auction markets.
+\newblock \emph{Management Science}, 68(12):8363--8392.
+
+\bibitem[Deng et al.(2023)]{deng2023multichannel}
+Deng, Y., Mao, J., Mirrokni, V., and Zuo, S. (2023).
+\newblock Multi-channel autobidding with budget and ROI constraints.
+\newblock In \emph{ICML}, pages 7614--7628.
+
+\bibitem[Despotovic et al.(2018)]{despotovic2018cpa}
+Despotovic, Z., Henzinger, M., and Khazraei, V. (2018).
+\newblock Cost per action constrained auctions.
+\newblock arXiv preprint arXiv:1809.08837.
+
+\bibitem[Dikkala et al.(2019)]{dikkala2019causal}
+Dikkala, N., Lewis, G., Mackey, L., and Syrgkanis, V. (2019).
+\newblock Minimax estimation of conditional moment models.
+\newblock In \emph{NeurIPS}, pages 12248--12259.
+
+\bibitem[Devanur et al.(2016)]{devanur2016budgets}
+Devanur, N., Jain, K., and Wilkens, C. (2016).
+\newblock Online budgeted allocation with general budgets.
+\newblock In \emph{EC}, pages 419--436.
+
+\bibitem[Feldman et al.(2009)]{feldman2009online}
+Feldman, J., Korula, N., and Mirrokni, V. (2009).
+\newblock Online stochastic packing applied to display ad allocation.
+\newblock In \emph{ESA}.
+
+\bibitem[Feng et al.(2021)]{feng2021reserve}
+Feng, Z., Narasimhan, H., and Parkes, D. (2021).
+\newblock Reserve price optimization for first-price auctions in display advertising.
+\newblock In \emph{ICML}, pages 3284--3293.
+
+\bibitem[Gao and Qiao(2025)]{gao2025reach}
+Gao, Y. and Qiao, Y. (2025).
+\newblock Reach and frequency optimization under k-anonymity constraints.
+\newblock arXiv preprint arXiv:2501.04882.
+
+\bibitem[Grigas et al.(2017)]{grigas2017profit}
+Grigas, P., Lobel, R., and Zhang, H. (2017).
+\newblock Profit maximization for online advertising demand-side platforms.
+\newblock In \emph{AdKDD}, pages 1--9.
+
+\bibitem[Hasu et al.(2021)]{hasu2021multiplatform}
+Hasu, V., Talebi, M., Mehta, A., and Roughgarden, T. (2021).
+\newblock Stochastic bandits for multi-platform budget optimization in online advertising.
+\newblock In \emph{WWW}, pages 2805--2817.
+
+\bibitem[Hojjat et al.(2017)]{hojjat2017reach}
+Hojjat, A., Turner, J., Cetintas, S., and Yang, J. (2017).
+\newblock A unified framework for the scheduling of guaranteed targeted display advertising under reach and frequency requirements.
+\newblock \emph{Operations Research}, 65(2):289--313.
+
+\bibitem[Karande et al.(2022)]{karande2022pacing}
+Karande, C., Kokkodis, M., Pu, Y., and Yoganarasimhan, H. (2022).
+\newblock Optimal spend rate estimation and pacing for online advertising.
+\newblock arXiv preprint arXiv:2202.05881.
+
+\bibitem[Karp et al.(1990)]{karp1990optimal}
+Karp, R., Vazirani, U., and Vazirani, V. (1990).
+\newblock An optimal algorithm for on-line bipartite matching.
+\newblock In \emph{STOC}.
+
+\bibitem[Liu et al.(2024)]{liu2024delay}
+Liu, Z., Wang, T., Chen, M., and Yang, Y. (2024).
+\newblock Long-delayed conversions prediction for bidding in online advertising.
+\newblock arXiv preprint arXiv:2411.16095.
+
+\bibitem[Mehta et al.(2007)]{mehta2007adwords}
+Mehta, A., Saberi, A., Vazirani, U., and Vazirani, V. (2007).
+\newblock Adwords and generalized online matching.
+\newblock \emph{Journal of the ACM}, 54(5):1--19.
+
+\bibitem[Mehta(2013)]{mehta2013online}
+Mehta, A. (2013).
+\newblock Online matching and ad allocation.
+\newblock \emph{Foundations and Trends in Theoretical Computer Science}, 8(4):265--368.
+
+\bibitem[Moriwaki et al.(2020)]{moriwaki2020lift}
+Moriwaki, R., Yasui, S., and Morita, M. (2020).
+\newblock Unbiased lift-based bidding system.
+\newblock In \emph{AdKDD}, pages 1--9.
+
+\bibitem[Moriwaki and Hayakawa(2022)]{moriwaki2022realworld}
+Moriwaki, R. and Hayakawa, Y. (2022).
+\newblock Real-world implementation of a lift-based bidding system.
+\newblock arXiv preprint arXiv:2202.13868.
+
+\bibitem[Myerson(1981)]{myerson1981optimal}
+Myerson, R. (1981).
+\newblock Optimal auction design.
+\newblock \emph{Mathematics of Operations Research}, 6(1):58--73.
+
+\bibitem[Vee et al.(2010)]{vee2010gd}
+Vee, E., Vassilvitskii, S., and Shanmugasundaram, J. (2010).
+\newblock Optimal online assignment with forecasts.
+\newblock In \emph{EC}, pages 109--118.
+
+\bibitem[Buchbinder et al.(2011)]{buchbinder2011frequency}
+Buchbinder, N., Jain, K., and Naor, J. (2011).
+\newblock Online primal-dual algorithms for maximizing ad-auctions revenue.
+\newblock In \emph{WADS}, pages 253--264.
+
+\bibitem[Wang et al.(2024)]{wang2024robust}
+Wang, H., Zhang, Y., Liu, Q., and Chen, W. (2024).
+\newblock Double distributionally robust bid shading for first-price auctions.
+\newblock arXiv preprint arXiv:2410.14864.
+
+\bibitem[Wu et al.(2018)]{wu2018budget}
+Wu, D., Chen, X., Yang, X., Wang, H., Tan, Q., Zhang, X., Xu, J., and Gai, K. (2018).
+\newblock Budget constrained bidding by model-free reinforcement learning in display advertising.
+\newblock In \emph{CIKM}, pages 1443--1451.
+
+\bibitem[Zhao et al.(2022)]{zhao2022mcmf}
+Zhao, Y., Wang, Y., Xu, H., Wu, Y., and Yang, J. (2022).
+\newblock MCMF: Multi-constraints with merging features for stable bid control in online advertising.
+\newblock In \emph{KDD}, pages 4623--4633.
+
+\bibitem[Zhou et al.(2021)]{zhou2021unknown}
+Zhou, Y., Feng, Z., and Xu, P. (2021).
+\newblock Adwords with unknown budgets and beyond.
+\newblock arXiv preprint arXiv:2110.00504.
+
+\bibitem[Zhou et al.(2025)]{zhou2025ocpc}
+Zhou, X., Liu, Y., Wang, J., and Chen, W. (2025).
+\newblock OCPC via constrained MDP: An industrial application.
+\newblock \emph{PACMMOD}, 3(1):1--25.
+
+\end{thebibliography}
+
+\end{document}

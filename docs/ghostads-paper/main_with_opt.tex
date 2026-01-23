@@ -1,0 +1,44 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{adjustbox}
+\usetikzlibrary{positioning, arrows.meta, shapes}
+
+\onehalfspacing
+
+\title{Measuring and Optimizing Advertising Incrementality with Ghost Ads}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Advertising platforms face a fundamental challenge: distinguishing correlation from causation in user behavior. We present ghost ads methodology for measuring incremental effects and demonstrate how these measurements enable optimal resource allocation. Through mixed-integer linear programming on synthetic data calibrated to marketplace conditions, we show that causal optimization achieves 36-90\% higher incremental return on ad spend compared to correlation-based methods across bidding, ranking, frequency capping, and eligibility decisions. The key insight is that baseline purchase probability and treatment effects exhibit strong negative correlation—users who would convert organically show minimal lift from advertising. By identifying and targeting high-lift users, causal methods dramatically improve platform economics while reducing wasted impressions.
+\end{abstract}
+
+\input{introduction.tex}
+\input{approaches.tex}
+\input{ghostads.tex}
+\input{optimization.tex}
+\input{pilot.tex}
+\input{example.tex}
+\input{extensions.tex}
+
+\appendix
+\input{notation.tex}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}

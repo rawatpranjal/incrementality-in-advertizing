@@ -1,0 +1,358 @@
+% Backup Slides - Technical Details
+
+\begin{frame}{Notation: Core Variables}
+
+\begin{table}
+\centering
+\tiny
+\begin{tabular}{p{1.5cm}p{8cm}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$Z_i$ & Treatment assignment: $Z_i=1$ if treatment, $Z_i=0$ if control \\
+\midrule
+$Y_i(1)$ & Potential outcome under focal ad exposure \\
+$Y_i(0)$ & Potential outcome under no ad (baseline) \\
+$Y_i(P)$ & Potential outcome under placebo ad \\
+\midrule
+$D_i(1)$ & Potential focal ad exposure under treatment \\
+$D_i(0)$ & Potential focal ad exposure under control (=0 for ITT/GA/PGA) \\
+\midrule
+$Y_i$ & Observed outcome \\
+$D_i$ & Observed focal ad exposure: $D_i = Z_i D_i(1)$ \\
+$P_i$ & Placebo exposure indicator \\
+$\tilde{D}_i$ & Ghost auction indicator (control users): $\tilde{D}_i=1 \iff D_i(1)=1$ \\
+$\hat{D}_i$ & Predicted exposure (pre-randomization): $\hat{D}_i \perp Z_i$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{table}
+\centering
+\tiny
+\begin{tabular}{p{1.5cm}p{8cm}}
+\toprule
+\textbf{Symbol} & \textbf{Definition} \\
+\midrule
+$\tau_{\text{ATT}}$ & Average treatment effect on treated: $E[Y_i(1) - Y_i(0) \mid D_i(1)=1]$ \\
+$\tau_{\text{ITT}}$ & Intent-to-treat effect: $E[Y_i \mid Z_i=1] - E[Y_i \mid Z_i=0]$ \\
+$\pi$ & Compliance rate: $P(D_i(1)=1)$ \\
+$\hat{p}$ & Compliance within predicted stratum: $P(D_i=1 \mid Z_i=1, \hat{D}_i=1)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Key Assumptions}
+
+\textbf{All methods require:}
+\begin{itemize}
+\item \textbf{(A1) Random assignment:} $Z_i \perp (Y_i(0), Y_i(1), D_i(1))$
+\item \textbf{(A2) One-sided noncompliance:} $D_i(0) = 0$ (control never sees focal ad)
+\item \textbf{(A3) SUTVA:} No interference between units
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Method-specific assumptions:}
+
+\begin{table}
+\centering
+\tiny
+\begin{tabular}{lp{7cm}}
+\toprule
+\textbf{Method} & \textbf{Additional Assumptions} \\
+\midrule
+PSA & (A4) Perfect blind: $P_i(0)=1 \iff D_i(1)=1$ \\
+ & (A5) No placebo effect: $Y_i(P) = Y_i(0)$ \\
+\midrule
+Ghost Ads & (A6) Correct prediction: $\tilde{D}_i=1 \iff D_i(1)=1$ for $Z_i=0$ \\
+ & (A7) Correct control baseline \\
+\midrule
+PGA & (A8) Predetermined prediction: $\hat{D}_i \perp Z_i$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{ITT and Dilution}
+
+\textbf{Intent-to-Treat Estimator:}
+\begin{equation}
+\tau_{\text{ITT}} = E[Y_i \mid Z_i=1] - E[Y_i \mid Z_i=0]
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Relationship to ATT:}
+\begin{equation}
+\tau_{\text{ITT}} = \pi \cdot \tau_{\text{ATT}}
+\end{equation}
+
+where $\pi = P(D_i(1)=1)$ is the compliance rate
+
+\vspace{0.3cm}
+
+\textbf{LATE Estimator:}
+\begin{equation}
+\hat{\tau}_{\text{LATE}} = \frac{\tau_{\text{ITT}}}{\pi} = \frac{E[Y_i \mid Z_i=1] - E[Y_i \mid Z_i=0]}{P(D_i=1 \mid Z_i=1)}
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Variance (delta method):}
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{LATE}}) \approx \frac{1}{\pi^2}\left[\text{Var}(\hat\beta) + \tau^2\text{Var}(\hat\pi) - 2\tau\text{Cov}(\hat\beta,\hat\pi)\right]
+\end{equation}
+
+The $1/\pi^2$ factor creates the weak first-stage problem when $\pi$ is small
+
+\end{frame}
+
+\begin{frame}{Placebo Ads (PSA)}
+
+\textbf{PSA Estimator:}
+\begin{equation}
+\hat{\tau}_{\text{PSA}} = E[Y_i \mid Z_i=1, D_i=1] - E[Y_i \mid Z_i=0, P_i=1]
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Identification:}
+
+Under (A1)-(A5):
+\begin{align}
+E[\hat{\tau}_{\text{PSA}}] &= E[Y_i(1) \mid D_i(1)=1] - E[Y_i(P) \mid D_i(1)=1] \\
+&= E[Y_i(1) \mid D_i(1)=1] - E[Y_i(0) \mid D_i(1)=1] \quad \text{by (A5)} \\
+&= \tau_{\text{ATT}}
+\end{align}
+
+\vspace{0.3cm}
+
+\textbf{Variance:}
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{PSA}}) = \frac{\sigma^2_T}{N_T} + \frac{\sigma^2_C}{N_C} \approx \frac{4\sigma^2}{N\pi}
+\end{equation}
+
+Under balanced assignment with $N_T \approx N_C \approx N\pi/2$
+
+\end{frame}
+
+\begin{frame}{Ghost Ads}
+
+\textbf{Ghost Ads Estimator:}
+\begin{equation}
+\hat{\tau}_{\text{GA}} = E[Y_i \mid Z_i=1, D_i=1] - E[Y_i \mid Z_i=0, \tilde{D}_i=1]
+\end{equation}
+
+where $\tilde{D}_i=1$ indicates control user with ghost impression
+
+\vspace{0.3cm}
+
+\textbf{Identification:}
+
+Under (A1)-(A3), (A6)-(A7):
+\begin{align}
+E[\hat{\tau}_{\text{GA}}] &= E[Y_i(1) \mid D_i(1)=1] - E[Y_i(0) \mid \tilde{D}_i=1] \\
+&= E[Y_i(1) \mid D_i(1)=1] - E[Y_i(0) \mid D_i(1)=1] \quad \text{by (A6)} \\
+&= \tau_{\text{ATT}}
+\end{align}
+
+\vspace{0.3cm}
+
+\textbf{Variance:}
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{GA}}) = \frac{\sigma^2_T}{N_T} + \frac{\sigma^2_C}{N_C} \approx \frac{4\sigma^2}{N\pi}
+\end{equation}
+
+Same precision as PSA, no contamination
+
+\end{frame}
+
+\begin{frame}{Predicted Ghost Ads (PGA)}
+
+\textbf{PGA Estimator:}
+\begin{equation}
+\hat{\tau}_{\text{PGA}} = \frac{E[Y_i \mid Z_i=1, \hat{D}_i=1] - E[Y_i \mid Z_i=0, \hat{D}_i=1]}{P(D_i=1 \mid Z_i=1, \hat{D}_i=1)}
+\end{equation}
+
+where $\hat{D}_i$ is pre-randomization predicted exposure
+
+\vspace{0.3cm}
+
+\textbf{Identification:}
+
+Under (A1)-(A3), (A8):
+\begin{align}
+E[Y_i \mid Z_i=1, \hat{D}_i=1] - E[Y_i \mid Z_i=0, \hat{D}_i=1] &= \hat{p} \cdot \tau_{\text{PGA}}
+\end{align}
+
+where $\tau_{\text{PGA}} = E[Y_i(1) - Y_i(0) \mid \hat{D}_i=1, D_i(1)=1]$ is the LATE in predicted stratum
+
+\vspace{0.3cm}
+
+\textbf{Variance (delta method):}
+\begin{equation}
+\text{Var}(\hat{\tau}_{\text{PGA}}) = \frac{1}{\hat{p}^2}\left[\text{Var}(\hat{\beta}) + \hat{\tau}^2\text{Var}(\hat{p}) - 2\hat{\tau}\text{Cov}(\hat{\beta},\hat{p})\right]
+\end{equation}
+
+When $\hat{p} \approx 1$ (high compliance), variance $\approx \frac{4\sigma^2}{N\pi}$
+
+\end{frame}
+
+\begin{frame}{Precision Comparison}
+
+\begin{table}
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{Variance} & \textbf{SD} & \textbf{Relative} \\
+\midrule
+ITT-LATE & $\frac{\text{const}}{N\pi^2}$ & $\frac{1}{\sqrt{N\pi^2}}$ & Baseline \\
+\addlinespace
+PSA & $\frac{\text{const}}{N\pi}$ & $\frac{1}{\sqrt{N\pi}}$ & $\pi \times$ better \\
+\addlinespace
+Ghost Ads & $\frac{\text{const}}{N\pi}$ & $\frac{1}{\sqrt{N\pi}}$ & $\pi \times$ better \\
+\addlinespace
+PGA & $\frac{\text{const}}{N\pi}$ & $\frac{1}{\sqrt{N\pi}}$ & $\pi \times$ better \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\textbf{Key Insight:} PSA, Ghost Ads, and PGA avoid the weak first-stage penalty
+\begin{itemize}
+\item ITT-LATE variance scales as $1/(N\pi^2)$
+\item Other methods scale as $1/(N\pi)$
+\item Precision gain of $1/\pi$ (e.g., 10x when $\pi=0.10$)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Effect Heterogeneity and External Validity}
+
+\textbf{ATT vs ATE:}
+
+All methods estimate $\tau_{\text{ATT}} = E[Y_i(1) - Y_i(0) \mid D_i(1)=1]$
+
+\vspace{0.3cm}
+
+This differs from $\tau_{\text{ATE}} = E[Y_i(1) - Y_i(0)]$ if:
+\begin{itemize}
+\item Treatment effects vary across users
+\item Users who see ads have different effects than those who don't
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{PGA identifies stratum-specific LATE:}
+
+\begin{equation}
+\tau_{\text{PGA}} = E[Y_i(1) - Y_i(0) \mid \hat{D}_i=1, D_i(1)=1]
+\end{equation}
+
+\vspace{0.3cm}
+
+This equals overall $\tau_{\text{ATT}}$ if:
+\begin{enumerate}
+\item Perfect prediction: $\hat{D}_i = D_i(1)$ almost surely, OR
+\item Homogeneous effects: $\tau$ constant across prediction strata
+\end{enumerate}
+
+\vspace{0.3cm}
+
+Empirically, under-prediction rate $\approx 3\%$, so $\tau_{\text{PGA}} \approx \tau_{\text{ATT}}$
+
+\end{frame}
+
+\begin{frame}{Implementation: Weighted Estimator}
+
+When limiting control group membership with cap $K$:
+
+\vspace{0.3cm}
+
+\textbf{Inclusion probability:}
+\begin{equation}
+\pi_{iv} = p_v \cdot s(i) \quad \text{where} \quad s(i) = \min\left(1, \frac{K}{\sum_v p_v}\right)
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Inverse-probability weighted estimator:}
+\begin{equation}
+\hat{\tau}_v = \frac{1}{N_T}\sum_{i:T_{iv}=1} Y_{iv} - \frac{\sum_{i:T_{iv}=0} w_{iv} Y_{iv}}{\sum_{i:T_{iv}=0} w_{iv}}
+\end{equation}
+
+where $w_{iv} = \mathbf{1}[\hat{D}_{iv}=1] / \pi_{iv}$
+
+\vspace{0.3cm}
+
+\textbf{Why this works:}
+\begin{itemize}
+\item Control users admitted with probability $\pi_{iv}$
+\item Upweight by $1/\pi_{iv}$ to correct for selection
+\item Maintains unbiasedness under random admission
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Variance with Weighting}
+
+\textbf{Weighted estimator variance:}
+
+\begin{equation}
+\text{Var}(\hat{\tau}_v) = \frac{\sigma^2_T}{N_T} + \frac{E[w_{iv}^2] \sigma^2_C}{\left(E[w_{iv}]\right)^2 N_C}
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Design effect:}
+\begin{equation}
+\text{DEFF} = \frac{E[w_{iv}^2]}{(E[w_{iv}])^2} = \frac{\sum \pi_{iv}^{-1}}{\left(\sum \pi_{iv}^{-1}\right)^2 / N_C}
+\end{equation}
+
+\vspace{0.5cm}
+
+\textbf{Trade-off:}
+\begin{itemize}
+\item Capping $K$ reduces computational cost (fewer ghost auctions)
+\item But increases variance through weighting
+\item Optimal $K$ balances computational and statistical efficiency
+\item Typical choice: $K \in \{3, 5, 10\}$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Statistical Power Calculations}
+
+\textbf{Minimum detectable effect (MDE):}
+
+For power $1-\beta$ at significance level $\alpha$:
+
+\begin{equation}
+\text{MDE} = (z_{\alpha/2} + z_\beta) \sqrt{\frac{2\sigma^2}{N\pi}}
+\end{equation}
+
+\vspace{0.3cm}
+
+\textbf{Example:} 80\% power, 5\% significance, $\sigma^2 = 1$, $\pi = 0.10$
+\begin{itemize}
+\item $N = 10,000$: MDE = 0.056
+\item $N = 50,000$: MDE = 0.025
+\item $N = 100,000$: MDE = 0.018
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Required sample size for given MDE:}
+\begin{equation}
+N = \frac{2\sigma^2(z_{\alpha/2} + z_\beta)^2}{\pi \cdot \text{MDE}^2}
+\end{equation}
+
+\end{frame}

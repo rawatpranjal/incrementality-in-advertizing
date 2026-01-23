@@ -1,0 +1,566 @@
+% Backup Slides - Technical Appendix
+
+% ===========================================================================
+% PART 0: Selection Bias
+% ===========================================================================
+
+\begin{frame}{What We Observe}
+
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item $i$ is user (unit of analysis).
+\item Outcome ($Y_i \in \mathbb{R}$): measured result per user.
+\item Assignment ($Z_i\in\{0,1\}$): randomized assignment to treatment (1) or control (0).
+\item Exposure ($D_i\in\{0,1\}$): actually was exposed to the ad.
+\item Group means: $\bar Y_{D=1}$, $\bar Y_{D=0}$, $\bar Y_{Z=1}$, $\bar Y_{Z=0}$, $\bar D_{Z=1}$, $\bar D_{Z=0}$.
+\item Notation for counts: $N$ total, $n_{g}$ in group $g$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{What we don't see (Potential Outcomes)}
+
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item Assignment to outcome:
+  \begin{itemize}
+  \item $Y_i^{Z}(1)$: outcome if user $i$ is assigned to treatment.
+  \item $Y_i^{Z}(0)$: outcome if user $i$ is assigned to control.
+  \end{itemize}
+\item Exposure to outcome:
+  \begin{itemize}
+  \item $Y_i^{D}(1)$: outcome if user $i$ is exposed to the ad.
+  \item $Y_i^{D}(0)$: outcome if user $i$ is not exposed to the ad.
+  \end{itemize}
+\item Assignment to exposure:
+  \begin{itemize}
+  \item $D_i^{Z}(1)$: whether user $i$ would be exposed if assigned to treatment.
+  \item $D_i^{Z}(0)$: whether user $i$ would be exposed if assigned to control.
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Assumptions}
+
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item (A1) Randomization: $Z_i \perp (Y_i^{D}(0), Y_i^{D}(1), D_i^{Z}(0), D_i^{Z}(1), Y_i^{Z}(0), Y_i^{Z}(1))$.
+  \begin{itemize}
+  \item Assignment is independent of all potential outcomes and exposures.
+  \end{itemize}
+\item (A0) Consistency: $Y_i = Y_i^{Z}(Z_i) = Y_i^{D}(D_i)$ and $D_i = D_i^{Z}(Z_i)$.
+  \begin{itemize}
+  \item Observed outcomes match potential outcomes under realized treatment.
+  \end{itemize}
+\item (A2) One-sided noncompliance: $D_i^{Z}(0) = 0$ a.s.
+  \begin{itemize}
+  \item No exposure in control.
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{What We Really Care About}
+
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item Individual treatment effect: $\tau_i := Y_i^{D}(1) - Y_i^{D}(0)$.
+\item Average Treatment effect on the Treated (ATT):
+  \[
+  \tau_{\text{ATT}} := E[\tau_i \mid D_i = 1] = E[Y_i^{D}(1) - Y_i^{D}(0) \mid D_i = 1].
+  \]
+\item This is the effect on those who are exposed.
+\item We do not care about $E[Y_i^{Z}(1) - Y_i^{Z}(0) \mid Z_i = 1]$.
+\item We care about exposure (which we do not control), not just assignment (which we control perfectly).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Selection-Bias Decomposition (by exposure)}
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\begin{align*}
+\underbrace{E[Y_i\mid D_i=1]-E[Y_i\mid D_i=0]}_{\text{observed}\footnotemark}
+&= \underbrace{E[Y_i^{D}(1)-Y_i^{D}(0)\mid D_i=1]}_{\text{ATT (not observed)}} \\
+&\quad + \underbrace{E[Y_i^{D}(0)\mid D_i=1]-E[Y_i^{D}(0)\mid D_i=0]}_{\text{selection bias (not observed)}}
+\end{align*}
+}}
+\end{center}
+
+\vspace{0.5cm}
+
+\footnotetext{\tiny Can be approximated by $\bar Y_{D=1} - \bar Y_{D=0}$.}
+
+\vspace{0.3cm}
+
+Observed exposed--unexposed gap equals the actual causal effect plus an intrinsic baseline difference between exposed and unexposed groups.
+
+\end{frame}
+
+% ===========================================================================
+% PART 1: ITT
+% ===========================================================================
+
+\begin{frame}{ITT is Diluted}
+
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item Estimator (Intent to Treat): $\hat\tau_{\text{ITT}}=\bar Y_{Z=1}-\bar Y_{Z=0}$.
+\item Exposure rate: $\pi := E[D_i\mid Z_i=1]$.\footnotemark
+\item Average treatment effect on treated: $\tau_{\text{ATT}} := E[\tau_i\mid D_i=1]$.
+\end{itemize}
+
+\footnotetext{\tiny In practice, approximate $\pi$ with $\hat\pi = \bar D_{Z=1}$, where $\bar D_{Z=1} = \frac{1}{n_1}\sum_{i:Z_i=1}D_i$.}
+
+\vspace{0.3cm}
+
+\begin{center}
+\fbox{\Large $\displaystyle \tau_{\text{ITT}}=\pi\cdot \tau_{\text{ATT}}$}
+\end{center}
+
+\vspace{0.3cm}
+
+Since $\pi < 1$, $\tau_{\text{ITT}}$ is biased towards 0.
+
+\end{frame}
+
+\begin{frame}{ITT is Diluted (proof)}
+
+\begin{align*}
+\tau_{\text{ITT}}
+&=E[Y_i\mid Z_i=1]-E[Y_i\mid Z_i=0] \\
+&=E\big[Y_i^{D}(0)+D_i\cdot\tau_i\mid Z_i=1\big]-E\big[Y_i^{D}(0)\mid Z_i=0\big]\quad\text{(A0)} \\
+&=E[D_i\cdot\tau_i\mid Z_i=1]\quad\text{(A1)} \\
+&=E[D_i\mid Z_i=1]\,E[\tau_i\mid D_i=1,Z_i=1] \\
+&=\pi\cdot \tau_{\text{ATT}}\quad\text{(A2 one-sided: }D_i^{Z}(0)=0\text{)}.
+\end{align*}
+
+\vspace{0.3cm}
+
+{\small A0 = Consistency; A1 = Randomization; A2 ensures $D_i=1\Rightarrow Z_i=1$, so $E[\tau_i\mid D_i=1,Z_i=1]=E[\tau_i\mid D_i=1]$.}
+
+\end{frame}
+
+\begin{frame}{ITT Variance}
+
+Variance:
+\[
+\operatorname{Var}(\hat\tau_{\text{ITT}})=\frac{\sigma_1^2}{n_1}+\frac{\sigma_0^2}{n_0},
+\quad
+\sigma_z^2:=\operatorname{Var}(Y\mid Z=z).\footnotemark
+\]
+
+\vspace{0.3cm}
+
+{\small \textbf{Proof:}}
+\begin{align*}
+\operatorname{Var}(\hat\tau_{\text{ITT}})
+&= \operatorname{Var}(\bar Y_{Z=1}-\bar Y_{Z=0}) \\
+&= \operatorname{Var}(\bar Y_{Z=1})+\operatorname{Var}(\bar Y_{Z=0}) \quad \text{(disjoint units)} \\
+&= \frac{\sigma_1^2}{n_1}+\frac{\sigma_0^2}{n_0} \quad \text{(sample mean variance)}.
+\end{align*}
+
+\footnotetext{\tiny In practice, approximate $\operatorname{Var}(\hat\tau_{\text{ITT}})$ by replacing $\sigma_z^2$ with sample variance $s_z^2 = \frac{1}{n_z-1}\sum_{i:Z_i=z}(Y_i-\bar Y_{Z=z})^2$.}
+
+\end{frame}
+
+% ===========================================================================
+% PART 2: Rescaled ITT (LATE)
+% ===========================================================================
+
+\begin{frame}{LATE: What We Estimate}
+
+Target (compliers):
+\[
+\tau_{\text{LATE}}
+:=E\big[Y^{D}(1)-Y^{D}(0)\mid D^{Z}(1)>D^{Z}(0)\big].
+\]
+{\small \hfill (average effect on compliers)}
+
+\vspace{0.3cm}
+
+Estimator (Wald / adjusted ITT):
+\[
+\hat\tau_{\text{LATE}}
+=\frac{\bar Y_{Z=1}-\bar Y_{Z=0}}{\bar D_{Z=1}-\bar D_{Z=0}}
+=\frac{\hat\tau_{\text{ITT}}}{\hat\pi_{\text{IV}}},
+\quad \hat\pi_{\text{IV}}:=\bar D_{Z=1}-\bar D_{Z=0}.
+\]
+
+\vspace{0.3cm}
+
+{\small Context: $\hat\tau_{\text{ITT}}=\bar Y_{Z=1}-\bar Y_{Z=0}$ from earlier; $\hat\pi=\bar D_{Z=1}$ was the exposure rate.}
+
+\end{frame}
+
+\begin{frame}{LATE: Assumptions}
+
+Already defined: binary $D\in\{0,1\}$, A0 (Consistency), A1 (Randomization).
+
+\vspace{0.3cm}
+
+\textbf{Add:}
+
+\setbeamertemplate{itemize items}[circle]
+\begin{itemize}
+\item Exclusion: $Y^{Z}(z)=Y^{D}\big(D^{Z}(z)\big)$.
+  \begin{itemize}
+  \item Assignment affects outcome only through exposure.
+  \end{itemize}
+\item Monotonicity (no defiers): $D^{Z}(1)\ge D^{Z}(0)$ almost surely.
+  \begin{itemize}
+  \item Assignment never makes anyone less likely to be exposed.
+  \end{itemize}
+\item First stage: $E[D\mid Z=1]-E[D\mid Z=0]>0$.
+  \begin{itemize}
+  \item Assignment increases exposure probability.
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{LATE: Identification}
+
+Using A0, A1, \textbf{Exclusion}:
+\[
+E[Y\mid Z=1]-E[Y\mid Z=0]
+=E\big[Y^{D}(D^{Z}(1))-Y^{D}(D^{Z}(0))\big]
+=E\big[\tau_i\big(D^{Z}(1)-D^{Z}(0)\big)\big].
+\]
+
+\[
+E[D\mid Z=1]-E[D\mid Z=0]=E\big[D^{Z}(1)-D^{Z}(0)\big].
+\]
+
+With \textbf{Monotonicity}, $D^{Z}(1)-D^{Z}(0)\in\{0,1\}$, so
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{
+\[
+\frac{E[Y\mid Z=1]-E[Y\mid Z=0]}{E[D\mid Z=1]-E[D\mid Z=0]}
+=E[\tau_i\mid D^{Z}(1)>D^{Z}(0)]
+=\tau_{\text{LATE}}.
+\]
+}}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{LATE: Equal to ATT}
+
+\setbeamertemplate{itemize items}[circle]
+
+When someone is assigned to control group, there is no chance of exposure. That means one-sided exposure.
+
+\vspace{0.3cm}
+
+If $D^{Z}(0)=0$ (one-sided exposure, A2), then:
+
+\begin{itemize}
+\item $\pi_{\text{IV}}=E[D\mid Z=1]=\pi$ (equals exposure / compliance rate)
+\item Compliers = exposed under treatment assignment
+\end{itemize}
+
+\vspace{0.5cm}
+
+Hence:
+\[
+\hat\tau_{\text{LATE}}=\frac{\hat\tau_{\text{ITT}}}{\hat\pi_{\text{IV}}}
+=\frac{\hat\tau_{\text{ITT}}}{\hat\pi}
+\quad\text{and}\quad \text{LATE}=\text{ATT}.
+\]
+
+\end{frame}
+
+\begin{frame}{LATE: Variance}
+
+{\small
+Estimator: $\hat\tau_{\text{LATE}}=\dfrac{\hat\tau_{\text{ITT}}}{\hat\pi_{\text{IV}}}$,
+$\hat\tau_{\text{ITT}}=\bar Y_{Z=1}-\bar Y_{Z=0}$, $\hat\pi_{\text{IV}}=\bar D_{Z=1}-\bar D_{Z=0}$.
+
+\vspace{0.15cm}
+
+Formula (Delta method):
+\[
+\boxed{
+\operatorname{Var}(\hat\tau_{\text{LATE}})
+\approx
+\frac{1}{\pi_{\text{IV}}^{2}}\operatorname{Var}(\hat\tau_{\text{ITT}})
++\frac{\tau_{\text{LATE}}^{2}}{\pi_{\text{IV}}^{2}}\operatorname{Var}(\hat\pi_{\text{IV}})
+-\frac{2\,\tau_{\text{LATE}}}{\pi_{\text{IV}}^{2}}\operatorname{Cov}(\hat\tau_{\text{ITT}},\hat\pi_{\text{IV}})
+}
+\]
+
+\vspace{0.15cm}
+
+Components (disjoint arms):
+\[
+\operatorname{Var}(\hat\tau_{\text{ITT}})=\tfrac{\sigma_1^2}{n_1}+\tfrac{\sigma_0^2}{n_0},\quad
+\operatorname{Var}(\hat\pi_{\text{IV}})=\tfrac{v_1}{n_1}+\tfrac{v_0}{n_0},
+\]
+\[
+\operatorname{Cov}(\hat\tau_{\text{ITT}},\hat\pi_{\text{IV}})=\tfrac{\operatorname{Cov}(Y,D\mid Z=1)}{n_1}+\tfrac{\operatorname{Cov}(Y,D\mid Z=0)}{n_0},
+\]
+where $v_z:=\operatorname{Var}(D\mid Z=z)=\pi_z(1-\pi_z)$.
+
+\vspace{0.15cm}
+
+Under one-sided exposure (A2): $v_0=0$ and $\operatorname{Cov}(Y,D\mid Z=0)=0$, so
+\[
+\operatorname{Var}(\hat\tau_{\text{LATE}})
+\approx
+\underbrace{\frac{1}{\pi^{2}}}_{\text{inflates variance}}
+\Big[
+\tfrac{\sigma_1^2}{n_1}+\tfrac{\sigma_0^2}{n_0}
++\tau_{\text{LATE}}^{2}\tfrac{\pi(1-\pi)}{n_1}
+-2\,\tau_{\text{LATE}}\tfrac{\operatorname{Cov}(Y,D\mid Z=1)}{n_1}
+\Big].
+\]
+}
+
+\end{frame}
+
+% ===========================================================================
+% PART 3: Placebo Ads (PSA)
+% ===========================================================================
+
+\begin{frame}{PSA: Notation}
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item New flag (control arm): $R_i\in\{0,1\}$ indicates placebo ad when $Z_i=0$. ($R_i$ only defined/used in control.)
+\item Estimator (difference in means):
+\[
+\hat\tau_{\text{PSA}}:=\ \bar Y_{Z=1,D=1}\ -\ \bar Y_{Z=0,R=1}.
+\]
+\item Cell counts: $N_T=\#\{Z=1,D=1\}$, $N_C=\#\{Z=0,R=1\}$.
+\end{itemize}
+
+\vspace{0.3cm}
+{\small Everything else—$i,Y,Z,D$, group means—already defined.}
+
+\end{frame}
+
+\begin{frame}{PSA: Assumptions}
+
+{\small Control users see either placebo ad or nothing; observed outcome matches potential outcome.}
+\[
+\text{if }Z_i=0,R_i=1\text{ then }Y_i=Y_i^{\text{pl}};\quad
+\text{if }Z_i=0,R_i=0\text{ then }Y_i=Y_i^D(0).
+\]
+
+\vspace{0.3cm}
+
+{\small In control, placebo shown to exactly those who would have seen real ad under treatment.}
+\[
+Z_i=0:\ R_i=1\ \Longleftrightarrow\ D_i^Z(1)=1.
+\]
+
+\vspace{0.3cm}
+
+{\small Placebo has no effect; equivalent to not seeing ad.}
+\[
+Y_i^{\text{pl}}=Y_i^D(0).
+\]
+
+\end{frame}
+
+\begin{frame}{PSA: Identification (cells)}
+
+Treated \& exposed cell:
+\begin{align*}
+E[Y\mid Z=1,D=1]
+&\overset{\text{A0}}{=}E[Y^D(1)\mid Z=1,D=1]\\
+&\overset{\text{A0}}{=}E[Y^D(1)\mid Z=1,D^Z(1)=1]\\
+&\overset{\text{A1}}{=}E[Y^D(1)\mid D^Z(1)=1].
+\end{align*}
+
+Control placebo cell:
+\begin{align*}
+E[Y\mid Z=0,R=1]
+&\overset{\text{A0-pl}}{=}E[Y^{\text{pl}}\mid Z=0,R=1]\\
+&\overset{\text{A4}}{=}E[Y^{\text{pl}}\mid Z=0,D^Z(1)=1]\\
+&\overset{\text{A1}}{=}E[Y^{\text{pl}}\mid D^Z(1)=1]\\
+&\overset{\text{A5}}{=}E[Y^D(0)\mid D^Z(1)=1].
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{PSA: Equals ATT}
+
+Under one-sided exposure (A2: $D^Z(0)=0$), the would-be-exposed under treatment are exactly the observed treated:
+\[
+\tau_{\text{ATT}}:=E[\tau_i\mid D^Z(1)=1] = E[\tau_i\mid D_i=1].
+\]
+
+\vspace{0.3cm}
+
+Subtract:
+\begin{align*}
+E[\hat\tau_{\text{PSA}}]
+&=E[Y\mid Z=1,D=1]-E[Y\mid Z=0,R=1]\\
+&=E[Y^D(1)\mid D^Z(1)=1]-E[Y^D(0)\mid D^Z(1)=1]
+=\tau_{\text{ATT}}.
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{PSA: Variance}
+
+Variance (disjoint cells):\footnotemark
+\[
+\operatorname{Var}(\hat\tau_{\text{PSA}}\mid N_T,N_C)
+=\frac{\sigma_T^2}{N_T}+\frac{\sigma_C^2}{N_C},
+\]
+\[
+\sigma_T^2=\operatorname{Var}(Y\mid Z=1,D=1),\quad
+\sigma_C^2=\operatorname{Var}(Y\mid Z=0,R=1).
+\]
+
+{\small Disjoint cells ($N_T \cap N_C = \emptyset$) $\Rightarrow$ covariance = 0.}
+
+\footnotetext{\tiny In practice, use plug-in standard errors: replace $\sigma_T^2,\sigma_C^2$ with within-cell sample variances.}
+
+\end{frame}
+
+% ===========================================================================
+% PART 4: Ghost Ads (GA)
+% ===========================================================================
+
+\begin{frame}{Ghost Ads: Notation}
+\setbeamertemplate{itemize items}[circle]
+
+\begin{itemize}
+\item New control-arm tag (ghost): $\tilde{D}_i \in \{0,1\}$ defined only when $Z_i=0$; $\tilde{D}_i=1$ flags "would have been exposed under treatment." ($\tilde{D}_i$ only defined/used in control.)
+\item Perfect ghost mapping (control): for $Z_i=0$, $\tilde{D}_i=1 \iff D_i^Z(1)=1$.
+\item Estimator (difference in means):
+\[
+\hat\tau_{\text{GA}}:=\ \bar Y_{Z=1,D=1}\ -\ \bar Y_{Z=0,\tilde D=1}.
+\]
+\item Cell counts: $N_T=\#\{Z=1,D=1\}$, $\tilde N_C=\#\{Z=0,\tilde D=1\}$.
+\end{itemize}
+
+\vspace{0.3cm}
+{\small Everything else—$i,Y,Z,D$, group means—already defined.}
+
+\end{frame}
+
+\begin{frame}{Ghost Ads: Identification (cells)}
+
+Treated \& exposed cell:
+\begin{align*}
+E[Y\mid Z=1,D=1]
+&\overset{\text{A0}}{=}E[Y^D(1)\mid Z=1,D=1]\\
+&\overset{\text{A0}}{=}E[Y^D(1)\mid Z=1,D^Z(1)=1]\\
+&\overset{\text{A1}}{=}E[Y^D(1)\mid D^Z(1)=1].
+\end{align*}
+
+Ghost control cell:
+\begin{align*}
+E[Y\mid Z=0,\tilde D=1]
+&\overset{\text{A0}}{=}E[Y^D(0)\mid Z=0,\tilde D=1]\\
+&\overset{\text{A6}}{=}E[Y^D(0)\mid Z=0,D^Z(1)=1]\\
+&\overset{\text{A1}}{=}E[Y^D(0)\mid D^Z(1)=1].
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{Ghost Ads: Equals ATT}
+
+Subtract:
+\begin{align*}
+E[\hat\tau_{\text{GA}}]
+&=E[Y\mid Z=1,D=1]-E[Y\mid Z=0,\tilde D=1]\\
+&=E[Y^D(1)\mid D^Z(1)=1]-E[Y^D(0)\mid D^Z(1)=1]
+=\tau_{\text{ATT}}.
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{Ghost Ads: Variance}
+
+Variance (disjoint cells):\footnotemark
+\[
+\operatorname{Var}(\hat\tau_{\text{GA}}\mid N_T,\tilde N_C)
+=\frac{\sigma_T^2}{N_T}+\frac{\tilde\sigma_C^2}{\tilde N_C},
+\]
+\[
+\sigma_T^2=\operatorname{Var}(Y\mid Z=1,D=1),\quad
+\tilde\sigma_C^2=\operatorname{Var}(Y\mid Z=0,\tilde D=1).
+\]
+
+{\small Disjoint cells ($N_T \cap \tilde N_C = \emptyset$) $\Rightarrow$ covariance = 0.}
+
+\footnotetext{\tiny In practice, use plug-in standard errors: replace $\sigma_T^2,\tilde\sigma_C^2$ with within-cell sample variances.}
+
+\end{frame}
+
+% ===========================================================================
+% PART 7: Comparison
+% ===========================================================================
+
+\begin{frame}{Comparing Methods}
+
+\begin{table}
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+Method & Target & Variance & Notes \\
+\midrule
+Selection on $D$ & Biased & --- & Simple difference in means \\
+\addlinespace
+ITT & $\pi_{\text{IV}}\,\tau_{\text{LATE}}$$^{*}$ & $O(1/N)$ & Diluted by first stage \\
+\addlinespace
+IV / Wald & $\tau_{\text{ATT}}$$^{\dagger}$ & $\sim (\cdot)/\pi_{\text{IV}}^{2}$ & Weak 1st stage inflates variance \\
+\addlinespace
+PSA & $\tau_{\text{ATT}}$ & $\sim O(1/(N\pi))$ & Needs placebo neutrality \\
+\addlinespace
+Ghost Ads & $\tau_{\text{ATT}}$ & $\sim O(1/(N\pi))$ & Needs accurate ghost tag \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.2cm}
+
+{\small $^{*}$Under A2 (one-sided exposure), $\pi_{\text{IV}}=\pi$ and $\tau_{\text{LATE}}=\tau_{\text{ATT}}$, so ITT $=\pi\cdot\tau_{\text{ATT}}$.}
+
+{\small $^{\dagger}$Equals $\tau_{\text{ATT}}$ only under A2 (one-sided exposure).}
+
+\end{frame}
+
+\begin{frame}{References}
+
+{\small
+
+\begin{itemize}
+\item Angrist, J. D., Imbens, G. W., \& Rubin, D. B. (1996). Identification of causal effects using instrumental variables. \textit{Journal of the American Statistical Association}, 91(434), 444-455.
+
+\vspace{0.2cm}
+
+\item Lewis, R. A., \& Rao, J. M. (2015). The unfavorable economics of measuring the returns to advertising. \textit{Quarterly Journal of Economics}, 130(4), 1941-1973.
+
+\vspace{0.2cm}
+
+\item Johnson, G. A., Lewis, R. A., \& Nubbemeyer, E. I. (2017). Ghost ads: Improving the economics of measuring online ad effectiveness. \textit{Journal of Marketing Research}, 54(6), 867-884.
+
+\vspace{0.2cm}
+
+\item Johnson, G. A., Lewis, R. A., \& Reiley, D. H. (2017). When less is more: Data and power in advertising experiments. \textit{Marketing Science}, 36(1), 43-53.
+
+\vspace{0.2cm}
+
+\item Gordon, B. R., Zettelmeyer, F., Bhargava, N., \& Chapsky, D. (2019). A comparison of approaches to advertising measurement: Evidence from big field experiments at Facebook. \textit{Marketing Science}, 38(2), 193-225.
+
+\end{itemize}
+
+}
+
+\end{frame}

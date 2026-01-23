@@ -1,0 +1,126 @@
+\section*{The Incrementality Problem\footnote{In this note, "incrementality" means the average treatment effect on the treated: the expected increase in purchase outcomes among users who actually receive an impression compared with what those same users would have done without the ad.}}
+
+The main problem in measuring advertising effectiveness is telling the difference between correlation and causation. If you compare users who saw ads to users who didn't, you're mixing together people who would have bought anyway with people who \textit{only bought because of the ad}. 
+
+People in hospitals are more likely to die, but hospitals don't cause death in people; it is just that sick people seek hospitals. In the same way, people who really want to purchase something are more likely to see and click on ads, but that doesn't necessarily mean the ads caused them to buy.
+
+\begin{itemize}
+\item When a user clicks an ad and buys something, the ad might have convinced them to buy, or they might have already planned to buy and just used the ad to find the product.
+\item Users who see more ads are different from users who don't, both in ways we can see (like search history and browsing patterns) and in ways we can't see (e.g. how much they wanted to buy in the first place).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    every node/.style={font=\small,align=center},
+    arrow/.style={-{Stealth[length=2mm]}, thick}
+]
+    \node (intent) [draw, rectangle, minimum width=2.5cm, minimum height=0.8cm] {User Intent \\ Vendor Attractiveness \\ Seasonal Trends};
+    \node (ad) [draw, rectangle, below left=1.5cm and 2cm of intent, minimum width=2.5cm, minimum height=0.8cm] {Ad Exposure};
+    \node (purchase) [draw, rectangle, below right=1.5cm and 2cm of intent, minimum width=2.5cm, minimum height=0.8cm] {Purchase};
+
+    \draw [arrow] (intent) -- (ad);
+    \draw [arrow] (intent) -- (purchase);
+    \draw [arrow, dashed] (ad) -- node[above, sloped] {Causal Effect?} (purchase);
+\end{tikzpicture}
+\caption{User intent affects both ad exposure and purchase decisions.}
+\label{fig:dag}
+\end{figure}
+
+What we really want to know is the persuasive effect of the ad—the purchases that would not have happened without the ad. That is the value to the marketplace, and the real reason why vendors are ready to pay for ads. But we can't see measure that directly from correlations.
+
+\subsection*{A Simple Example}
+
+Suppose, in reality, the ad actually increases purchase rates by 5 percentage points for everyone. Say you have two types of users: type A high-intent users (80\% would buy anyway and show signs) and type B low-intent users (10\% would buy anyway and show signs of disinterest). The ad system, powered by targeting algorithms, shows ads to 90\% of type A users and only 10\% of type B users (it is doing its job!).
+
+Table \ref{tab:confounding_example} shows what happens with 1,000 users (500 type A, 500 type B).
+
+\begin{table}[H]
+\centering
+\caption{Numerical Example of Confounding Bias}
+\label{tab:confounding_example}
+\begin{tabular}{lcccc}
+\toprule
+User Type & Count & Ad Exposure & Purchase Rate & Purchases \\
+\midrule
+\multicolumn{5}{l}{\textit{Type A Users (Baseline 80\%)}} \\
+\quad Exposed to Ad & 450 & Yes & 85\% & 382.5 \\
+\quad Not Exposed & 50 & No & 80\% & 40.0 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Type B Users (Baseline 10\%)}} \\
+\quad Exposed to Ad & 50 & Yes & 15\% & 7.5 \\
+\quad Not Exposed & 450 & No & 10\% & 45.0 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Aggregate Observed Data}} \\
+\quad All Exposed & 500 & Yes & 78.0\% & 390 \\
+\quad All Not Exposed & 500 & No & 17.0\% & 85 \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Naive Estimate}} \\
+\quad Difference & & & 61.0 pp & \\
+\addlinespace
+\multicolumn{5}{l}{\textit{True Causal Effect (Assumed Constant)}} \\
+\quad Within Type A & & & 5.0 pp & \\
+\quad Within Type B & & & 5.0 pp & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+If you compare the two groups, you see 78\% of ad viewers bought versus 17\% of non-viewers. That's a 61 percentage point difference. But the real ad effect is only 5 percentage points. The bias gets worse when targeting is better. If only type A users saw ads, you'd measure a 75 percentage point difference when the real effect is still 5 percentage points. If targeting is random, there's no bias. But good ad systems are \textit{not random}. The better your targeting, the harder it is to trust correlations between ad-impressions and purchases.
+
+\subsection*{What Causes This Problem in Marketplaces}
+
+Even the best ad-system does not track everything, and so there will be signals that both affects how users search and browse, and therefore how users see ads and click on them, as well as how users decide to purchase. Even if we control for predicted click-through rates (pCTR) and predicted conversion rates (pCVR), there are still many other factors that affect both ad exposure and purchase outcomes. Figure \ref{fig:confounding_dag} shows a picture of these causal relationships.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2cm and 2.5cm,
+    every node/.style={font=\scriptsize,align=center},
+    arrow/.style={-{Stealth[length=2mm, width=1.5mm]}, thick},
+    causal/.style={-{Stealth[length=3mm, width=2.5mm]}, ultra thick, red, dashed},
+    box/.style={draw, rounded corners=3pt, thick, minimum width=2.8cm, minimum height=1.2cm, fill=white, drop shadow, align=center, text width=2.6cm},
+    signal/.style={box, draw=blue!70, fill=blue!10, text width=3.2cm, minimum width=3.4cm},
+    process/.style={box, draw=orange!70, fill=orange!10},
+    system/.style={box, draw=teal!70, fill=teal!10},
+    outcome/.style={box, draw=green!70, fill=green!10},
+    exposure/.style={box, draw=purple!70, fill=purple!10}
+]
+    % Main causal pathway in center (horizontal)
+    \node (ad) [exposure] {\textbf{Ad Exposure}\\{\tiny (impression / click)}};
+    \node (purchase) [outcome, right=2.5cm of ad] {\textbf{Purchase}};
+    \node (rank) [process, left=1cm of ad] {\textbf{Rank}};
+    \node (pctr) [process, above left=0.8cm and 1cm of rank] {\textbf{Ad Relevance}\\{\tiny (pCTR, pCVR)}};
+    \node (autobid) [system, below left=0.8cm and 1cm of rank] {\textbf{Autobidding}};
+
+    % Observable signals pathway from top - split into two
+    \node (vendor) [signal, below=1.2cm of autobid] {\textbf{Vendor Signals}\\{\tiny budget, campaign,\\eligibility}};
+    \node (userproduct) [signal, above=1.8cm of pctr] {\textbf{Observable Signals}\\{\tiny user history, product features, context}};
+
+    % Unobservable signals from top-right
+    \node (unobservable) [signal, above right=2.2cm and 2cm of ad] {\textbf{Unobservable}\\{\tiny intent, outside options}};
+
+    % Observable pathway arrows (gray)
+    \draw [arrow, gray!60, line width=0.8pt] (userproduct) -- (pctr);
+    \draw [arrow, gray!60, line width=0.8pt] (vendor) -- (autobid);
+    \draw [arrow, gray!60, line width=0.8pt] (pctr) -- (autobid);
+    \draw [arrow, gray!60, line width=0.8pt] (pctr) to[out=-20,in=120] node[above, sloped, font=\tiny] {quality score} (rank);
+    \draw [arrow, gray!60, line width=0.8pt] (pctr) to[out=-50,in=150] (ad);
+    \draw [arrow, gray!60, line width=0.8pt] (autobid) to[out=20,in=240] node[below, sloped, font=\tiny] {bid} (rank);
+    \draw [arrow, gray!60, line width=0.8pt] (rank) -- (ad);
+
+    % Confounding pathways (gray)
+    \draw [arrow, gray!60, line width=0.8pt] (pctr) to[out=10,in=145] (purchase);
+    \draw [arrow, gray!60, line width=0.8pt] (unobservable) to[out=-30,in=90] (purchase);
+    \draw [arrow, gray!60, line width=0.8pt] (unobservable) to[out=-135,in=75] (ad);
+
+    % Main causal effect (RED, center stage)
+    \draw [causal] (ad) -- (purchase);
+\end{tikzpicture}
+\caption{Unobservable signals affect both ad exposure and purchases directly, and from outside the ad-system.}
+\label{fig:confounding_dag}
+\end{figure}
+
+These confounding factors are numerous. Observable signals include product characteristics (photo quality, price, brand recognition), user behavior (search specificity, browsing history, session depth), and market dynamics (review ratings, time patterns). For instance, a user making a specific search like "Nike Air Max size 10" is more likely to see a targeted ad and is also independently more likely to buy. Unobservable factors are just as influential, including latent user intent, income, age, budget constraints, awareness of outside options, and purchase urgency. A high-intent user, for example, will naturally see more ads through active searching and is already predisposed to convert, regardless of the ad's influence.
+
+The platform can track many of these things—prices, categories, vendors, timestamps, and purchase history. And a good way to control for these is to control for rank, pCTR, pCVR and perhaps even the bids. However, the ad-system does not observe everything and cannot control for everything--there will always be hidden confounders.

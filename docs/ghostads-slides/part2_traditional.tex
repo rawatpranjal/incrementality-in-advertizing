@@ -1,0 +1,205 @@
+% Part 2: What People Usually Try
+
+\begin{frame}{Randomization eliminates confounding}
+
+\pause
+
+\textbf{\large The idea:}
+
+\begin{itemize}
+\item Treatment group can see ad
+\item Control group blocked from ad
+\item Compare average outcomes
+\end{itemize}
+
+\pause
+
+\vspace{0.5cm}
+
+\textbf{\large The problem:}
+
+\begin{center}
+\begin{tikzpicture}[box/.style={draw, rectangle, rounded corners, minimum width=2.5cm, minimum height=0.8cm, align=center, line width=2pt}]
+    \node (assigned) [box, fill=BrandSecondary!20] {10,000\\eligible};
+    \node (saw) [box, fill=SuccessGreen!20, right=5cm of assigned] {1,000\\actually saw\\ad};
+
+    \draw [-{Stealth[length=3mm]}, very thick, ErrorRed] (assigned) -- node[above] {\textbf{90\% never saw ad}} (saw);
+\end{tikzpicture}
+\end{center}
+
+\pause
+
+\visible<4->{
+\begin{warningbox}
+\centering
+\textbf{Dilution problem:} In control, we don't know who would have seen ad.\\
+\end{warningbox}
+}
+
+\end{frame}
+
+\begin{frame}{Simple user holdouts suffer from dilution}
+
+\pause
+
+\begin{columns}
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{SuccessGreen}{\textbf{Treatment Group}}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{tikzpicture}[scale=0.85]
+    \node [draw, rectangle, rounded corners=4pt, fill=BrandSecondary!30, minimum width=2.8cm, minimum height=0.75cm, line width=2.5pt, align=center] at (0,0) {
+        {\small \textbf{Saw ad}}\\
+        {\tiny 1,000 users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!10, minimum width=2.8cm, minimum height=0.75cm, line width=2.5pt, align=center] at (0,-1.3) {
+        {\small \textbf{Never saw ad}}\\
+        {\tiny 9,000 users}
+    };
+\end{tikzpicture}
+
+\vspace{0.15cm}
+{\small \textcolor{SuccessGreen}{\checkmark\ We CAN identify}}
+
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{ErrorRed}{\textbf{Control Group}}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{tikzpicture}[scale=0.85]
+    \node [draw, rectangle, rounded corners=4pt, fill=BrandAccent!10, minimum width=2.8cm, minimum height=0.75cm, line width=2.5pt, dashed, opacity=0.6, align=center] at (0,0) {
+        {\small \textbf{Would've seen ad}}\\
+        {\tiny ??? users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!5, minimum width=2.8cm, minimum height=0.75cm, line width=2.5pt, dashed, opacity=0.6, align=center] at (0,-1.3) {
+        {\small \textbf{Would NOT see ad}}\\
+        {\tiny ??? users}
+    };
+\end{tikzpicture}
+
+\vspace{0.15cm}
+{\small \textcolor{ErrorRed}{\xmark\ We CANNOT identify}}
+
+\end{columns}
+
+\pause
+
+\vspace{0.2cm}
+
+\visible<3->{
+\begin{warningbox}
+\centering
+Without knowing who would be exposed, can't compare apples to apples.
+\end{warningbox}
+}
+
+\end{frame}
+
+\begin{frame}{ITT diluted, LATE has high variance}
+
+\pause
+
+\faCalculator\ Intent-to-Treat (ITT) = Avg. outcomes in treatment - avg. outcomes in control\\[0.3cm]
+
+\pause
+
+\faExclamationTriangle\ Estimate is biased towards 0\\[0.3cm]
+
+\pause
+
+\faCalculator\ Local Avg. Treatment Effect (LATE) = $\frac{\text{ITT}}{\text{\% exposed in treatment}}$\\[0.3cm]
+
+\pause
+
+\faExclamationTriangle\ Example: If only 10\% saw ad, multiply variance by 100\\[0.3cm]
+
+\pause
+
+\faExclamationTriangle\ To get sufficient power will have to run XPs for longer\\[0.3cm]
+
+\pause
+
+\vspace{0.3cm}
+
+\begin{warningbox}
+\centering
+ITT and LATE are both inadequate
+\end{warningbox}
+
+\end{frame}
+
+\begin{frame}{Placebo ads fix dilution but contaminate the control group}
+
+\pause
+
+\faLightbulb\ Show control group users a placebo instead of actual ad\\[0.3cm]
+
+\pause
+
+\textbf{\large Result:} Now we CAN identify both groups!
+
+\pause
+
+\vspace{-0.1cm}
+
+\begin{columns}
+\column{0.48\textwidth}
+\begin{center}
+{\small \textbf{Treatment}}\\
+\vspace{0.2cm}
+\begin{tikzpicture}[scale=0.8]
+    \node [draw, rectangle, rounded corners=4pt, fill=BrandSecondary!30, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, align=center] at (0,0) {
+        {\small \textbf{Saw ad}}\\
+        {\tiny 1,000 users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!10, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, dashed, opacity=0.6, align=center] at (0,-1.3) {
+        {\small \textbf{Never saw ad}}\\
+        {\tiny 9,000 users}
+    };
+\end{tikzpicture}
+\end{center}
+
+\column{0.48\textwidth}
+\begin{center}
+{\small \textbf{Control}}\\
+\vspace{0.2cm}
+\begin{tikzpicture}[scale=0.8]
+    \node [draw, rectangle, rounded corners=4pt, fill=BrandAccent!30, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, align=center] at (0,0) {
+        {\small \textbf{Saw placebo ad}}\\
+        {\tiny 1,000 users}
+    };
+    \node [draw, rectangle, rounded corners=4pt, fill=black!10, minimum width=2.5cm, minimum height=0.75cm, line width=2pt, dashed, opacity=0.6, align=center] at (0,-1.3) {
+        {\small \textbf{Never saw ad}}\\
+        {\tiny 9,000 users}
+    };
+\end{tikzpicture}
+\end{center}
+\end{columns}
+
+\pause
+
+\vspace{0.1cm}
+
+\textbf{\large Contamination: Placebo may end up changing the behaviour}
+
+\pause
+
+\vspace{0.3cm}
+
+\begin{columns}
+\column{0.48\textwidth}
+\faHeart\ Charity PSAs reduce spending\\[0.3cm]
+\faStore\ Competitor ads affect purchases
+
+\column{0.48\textwidth}
+\faFrown\ Irrelevant ads hurt UX\\[0.3cm]
+\faExclamationTriangle\ Brand safety risks
+
+\end{columns}
+
+\end{frame}

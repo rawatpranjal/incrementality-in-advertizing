@@ -1,0 +1,107 @@
+\contentsline {section}{\numberline {1}Common Notation}{5}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Indices and Sets}{5}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Budget and Spend}{5}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Bids, Prices, and Values}{5}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Allocation and Matching}{5}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Rewards and Outcomes}{6}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}Constraints and Multipliers}{6}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Distributions and Uncertainty}{6}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}State and Context}{6}{subsection.1.8}%
+\contentsline {section}{\numberline {2}Online Budgeted Allocation (AdWords Problem)}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}The AdWords Problem (Mehta et al.)}{7}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Problem Formulation}{7}{subsubsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.2}Generalized Budgets}{7}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Pacing and Repeated Auctions}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Repeated Auctions with Budget (Balseiro-Gur)}{9}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Primal Problem}{9}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Lagrangian and Pacing Multiplier}{9}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Pacing Equilibrium (First-Price Auctions)}{9}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Bidder $i$'s Problem}{10}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Pacing Equilibrium Condition}{10}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Learning to Bid in First-Price Auctions with Budgets}{10}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Problem Formulation}{10}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Primal-Dual Algorithm}{11}{subsubsection.3.3.2}%
+\contentsline {section}{\numberline {4}Optimal Spend-Rate Estimation and Pacing}{12}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Joint Forecasting and Control (Karande et al.)}{12}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Problem Formulation}{12}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Lagrangian Dual Formulation}{12}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}Optimization-Based Pacing in eBay Sponsored Search (Chen et al.)}{13}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Seller's Optimization Problem}{13}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Lagrangian Dual and AdaptivePacing Algorithm}{13}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}Comparison: Throttling vs. Bid Shading}{14}{subsubsection.4.2.3}%
+\contentsline {section}{\numberline {5}Autobidding via RL and Constrained MDPs}{15}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Constrained MDP for Autobidding}{15}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}CMDP Formulation}{15}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Lagrangian Dual and Q-Learning}{15}{subsubsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.2}ROI-Constrained Autobidding}{16}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Bandits with Knapsacks (BwK)}{17}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Stochastic BwK (Badanidiyuru et al.)}{17}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}Problem Formulation}{17}{subsubsection.6.1.1}%
+\contentsline {subsubsection}{\numberline {6.1.2}Regret Definition}{17}{subsubsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.2}Linear Contextual BwK (Agrawal-Devanur)}{17}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Problem Formulation}{18}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Optimal Static Policy}{18}{subsubsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.3}Confidence Ellipsoid and Optimism}{19}{subsubsection.6.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.4}Algorithm: Primal-Dual with Optimistic Estimates}{19}{subsubsection.6.2.4}%
+\contentsline {section}{\numberline {7}CPA/ROI-Constrained Auctions}{21}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Cost-Per-Action (CPA) Constraint}{21}{subsection.7.1}%
+\contentsline {subsubsection}{\numberline {7.1.1}Problem Formulation}{21}{subsubsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.2}Lagrangian Formulation}{21}{subsubsection.7.1.2}%
+\contentsline {subsection}{\numberline {7.2}Multi-Channel ROI Constraint (Deng et al.)}{22}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Global Optimization Model}{22}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Lagrangian Decomposition}{22}{subsubsection.7.2.2}%
+\contentsline {section}{\numberline {8}Lift-Based Bidding (Incrementality)}{24}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Unbiased Lift-Based Bidding (Moriwaki et al.)}{24}{subsection.8.1}%
+\contentsline {subsubsection}{\numberline {8.1.1}Lift Definition}{24}{subsubsection.8.1.1}%
+\contentsline {subsubsection}{\numberline {8.1.2}Lift-Based Bidding Problem}{24}{subsubsection.8.1.2}%
+\contentsline {subsubsection}{\numberline {8.1.3}Debiased Lift Estimation}{24}{subsubsection.8.1.3}%
+\contentsline {section}{\numberline {9}Multi-Platform Budget Optimization}{26}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Stochastic Bandits for Multi-Platform Allocation}{26}{subsection.9.1}%
+\contentsline {subsubsection}{\numberline {9.1.1}Problem Formulation}{26}{subsubsection.9.1.1}%
+\contentsline {subsubsection}{\numberline {9.1.2}Online Learning}{26}{subsubsection.9.1.2}%
+\contentsline {section}{\numberline {10}Guaranteed Delivery (GD) Contracts}{28}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Compact Allocation Plan (Vee et al.)}{28}{subsection.10.1}%
+\contentsline {subsubsection}{\numberline {10.1.1}Offline LP Formulation}{28}{subsubsection.10.1.1}%
+\contentsline {subsubsection}{\numberline {10.1.2}Online Algorithm via Dual Variables}{28}{subsubsection.10.1.2}%
+\contentsline {subsection}{\numberline {10.2}Reach and Frequency Constraints}{29}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Traffic Shaping for Underdelivery Minimization (Chakrabarti and Vee)}{29}{subsection.10.3}%
+\contentsline {subsubsection}{\numberline {10.3.1}Traffic Shaping Graph}{29}{subsubsection.10.3.1}%
+\contentsline {subsubsection}{\numberline {10.3.2}Optimization Formulation}{30}{subsubsection.10.3.2}%
+\contentsline {subsubsection}{\numberline {10.3.3}Online Reconstruction Algorithm}{30}{subsubsection.10.3.3}%
+\contentsline {section}{\numberline {11}Frequency Capping Optimization}{32}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Online Assignment with Per-User Caps}{32}{subsection.11.1}%
+\contentsline {subsubsection}{\numberline {11.1.1}Problem Formulation}{32}{subsubsection.11.1.1}%
+\contentsline {subsubsection}{\numberline {11.1.2}Online Algorithm via Multiplicative Weights}{32}{subsubsection.11.1.2}%
+\contentsline {subsection}{\numberline {11.2}Reach Optimization with k-Anonymity (Gao and Qiao)}{32}{subsection.11.2}%
+\contentsline {subsubsection}{\numberline {11.2.1}Classical Reach Optimization (No Privacy)}{33}{subsubsection.11.2.1}%
+\contentsline {subsubsection}{\numberline {11.2.2}Reach Optimization Under k-Anonymity}{33}{subsubsection.11.2.2}%
+\contentsline {subsubsection}{\numberline {11.2.3}Lagrangian Dual Formulation}{34}{subsubsection.11.2.3}%
+\contentsline {subsubsection}{\numberline {11.2.4}Streaming Algorithm for $p_t$}{34}{subsubsection.11.2.4}%
+\contentsline {section}{\numberline {12}Reserve Price Optimization}{35}{section.12}%
+\contentsline {subsection}{\numberline {12.1}First-Price Auction Reserve (Feng et al.)}{35}{subsection.12.1}%
+\contentsline {subsubsection}{\numberline {12.1.1}Problem Formulation}{35}{subsubsection.12.1.1}%
+\contentsline {subsubsection}{\numberline {12.1.2}First-Order Condition}{35}{subsubsection.12.1.2}%
+\contentsline {subsection}{\numberline {12.2}Header Bidding Reserve}{35}{subsection.12.2}%
+\contentsline {section}{\numberline {13}Bid Shading (First-Price Auctions)}{37}{section.13}%
+\contentsline {subsection}{\numberline {13.1}Distributionally Robust Bid Shading}{37}{subsection.13.1}%
+\contentsline {subsubsection}{\numberline {13.1.1}Problem Formulation}{37}{subsubsection.13.1.1}%
+\contentsline {subsubsection}{\numberline {13.1.2}Robust Formulation}{37}{subsubsection.13.1.2}%
+\contentsline {subsubsection}{\numberline {13.1.3}Deep Distribution Network (DDN)}{37}{subsubsection.13.1.3}%
+\contentsline {section}{\numberline {14}DSP Profit Maximization}{38}{section.14}%
+\contentsline {subsection}{\numberline {14.1}Lagrangian Decomposition for DSP (Grigas et al.)}{38}{subsection.14.1}%
+\contentsline {subsubsection}{\numberline {14.1.1}Problem Formulation}{38}{subsubsection.14.1.1}%
+\contentsline {subsubsection}{\numberline {14.1.2}Lagrangian Decomposition}{38}{subsubsection.14.1.2}%
+\contentsline {section}{\numberline {15}Robust Pacing}{39}{section.15}%
+\contentsline {subsection}{\numberline {15.1}Distributionally Robust Pacing (Balseiro et al.)}{39}{subsection.15.1}%
+\contentsline {subsubsection}{\numberline {15.1.1}Problem Formulation}{39}{subsubsection.15.1.1}%
+\contentsline {subsubsection}{\numberline {15.1.2}Single-Sample Formulation}{39}{subsubsection.15.1.2}%
+\contentsline {section}{\numberline {16}Delay-Aware Bidding}{40}{section.16}%
+\contentsline {subsection}{\numberline {16.1}Multi-Constraint Bidding with Delayed Conversions}{40}{subsection.16.1}%
+\contentsline {subsubsection}{\numberline {16.1.1}Problem Formulation with Delay}{40}{subsubsection.16.1.1}%
+\contentsline {subsubsection}{\numberline {16.1.2}Predictive Imputation}{40}{subsubsection.16.1.2}%
+\contentsline {section}{\numberline {17}Online Causal Optimization in RTB}{41}{section.17}%
+\contentsline {subsection}{\numberline {17.1}Policy Learning under Auction Feedback}{41}{subsection.17.1}%
+\contentsline {subsubsection}{\numberline {17.1.1}Causal Objective}{41}{subsubsection.17.1.1}%
+\contentsline {subsubsection}{\numberline {17.1.2}Inverse Propensity Weighting}{41}{subsubsection.17.1.2}%
+\contentsline {subsubsection}{\numberline {17.1.3}Doubly Robust Estimation}{41}{subsubsection.17.1.3}%
+\contentsline {section}{\numberline {18}Summary of Canonical Problems}{42}{section.18}%

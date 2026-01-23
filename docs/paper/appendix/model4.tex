@@ -1,0 +1,173 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage[skip=8pt plus1pt, indent=0pt]{parskip}
+\usepackage{microtype}
+\raggedbottom
+
+\begin{document}
+
+\subsection*{Model 4: Causal Attribution}
+\vspace{-0.5em}
+Ad exposure in observational data correlates with unobserved purchase intent, biasing effect estimates. We recover the causal effect $\beta$ by instrumenting ad exposure through randomized bid suppression. A ghost ad mechanism creates exogenous variation: the system computes optimal bids for all opportunities but randomly suppresses actual bidding for a control group.
+
+\paragraph{Endogeneity Problem}
+Ad exposure $x_i$ correlates with unobserved user intent $\varepsilon_i$ because advertisers target high-conversion users. The OLS bias equals:
+\vspace{-0.5em}
+\[ \text{bias}(\hat{\beta}_{\text{OLS}}) = \frac{\text{Cov}(x_i, \varepsilon_i)}{\text{Var}(x_i)} > 0 \]
+\vspace{-0.5em}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lp{7cm}@{}}
+\toprule
+Bias Source & Mechanism \\
+\midrule
+Activity bias & High-activity users see more ads and purchase more \\
+Selection bias & Advertisers target users with higher conversion probability \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Instrumental Variable Solution}
+The instrument $z_i$ must satisfy:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}llp{4cm}@{}}
+\toprule
+Condition & Requirement & Test \\
+\midrule
+Relevance & $\text{Cov}(z_i, x_i) \neq 0$ & First-stage F > 10 \\
+Exclusion & $\text{Cov}(z_i, \varepsilon_i) = 0$ & Placebo outcomes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The IV estimator:
+\vspace{-0.5em}
+\[ \hat{\beta}_{\text{IV}} = \frac{\text{Cov}(z_i, y_i)}{\text{Cov}(z_i, x_i)} = (Z'X)^{-1}Z'Y \]
+\vspace{-0.5em}
+identifies the Local Average Treatment Effect for compliers.
+
+\paragraph{Ghost Ad Implementation}
+\vspace{-0.5em}
+We construct the instrument through the following process:
+
+\begin{table}[H]
+\centering
+\caption{Operational Flow for Ghost Ad Generation}
+\begin{tabular}{@{}lp{8.5cm}@{}}
+\toprule
+Step & Action and Rationale \\
+\midrule
+1. User Assignment & Assign each user $i$ a persistent random number, $U_i \sim \text{Uniform}(0,1)$. This determines their experimental group. \\
+\addlinespace[0.5em]
+2. Ghost Bid & System computes optimal bid $g_{ij}$ for every opportunity and logs it. \\
+\addlinespace[0.5em]
+3. Real Bid & If $U_i > p$: $b_{ij} = g_{ij}$ (treatment). If $U_i \le p$: $b_{ij} = 0$ (control). \\
+\addlinespace[0.5em]
+4. Logging & Log: user\_id, timestamp, treatment status, $g_{ij}$, $b_{ij}$, auction outcome. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{2SLS Estimation}
+Ghost ad data aggregates at user level for 2SLS:
+
+\begin{table}[H]
+\centering
+\caption{Variable Construction for IV Estimation}
+\begin{tabular}{@{}lp{8.5cm}@{}}
+\toprule
+Variable & Construction from Logs \\
+\midrule
+Outcome ($y_i$) & Total number of conversions for user $i$. \\
+\addlinespace[0.5em]
+Endogenous Treatment ($x_i$) & Total number of ads won and shown to user $i$ (count where \texttt{did\_win\_auction} is true). \\
+\addlinespace[0.5em]
+Instrument ($z_i$) & Total number of "ghost ads" for user $i$ (count where \texttt{ghost\_bid\_value} > 0). This is counted for all users, including the control group. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+2SLS process:
+
+\begin{table}[H]
+\centering
+\caption{The 2SLS Estimation Process}
+\begin{tabular}{@{}lp{8.5cm}@{}}
+\toprule
+Stage & Equation and Interpretation \\
+\midrule
+First Stage & $x_i = \pi_0 + \pi_1 z_i + \nu_i$ \\
+\midrule
+& Regress actual ads $x_i$ on ghost ads $z_i$ to obtain $\hat{x}_i$. \\
+\addlinespace[0.5em]
+Second Stage & $y_i = \beta_0 + \beta_{\text{IV}} \hat{x}_i + \eta_i$ \\
+\midrule
+& Regress outcome $y_i$ on predicted exposure $\hat{x}_i$ to obtain consistent $\hat{\beta}_{\text{IV}}$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Results}
+The IV estimate removes selection bias from the ad effect estimate.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lp{7cm}@{}}
+\toprule
+Estimator & Interpretation \\
+\midrule
+$\hat{\beta}_{\text{OLS}}$ & Biased estimate combining true effect and targeting correlation \\
+$\hat{\beta}_{\text{IV}}$ & Consistent estimate of causal ad effect \\
+$\hat{\beta}_{\text{OLS}} - \hat{\beta}_{\text{IV}}$ & Selection bias magnitude \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This IV methodology extends to dynamic ad-stock models, enabling unbiased estimation of time-varying $\beta_k$ coefficients.
+
+\paragraph{Empirical Example}
+E-commerce advertiser results:
+
+\begin{table}[H]
+\centering
+\caption{Comparison of OLS and IV Estimates}
+\begin{tabular}{@{}l>{\raggedleft\arraybackslash}p{2.5cm}>{\raggedleft\arraybackslash}p{2.5cm}@{}}
+\toprule
+Metric & OLS Estimate & IV Estimate \\
+\midrule
+Ad Effect ($\hat{\beta}$) & 0.080 & 0.030 \\
+Standard Error & (0.005) & (0.012) \\
+Implied iROAS at \$50 AOV & \$4.00 & \$1.50 \\
+Selection Bias & — & 167\% overestimation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+OLS estimates \$4 revenue per ad. IV reveals true causal effect: \$1.50. The \$2.50 difference reflects targeting correlation.
+
+\paragraph{Diagnostics}
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lp{7cm}@{}}
+\toprule
+Test & Criterion \\
+\midrule
+First-stage strength & F-statistic > 10 (> 100 preferred) \\
+Balance & Observable covariates equal across treatment/control \\
+Exclusion & Instrument uncorrelated with non-ad outcomes \\
+Monotonicity & No defiers in treatment assignment \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

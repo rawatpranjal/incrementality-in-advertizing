@@ -1,0 +1,198 @@
+% Part 4: Making It Real
+
+\begin{frame}{Vendor vs Campaign Level}
+
+\pause
+
+\begin{columns}
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{failred}{\faTimesCircle\ \textbf{Campaign-Level}}
+\end{center}
+
+\pause
+
+\vspace{0.2cm}
+
+\onslide<2->{Duration: 1-2 weeks}\\[0.2cm]
+\onslide<3->{\xmark\ Sparse data}\\[0.2cm]
+\onslide<4->{\xmark\ Low power}\\[0.2cm]
+\onslide<5->{\xmark\ Unstable}
+
+\column{0.48\textwidth}
+\begin{center}
+\textcolor{successgreen}{\faCheckCircle\ \textbf{Vendor-Level}}
+\end{center}
+
+\pause
+
+\vspace{0.2cm}
+
+\onslide<7->{Duration: Months}\\[0.2cm]
+\onslide<8->{\checkmark\ Rich data}\\[0.2cm]
+\onslide<9->{\checkmark\ High power}\\[0.2cm]
+\onslide<10->{\checkmark\ Stable}
+
+\end{columns}
+
+\pause
+
+\vspace{0.3cm}
+
+\begin{keybox}
+\centering
+\textbf{Recommendation:} Vendor-level for strategic measurement
+\end{keybox}
+
+\end{frame}
+
+\begin{frame}{What Data Do You Need?}
+
+\pause
+
+\textbf{\large Three key tables:}
+
+\vspace{0.5cm}
+
+\begin{itemize}
+\item<2-> \faDatabase\ \textbf{Randomization table}\\
+{\small user\_id, vendor\_id, treatment\_flag}
+
+\item<3-> \faGhost\ \textbf{Ghost log table}\\
+{\small user\_id, timestamp, predicted\_exposure, actual\_exposure}
+
+\item<4-> \faShoppingCart\ \textbf{Outcomes table}\\
+{\small user\_id, timestamp, conversions, revenue}
+\end{itemize}
+
+\pause
+
+\vspace{0.2cm}
+
+\begin{insightbox}
+\centering
+Join on (user\_id, vendor\_id) to compute incrementality
+\end{insightbox}
+
+\end{frame}
+
+\begin{frame}{Computing Incrementality}
+
+\pause
+
+\textbf{\large Step 1:} Filter to predicted-exposed users
+
+\pause
+
+\vspace{0.3cm}
+
+\textbf{\large Step 2:} Compute average outcomes per group
+
+\pause
+
+\vspace{0.3cm}
+
+\textbf{\large Step 3:} Calculate ITT
+
+\begin{center}
+ITT = Treatment mean - Control mean
+\end{center}
+
+\pause
+
+\vspace{0.3cm}
+
+\textbf{\large Step 4:} Scale by compliance
+
+\begin{center}
+\Large
+\textcolor{primarypurple}{\textbf{Incrementality = ITT / compliance}}
+\end{center}
+
+\pause
+
+\vspace{0.5cm}
+
+\begin{center}
+\normalsize
+Compliance = fraction who actually saw ads among predicted
+\end{center}
+
+\end{frame}
+
+\begin{frame}{iROAS: Return on Ad Spend}
+
+\pause
+
+\textbf{\large The metric advertisers care about:}
+
+\vspace{0.5cm}
+
+\pause
+
+\begin{center}
+\Huge
+\textcolor{primarypurple}{iROAS = Revenue / Cost}
+\end{center}
+
+\pause
+
+\vspace{0.8cm}
+
+\textbf{\large Example:}
+
+\begin{itemize}
+\item<4-> Incrementality = \$5.28 per impression
+\item<5-> Average cost = \$4.00 per impression
+\item<6-> iROAS = 5.28 / 4.00 = \textcolor{successgreen}{\textbf{1.32}}
+\end{itemize}
+
+\pause
+
+\vspace{0.2cm}
+
+\begin{keybox}
+\centering
+Every \$1 spent generates \$1.32 in incremental revenue
+\end{keybox}
+
+\end{frame}
+
+\begin{frame}{Infrastructure Overview}
+
+\pause
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={draw, rectangle, rounded corners, minimum width=3.2cm, minimum height=1cm, align=center, line width=2pt},
+    arrow/.style={-{Stealth[length=2.5mm]}, very thick}
+]
+    \pause
+    \node (request) [box, fill=accentblue!20] {\faUser\ Ad Request};
+
+    \pause
+    \node (online) [box, fill=successgreen!20, below left=1.5cm and 2cm of request] {\textbf{Online Pipeline}\\Real auction\\Serve ads};
+
+    \pause
+    \node (offline) [box, fill=primarypurple!20, below right=1.5cm and 2cm of request] {\textbf{Offline Pipeline}\\Ghost auctions\\Log predictions};
+
+    \pause
+    \node (analysis) [box, fill=accentorange!20, below=3.5cm of request] {\textbf{Analysis}\\Join tables\\Compute effects};
+
+    \draw [arrow, successgreen] (request) -- (online);
+    \draw [arrow, primarypurple] (request) -- (offline);
+    \draw [arrow, accentorange] (online) -- (analysis);
+    \draw [arrow, accentorange] (offline) -- (analysis);
+\end{tikzpicture}
+\end{center}
+
+\pause
+
+\vspace{0.2cm}
+
+\begin{insightbox}
+\centering
+Online and offline pipelines run in parallel
+\end{insightbox}
+
+\end{frame}

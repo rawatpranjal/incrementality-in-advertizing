@@ -1,0 +1,210 @@
+\section{Selection Bias, ITT, and Exposure-Matched Estimators}
+
+\subsection{Selection bias: why we randomize}
+
+We care about the average effect of the ad on those who would be exposed. Introduce the minimum notation:
+
+\begin{itemize}
+\item Let $Y_i^{D}(1)$ and $Y_i^{D}(0)$ be user $i$'s potential outcomes by exposure (saw the focal ad vs. did not). Define $\tau_i:=Y_i^{D}(1)-Y_i^{D}(0)$.
+\item Let $D_i\in\{0,1\}$ be the observed exposure indicator.
+\item Let $Z_i\in\{0,1\}$ be the random assignment to control/treatment, and $D_i^{Z}(z)$ the potential exposure under assignment $z$.
+\end{itemize}
+
+The observed outcome follows the switching equation:
+\[
+Y_i=Y_i^{D}(0)+D_i\,\tau_i.
+\]
+
+A na\"ive contrast by exposure, $E[Y\mid D=1]-E[Y\mid D=0]$, is generally biased:
+\[
+\underbrace{E[Y^{D}(1)-Y^{D}(0)\mid D=1]}_{\text{ATT among the exposed}}
+\;+\;
+\underbrace{E[Y^{D}(0)\mid D=1]-E[Y^{D}(0)\mid D=0]}_{\text{selection on baseline}}.
+\]
+People who end up exposed often differ in baseline outcomes ($Y^{D}(0)$) (they visit more, buy more, etc.). Randomization ($Z$) breaks this link at assignment, not at exposure, which is why we start from $Z$, not $D$.
+
+\subsubsection{Assumptions used as they arise}
+
+\begin{itemize}
+\item Exclusion/consistency for exposure (A0): $Y_i=Y_i^{D}(D_i)$.
+\item Randomization (A1): $Z_i\perp (Y_i^{D}(0),Y_i^{D}(1),D_i^{Z}(0),D_i^{Z}(1))$.
+\item One-sided non-compliance (A2): $D_i^{Z}(0)=0$ a.s. (control never sees the focal ad).
+\item SUTVA (A3): no interference; exposure well-defined.
+\item Positivity (A9): relevant probabilities in $(0,1)$.
+\end{itemize}
+
+\paragraph{Target estimand (ATT).}
+We focus on the Average Treatment effect on the Treated (exposed):
+\[
+\tau_{\text{ATT}} \;:=\; E[\tau_i \mid D_i^{Z}(1)=1].
+\]
+Under (A1) and (A2), $\tau_{\text{ATT}} = E[\tau_i \mid D_i=1]$.
+
+\subsection{ITT: difference by assignment (diluted)}
+
+Estimator. $\hat\tau_{\text{ITT}}=\bar Y_{Z=1}-\bar Y_{Z=0}$.
+
+\subsubsection{Target (dilution)}
+
+\begin{align}
+\tau_{\text{ITT}}
+&=E[Y\mid Z=1]-E[Y\mid Z=0] \nonumber \\
+&=E[Y^{D}(0)+D\tau\mid Z=1]-E[Y^{D}(0)\mid Z=0]\quad(\text{A0}) \nonumber \\
+&=E[D\tau\mid Z=1]\quad(\text{A1}) \nonumber \\
+&=\sum_{d\in\{0,1\}} \Pr(D=d\mid Z=1)\,E[d\cdot \tau \mid D=d,Z=1] \nonumber \\
+&=\Pr(D=1\mid Z=1)\,E[\tau\mid D=1,Z=1] \nonumber \\
+&=\pi\cdot \tau_{\text{ATT}},\quad \pi:=\Pr(D=1\mid Z=1).
+\end{align}
+
+So ITT is the ATT scaled down by exposure rate $\pi$.
+
+\subsubsection{Variance}
+
+With arm sizes $n_1,n_0$,
+\[
+\operatorname{Var}(\hat\tau_{\text{ITT}})=\frac{\sigma_1^2}{n_1}+\frac{\sigma_0^2}{n_0},
+\quad
+\begin{cases}
+\sigma_1^2=\operatorname{Var}(Y^{D}(0)+D\tau\mid Z=1),\\
+\sigma_0^2=\operatorname{Var}(Y^{D}(0)\mid Z=0).
+\end{cases}
+\]
+Order $O(1/N)$ under balanced arms.
+
+\subsection{Rescaled ITT (``ITT-LATE'' in practice): remove dilution by dividing by $\pi$}
+
+Estimator. $\widehat{\mathrm{ATET}}_{\text{ITT}}=\hat\tau_{\text{ITT}}/\hat\pi$, $\hat\pi=\bar D_{Z=1}$.
+
+\subsubsection{Target}
+
+By the identity above, $\mathrm{ATET}_{\text{ITT}}=\tau_{\text{ITT}}/\pi=\tau_{\text{ATT}}$ (consistent under A0--A2).
+
+\subsubsection{Variance (delta method, first order)}
+
+Let $A=\hat\tau_{\text{ITT}}$, $B=\hat\pi$. Then
+\[
+\operatorname{Var}(\widehat{\mathrm{ATET}}_{\text{ITT}})
+\approx
+\frac{\operatorname{Var}(A)+\mathrm{ATET}_{\text{ITT}}^{2}\operatorname{Var}(B)-2\,\mathrm{ATET}_{\text{ITT}}\operatorname{Cov}(A,B)}{\pi^{2}}.
+\]
+The approximation is evaluated at the population values $(\tau_{\text{ITT}},\pi)$; the ratio is consistent but generally not exactly unbiased in finite samples. The $1/\pi^{2}$ factor is the weak-first-stage penalty; when $\pi$ is small, intervals widen dramatically.
+
+\subsection{Placebo Ads (PSA): direct ATT without the ratio}
+
+Now add a single new symbol only here: a control-arm placebo flag $R_i\in\{0,1\}$.
+
+Assumptions local to PSA:
+\begin{itemize}
+\item (A4) Perfect placebo mapping (control): $R=1 \iff D^{Z}(1)=1$.
+\item (A5) Placebo neutrality: showing the placebo leaves outcomes at baseline ($Y^{\text{pl}}=Y^{D}(0)$).
+\end{itemize}
+
+Estimator. $\widehat{\mathrm{ATET}}_{\text{PSA}}=\bar Y_{Z=1,D=1}-\bar Y_{Z=0,R=1}$.
+
+\subsubsection{Target (no dilution)}
+
+\begin{align}
+E[Y\mid Z=0,R=1]
+&= E[Y^{\text{pl}}\mid Z=0,R=1] \quad \text{(consistency)} \nonumber\\
+&= E[Y^{\text{pl}}\mid Z=0, D^{Z}(1)=1] \quad \text{(A4: $R=1 \iff D^{Z}(1)=1$ in control)} \nonumber\\
+&= E[Y^{\text{pl}}\mid D^{Z}(1)=1] \quad \text{(A1: drop $Z$)} \nonumber\\
+&= E[Y^{D}(0)\mid D^{Z}(1)=1] \quad \text{(A5: placebo neutrality)}. \nonumber
+\end{align}
+\[
+E[Y\mid Z=1,D=1]=E[Y^{D}(1)\mid D^{Z}(1)=1] \quad \text{(consistency)}.
+\]
+Hence $E[\widehat{\mathrm{ATET}}_{\text{PSA}}]=\tau_{\text{ATT}}$.
+
+\subsubsection{Variance}
+
+Difference-in-means:
+\[
+\operatorname{Var}(\widehat{\mathrm{ATET}}_{\text{PSA}})
+=\frac{s_T^2}{N_T}+\frac{s_C^2}{N_C},
+\]
+with $N_T=\#\{Z=1,D=1\}$, $N_C=\#\{Z=0,R=1\}$ and $s_T^2, s_C^2$ the cell-wise sample variances. If $N_T,N_C\propto N\pi$, order $O(1/(N\pi))$.
+
+\subsection{Ghost Ads (GA): simulate the placebo control}
+
+Introduce a control-arm tag $\tilde D_i\in\{0,1\}$ for ``would have been exposed'' from a ghost auction.
+
+Assumption local to GA:
+\begin{itemize}
+\item (A6) Perfect ghost prediction (control): for $Z=0$, $\tilde D=1 \iff D^{Z}(1)=1$.
+\end{itemize}
+
+Estimator. $\widehat{\mathrm{ATET}}_{\text{GA}}=\bar Y_{Z=1,D=1}-\bar Y_{Z=0,\tilde D=1}$.
+
+\subsubsection{Target (no dilution)}
+
+Same algebra as PSA with $R$ replaced by $\tilde D$:
+\[
+E[\widehat{\mathrm{ATET}}_{\text{GA}}]=\tau_{\text{ATT}}.
+\]
+
+\subsubsection{Variance}
+
+$\operatorname{Var}(\widehat{\mathrm{ATET}}_{\text{GA}})=\frac{s_T^2}{N_T}+\frac{\tilde s_C^2}{\tilde N_C}$, with $s_T^2, \tilde s_C^2$ the cell-wise sample variances. Order $O(1/(N\pi))$ when $\tilde N_C\propto N\pi$.
+
+\subsection{Predicted Ghost Ads (PGA): pre-assign the ``would-be-exposed'' stratum}
+
+Introduce a pre-randomization tag $\hat D_i\in\{0,1\}$ and the stratum $S:=\{\hat D=1\}$. Define its prevalence $q:=\Pr(i\in S)$ and within-stratum first stage $p_S:=\Pr(D=1\mid Z=1,S)$.
+
+Estimator (within-stratum Wald).
+\[
+\widehat{\mathrm{LATE}}_{\text{PGA}}=\frac{\bar Y_{1,S}-\bar Y_{0,S}}{\hat p_S},\qquad \hat p_S=\bar D_{1,S}.
+\]
+
+\subsubsection{Target (no dilution within $S$)}
+
+Because $S$ is fixed pre-randomization, conditioning preserves randomization:
+\begin{align}
+\tau_{\text{ITT}}^{S}
+&= E[Y\mid Z=1,S]-E[Y\mid Z=0,S] \nonumber\\
+&= E[Y^{D}(0)+D\tau\mid Z=1,S]-E[Y^{D}(0)\mid Z=0,S] \quad \text{(A0)} \nonumber\\
+&= E[D\tau\mid Z=1,S] \quad \text{(A8 + randomization preserved within $S$)} \nonumber\\
+&= p_S\,E[\tau\mid D=1,S]. \nonumber
+\end{align}
+
+Hence the identity $\tau_{\text{ITT}}^{S}/p_S=E[\tau\mid D=1,S]=:\tau_{\text{ATT}\mid S}$, so $E[\widehat{\mathrm{LATE}}_{\text{PGA}}]\to \tau_{\text{ATT}\mid S}$. This equals the global $\tau_{\text{ATT}}$ only if $S$ matches the true would-be-exposed set (or effects are homogeneous).
+
+\subsubsection{Variance (delta, first order)}
+
+\[
+\operatorname{Var}(\widehat{\mathrm{LATE}}_{\text{PGA}})
+\approx
+\frac{\operatorname{Var}(\bar Y_{1,S}-\bar Y_{0,S})
++\mathrm{LATE}_{\text{PGA}}^{2}\operatorname{Var}(\hat p_S)
+-2\,\mathrm{LATE}_{\text{PGA}}\operatorname{Cov}(\bar Y_{1,S}-\bar Y_{0,S},\hat p_S)}{p_S^{2}},
+\]
+with $\operatorname{Var}(\bar Y_{1,S}-\bar Y_{0,S})=\sigma_{1,S}^2/n_{1,S}+\sigma_{0,S}^2/n_{0,S}$ and $\operatorname{Var}(\hat p_S)\approx p_S(1-p_S)/n_{1,S}$. If $|S|\approx N q$ and arms are balanced within $S$, order $O(1/(N\,q\,p_S^2))$; when $q\approx \pi$ and $p_S\approx 1$, this matches $O(1/(N\pi))$.
+
+\subsection{Quick scoreboard (targets and variance orders)}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Comparison of Estimators}
+\begin{tabular}{lccc}
+\toprule
+Method & Target & Variance Order & Notes \\
+\midrule
+Selection on $D$ & Biased & --- & Biased unless $D$ as-if random \\
+\addlinespace
+ITT & $\pi\,\tau_{\text{ATT}}$ & $O(1/N)$ & Diluted by $\pi$ \\
+\addlinespace
+ATET$_{\text{ITT}}$ & $\tau_{\text{ATT}}$ & $\sim (\cdot)/\pi^{2}$ & Weak first-stage penalty$^{\dagger}$ \\
+\addlinespace
+PSA & $\tau_{\text{ATT}}$ & $\sim O(1/(N\pi))$ & Direct difference-in-means \\
+\addlinespace
+GA & $\tau_{\text{ATT}}$ & $\sim O(1/(N\pi))$ & Direct difference-in-means \\
+\addlinespace
+PGA & $\tau_{\text{ATT}\mid S}$ & $\sim O(1/(N q p_S^{2}))$ & Stratum-specific, often $\approx O(1/(N\pi))$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\small$^{\dagger}$Often called ``ITT-LATE'' in practice.
+
+\noindent\small Note: $\sim O(\cdot)$ denotes first-order order-of-magnitude under balanced arms.
+
