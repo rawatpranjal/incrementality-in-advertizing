@@ -1,0 +1,157 @@
+================================================================================
+FULL CLICK MODEL COMPARISON
+================================================================================
+
+MODELS COMPARED:
+  1. Simple Baseline: Position-specific CTR
+  2. PBM: Position-Based Model (θ_k × α_i)
+  3. DBN: Dynamic Bayesian Network (satisfaction/continuation)
+  4. SDBN: Simplified DBN (cascade, stop-after-click)
+  5. UBM: User Browsing Model (γ_{r,r'} distance effect)
+
+================================================================================
+SECTION 1: DATA LOADING
+----------------------------------------
+
+Loaded sessions: 31,501
+Loaded items: 222,890
+
+Data statistics:
+  Total impressions: 222,890
+  Total clicks: 6,279
+  Overall CTR: 2.82%
+  Multi-click rate: 3.7%
+
+================================================================================
+SECTION 2: TRAIN/TEST SPLIT
+----------------------------------------
+
+Train sessions: 25,200
+Test sessions: 6,301
+
+Train CTR: 2.84%
+Test CTR: 2.97%
+
+================================================================================
+SECTION 3: MODEL FITTING
+----------------------------------------
+
+
+All models fitted.
+
+================================================================================
+SECTION 4: ITEM-LEVEL EVALUATION (TEST SET)
+----------------------------------------
+
+Evaluating models at item level...
+
+Item-level metrics (sorted by Log Loss):
+  Model      Log Loss     AUC        Brier      Perplexity  
+  ---------- ------------ ---------- ---------- ------------
+  Simple     0.1339       0.4904     0.0288     1.1433      
+  DBN        0.1356       0.5200     0.0289     1.1452      
+  PBM        0.1358       0.5115     0.0289     1.1455      
+  SDBN       0.1378       0.5040     0.0290     1.1477      
+  UBM        0.1412       0.5073     0.0290     1.1517      
+
+Best item-level model: Simple (Log Loss = 0.1339)
+
+================================================================================
+SECTION 5: SESSION-LEVEL EVALUATION (TEST SET)
+----------------------------------------
+
+Evaluating models at session level...
+
+Session-level metrics (sorted by Avg Neg LL):
+  Model      Avg Session LL  Avg Neg LL   Perplexity  
+  ---------- --------------- ------------ ------------
+  Simple     -0.83           0.1339       1.1433      
+  DBN        -0.84           0.1356       1.1452      
+  PBM        -0.84           0.1358       1.1455      
+  SDBN       -0.85           0.1378       1.1477      
+  UBM        -0.87           0.1412       1.1517      
+
+Best session-level model: Simple (Avg Neg LL = 0.1339)
+
+================================================================================
+SECTION 6: MODEL PARAMETERS SUMMARY
+----------------------------------------
+
+PBM Position Effects (θ_k):
+  θ_1 = 1.0000
+  θ_5 = 1.0000
+  θ_10 = 1.0000
+  θ_15 = 0.6216
+  θ_20 = 1.0000
+  Mean α = 0.0245
+
+DBN Parameters:
+  σ (satisfaction) = 0.8412
+  γ (continuation) = 0.9900
+  Mean α = 0.0249
+
+SDBN Parameters:
+  Mean γ (continuation) = 1.0000
+  Mean α = 0.0220
+
+UBM Parameters:
+  γ_{1,0} = 1.0000
+  γ_{5,0} = 0.8433
+  γ_{10,0} = 0.8004
+  Mean α = 0.0277
+
+================================================================================
+SECTION 7: RELATIVE PERFORMANCE
+----------------------------------------
+
+Log Loss improvement over Simple Baseline:
+  DBN: -1.25%
+  PBM: -1.41%
+  SDBN: -2.89%
+  UBM: -5.44%
+
+AUC improvement over Simple Baseline:
+  DBN: +6.03%
+  PBM: +4.30%
+  SDBN: +2.76%
+  UBM: +3.44%
+
+================================================================================
+SECTION 8: FINAL MODEL RANKING
+----------------------------------------
+
+Model rankings:
+  Model      LL Rank    AUC Rank   Session Rank Avg Rank  
+  ---------- ---------- ---------- ------------ ----------
+  Simple     1          5          1            2.33      
+  DBN        2          1          2            1.67      
+  PBM        3          2          3            2.67      
+  SDBN       4          4          4            4.00      
+  UBM        5          3          5            4.33      
+
+================================================================================
+SECTION 9: SUMMARY
+================================================================================
+
+KEY FINDINGS:
+
+1. Best item-level Log Loss: Simple (0.1339)
+2. Best session-level LL: Simple (0.1339)
+3. Best AUC: DBN (0.5200)
+
+MODEL CHARACTERISTICS:
+  - Simple: Position-only, no item effects
+  - PBM: Separates position (θ) and item (α) effects
+  - DBN: Models satisfaction/continuation dynamics
+  - SDBN: Cascade model, assumes single click
+  - UBM: Models examination given any prior click position
+
+RECOMMENDATIONS:
+  - Simple best for click prediction
+  - Use PBM for position effect estimation (interpretable θ_k)
+  - Use DBN for LTR training (separates attractiveness/satisfaction)
+
+================================================================================
+MODEL COMPARISON COMPLETE
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/click_models/results/13_model_comparison_full.txt
+================================================================================

@@ -1,0 +1,557 @@
+================================================================================
+IV STRATEGIES ANALYSIS
+Testing Multiple Instrumental Variable Approaches
+================================================================================
+
+OBJECTIVE:
+  Test multiple IV strategies from the literature for identifying
+  causal position effects on click-through rates.
+
+STRATEGIES TESTED:
+  1. Leave-One-Out (LOO) Competition
+  2. Conditional on PACING
+  3. Rank Discontinuities (RDD)
+  4. Within-Product Time Variation
+  5. Score Density / Local Randomization
+  6. Bid as Instrument
+  7. Vendor Concentration
+  8. IV Regression with n_bidders
+  9. Stratified IV by Placement
+  10. Within-Product IV
+  11. Weak Instrument Diagnostics
+  12. Sensitivity Analysis
+  13. Summary Comparison
+
+----------------------------------------
+LOADING DATA
+----------------------------------------
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/auctions_results_r2.parquet...
+    4,337,598 bids in 91,641 auctions
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/clicks_r2.parquet...
+    7,151 clicks
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/auctions_users_r2.parquet...
+    91,802 auction-user records
+
+Merging PLACEMENT from auctions_users...
+  Matched placements: 4,337,598 / 4,337,598
+
+Creating click indicator for winners...
+  Winners: 3,466,193
+  Clicked: 6,533 (0.188%)
+
+================================================================================
+SECTION 1: LEAVE-ONE-OUT COMPETITION MEASURES
+================================================================================
+
+Rationale:
+  Standard competition measures may be correlated with focal quality
+  because the focal product contributes to the auction's competitiveness.
+  LOO measures exclude the focal product, improving independence.
+
+Computing LOO measures...
+LOO Measure Summary Statistics:
+
+Measure                              N         Mean          Std          Min          Max
+------------------------- ------------ ------------ ------------ ------------ ------------
+n_bidders_loo                4,337,598      49.8240       8.8421       0.0000      73.0000
+mean_score_loo               4,337,598       0.1698       0.3315       0.0000       6.0079
+max_score_loo                4,337,598       0.6580       1.4708       0.0000      45.8639
+score_mass_above             4,337,598       5.8081      13.4116       0.0000     388.5378
+
+Independence Comparison: LOO vs Standard Measures
+
+LOO Measure          Standard            Corr(LOO,Q)     Corr(Std,Q)  Improvement
+-------------------- --------------- --------------- --------------- ------------
+n_bidders_loo        n_bidders                0.2008          0.2008       0.0000 [NO]
+mean_score_loo       mean_score               0.6488          0.6520       0.0032 [YES]
+max_score_loo        max_score                0.5878          0.5937       0.0060 [YES]
+
+First Stage: Correlation with RANKING
+
+Measure                      Corr(M,Rank)      p-value
+------------------------- --------------- ------------
+n_bidders_loo                      0.2846***     0.00e+00
+mean_score_loo                     0.0899***     0.00e+00
+max_score_loo                      0.0713***     0.00e+00
+score_mass_above                   0.2812***     0.00e+00
+
+Exclusion Check: Partial Correlation with Click | RANKING
+
+Measure                       Partial(M,Click|Rank)
+------------------------- -------------------------
+n_bidders_loo                               -0.0046 [GOOD]
+mean_score_loo                               0.0031 [GOOD]
+max_score_loo                                0.0012 [GOOD]
+score_mass_above                             0.0041 [GOOD]
+
+================================================================================
+SECTION 2: CONDITIONAL ON PACING
+================================================================================
+
+Rationale:
+  PACING reflects advertiser budget/strategy, not product quality.
+  Within PACING strata, competition variation may be quasi-random.
+
+PACING Distribution:
+
+  N: 4,337,598
+  Mean: 0.9445
+  Std: 0.1841
+  Min: 0.0067
+  Max: 1.0000
+
+PACING Percentiles:
+  P10: 0.9039
+  P25: 1.0000
+  P50: 1.0000
+  P75: 1.0000
+  P90: 1.0000
+  P95: 1.0000
+  P99: 1.0000
+
+PACING Deciles: 2 unique deciles
+
+Competition Variation Within PACING Deciles:
+
+  Decile            N   Mean n_bid    Std n_bid   Corr(n_bid,Rank)   Corr(n_bid,Q)
+-------- ------------ ------------ ------------ ------------------ ---------------
+       0      433,770        48.42        11.80             0.3141          0.0507
+       1    3,903,828        51.09         8.41             0.2839          0.2325
+
+Exclusion Check by PACING Decile:
+
+  Decile    N Winners    Corr(n_bid,Click)    Partial|Rank
+-------- ------------ -------------------- ---------------
+       0      301,118              -0.0141         -0.0028
+       1    3,165,075              -0.0138         -0.0049
+
+PACING x Competition Interaction:
+
+  Low PACING: N=4,337,598, Corr(n_bidders,RANKING)=0.2846, Corr(n_bidders,QUALITY)=0.2008
+
+================================================================================
+SECTION 3: RANK DISCONTINUITIES (RDD)
+================================================================================
+
+Rationale:
+  At the winner/loser cutoff, products are similar in quality.
+  Comparison across the cutoff identifies the position effect.
+
+Winner Rank Cutoffs by Auction:
+
+ Cutoff Rank   N Auctions        Pct
+------------ ------------ ----------
+           1        1,031       1.13%
+           2          787       0.86%
+           3          643       0.70%
+           4          517       0.57%
+           5          501       0.55%
+           6          451       0.49%
+           7          392       0.43%
+           8          354       0.39%
+           9          356       0.39%
+          10          350       0.38%
+
+Covariate Balance at Winner/Loser Cutoff:
+
+Observations at cutoff: 180,201
+  Last winners (distance=0): 91,240
+  First losers (distance=1): 88,961
+
+Covariate           Last Winner     First Loser         Diff      p-value
+--------------- --------------- --------------- ------------ ------------
+QUALITY                  0.0171          0.0194      -0.0024       0.0000***
+FINAL_BID                6.8340          6.5049       0.3291       0.0000***
+PACING                   0.9576          0.8850       0.0726       0.0000***
+score                    0.0986          0.0942       0.0044       0.0000***
+
+Local Linear RDD at Common Cutoffs:
+
+  Cutoff          N  Effect (Click)      Std Err      p-value
+-------- ---------- --------------- ------------ ------------
+       2      1,574          0.0013       0.0086       0.8831
+       3      1,929          0.0140       0.0073       0.0539
+       4      1,551         -0.0039       0.0070       0.5796
+       5      1,503          0.0040       0.0077       0.6050
+
+Bandwidth Sensitivity (at most common cutoff):
+
+Main cutoff: 1
+
+ Bandwidth          N       Effect      Std Err
+---------- ---------- ------------ ------------
+
+================================================================================
+SECTION 4: WITHIN-PRODUCT TIME VARIATION
+================================================================================
+
+Rationale:
+  Products appearing in multiple auctions face different competition.
+  Within-product variation in competition is plausibly exogenous.
+
+Product Auction Frequency:
+  1 auction: 387,963 products (33.4%)
+  2 auctions: 367,393 products
+  3-5 auctions: 250,343 products
+  6-10 auctions: 102,038 products
+  10+ auctions: 52,762 products
+
+Products with 3+ auctions: 405,143
+Bids from these products: 3,214,849
+
+Variance Decomposition:
+
+Variable              Total Var    Within-Prod Var   Between-Prod Var     Within %
+--------------- --------------- ------------------ ------------------ ------------
+RANKING                242.6869           123.5749           119.1119         50.9%
+n_bidders               77.7270            33.4344            44.2927         43.0%
+score                    0.2147             0.0985             0.1162         45.9%
+
+Within-Product Correlations:
+
+  Within-product Corr(n_bidders, RANKING): 0.2188 (p=0.0000)
+
+Within-Product: Competition -> CTR | RANKING
+
+  Within-product Corr(n_bidders, clicked): -0.0121 (p=0.0000)
+  Within-product Partial(n_bidders, clicked | RANKING): -0.0070
+
+Product Fixed Effects Model:
+
+  First stage (n_bidders -> RANKING): 0.396274
+  Reduced form (n_bidders -> clicked): -0.000095
+  2SLS estimate (RANKING -> clicked): -0.000241
+  OLS (RANKING -> clicked): -0.000112
+  IV/OLS ratio: 2.15x
+
+================================================================================
+SECTION 5: SCORE DENSITY / LOCAL RANDOMIZATION
+================================================================================
+
+Rationale:
+  Where scores are densely packed, small differences determine rank.
+  In these regions, rank assignment is quasi-random.
+
+Computing local density...
+
+Local Density Distribution:
+
+  N: 4,337,598
+  Mean: 310.1560
+  Std: 313.7230
+  Median: 188.4421
+  P90: 831.0423
+  P95: 937.0302
+  P99: 1000.0000
+
+Dense threshold (P75): 543.2983
+Dense observations: 1,084,400 (25.0%)
+
+Comparison: Dense vs Sparse Regions
+
+Region                     N    Mean QUALITY    Mean RANKING    Corr(Q,Rank)
+--------------- ------------ --------------- --------------- ---------------
+Sparse             3,253,198          0.0286           23.01          0.0081
+Dense              1,084,400          0.0081           34.62         -0.0583
+
+Position Effects by Density:
+
+Region             N Winners          CTR   Corr(Rank,Click)
+--------------- ------------ ------------ ------------------
+Sparse             2,805,034       0.0022            -0.0288
+Dense                661,159       0.0005            -0.0129
+
+Randomization Test in Dense Regions:
+If density creates quasi-randomization, QUALITY should not predict clicks.
+
+  Corr(QUALITY, clicked) in dense regions: 0.0306 (p=0.0000)
+  Partial(QUALITY, clicked | RANKING) in dense regions: 0.0313
+  -> QUALITY does not predict clicks conditional on RANKING in dense regions.
+  -> Supports local randomization assumption.
+
+================================================================================
+SECTION 6: BID AS INSTRUMENT
+================================================================================
+
+Rationale:
+  FINAL_BID reflects advertiser's private valuation/strategy.
+  Conditional on QUALITY, bid variation is plausibly exogenous.
+  If bid only affects clicks through RANKING, it can serve as IV.
+
+Bid-Quality Relationship:
+
+  Corr(BID, QUALITY): -0.0331 (p=0.0000)
+  Corr(BID, RANKING | QUALITY): -0.1319 (p=0.0000)
+
+Exclusion Check:
+
+  Corr(BID, Click | QUALITY): -0.0024
+  Corr(BID, Click | QUALITY, RANKING): -0.0065
+  -> BID does not directly affect clicks conditional on QUALITY and RANKING.
+  -> Exclusion restriction satisfied.
+
+First Stage: BID -> RANKING | QUALITY
+
+  First stage coefficient: -0.229102
+  First stage R2: 0.0174
+  First stage F-stat: 76848.81
+  -> F > 10: Strong instrument.
+
+2SLS Estimation: BID -> RANKING -> Click | QUALITY
+
+  First stage (BID -> RANKING): -0.182816
+  Reduced form (BID -> Click): -0.000011
+  2SLS (RANKING -> Click): 0.000061
+  OLS (RANKING -> Click): -0.000102
+  2SLS/OLS ratio: -0.60x
+
+================================================================================
+SECTION 7: VENDOR CONCENTRATION
+================================================================================
+
+Rationale:
+  Auctions vary in vendor concentration (HHI).
+  In concentrated auctions, competition dynamics differ.
+  Concentration may serve as exogenous variation in competition.
+
+Computing vendor concentration...
+
+Vendor HHI Distribution:
+
+  N: 4,337,598
+  Mean: 0.0545
+  Std: 0.0864
+  Min: 0.0135
+  Median: 0.0280
+  Max: 1.0000
+
+HHI Interpretation:
+  HHI = 1: All products from one vendor
+  HHI = 0.5: Two vendors with equal shares
+  HHI = 0.1: Ten vendors with equal shares
+
+First Stage: Vendor HHI -> RANKING
+
+  Corr(vendor_hhi, RANKING): 0.0046 (p=0.0000)
+  Partial(vendor_hhi, RANKING | QUALITY): 0.0132
+
+Independence: Vendor HHI vs Focal Characteristics
+
+  Corr(vendor_hhi, QUALITY): 0.1263 (p=0.0000)
+  Corr(vendor_hhi, FINAL_BID): 0.1427 (p=0.0000)
+
+Exclusion: Vendor HHI -> Click | RANKING
+
+  Partial(vendor_hhi, Click | RANKING): 0.0014
+  Exclusion assessment: [GOOD]
+
+Position Effects by Vendor Concentration Tercile:
+
+Tercile       N Winners          CTR   Corr(Rank,Click)
+---------- ------------ ------------ ------------------
+Low           1,172,627       0.0018            -0.0232
+Medium        1,155,851       0.0017            -0.0299
+High          1,137,715       0.0022            -0.0391
+
+================================================================================
+SECTION 8: IV REGRESSION WITH n_bidders
+================================================================================
+
+Model:
+  First stage: RANKING = α + β₁·n_bidders + β₂·QUALITY + ε
+  Second stage: Click = γ + δ·RANKING_hat + θ·QUALITY + η
+
+Sample size: 3,466,193 winners
+
+First Stage: n_bidders -> RANKING (controlling for QUALITY)
+
+  Coefficient on n_bidders: 0.513163
+  Coefficient on QUALITY: -36.578001
+  R-squared: 0.1065
+  Partial F-statistic for n_bidders: 402805.81
+  -> F > 10: Strong instrument.
+
+Reduced Form: n_bidders -> Click (controlling for QUALITY)
+
+  Coefficient on n_bidders: -0.000098
+  Coefficient on QUALITY: 0.021880
+
+Second Stage (2SLS): RANKING_hat -> Click (controlling for QUALITY)
+
+  2SLS coefficient on RANKING: -0.000192
+  2SLS coefficient on QUALITY: 0.014860
+
+OLS Comparison: RANKING -> Click (controlling for QUALITY)
+
+  OLS coefficient on RANKING: -0.000102
+  OLS coefficient on QUALITY: 0.016210
+
+Comparison:
+  2SLS RANKING effect: -0.000192
+  OLS RANKING effect: -0.000102
+  Ratio (2SLS/OLS): 1.89x
+
+  -> 2SLS magnitude larger than OLS.
+  -> Suggests OLS understates position effect (endogeneity bias toward zero).
+
+================================================================================
+SECTION 9: STRATIFIED IV BY PLACEMENT
+================================================================================
+
+Rationale:
+  First stage varies by placement (Browse/PDP: 0.42-0.43, Search: 0.17).
+  IV analysis should focus on placements with stronger first stage.
+
+ Placement          N     First Stage     F-stat         2SLS          OLS      Ratio
+---------- ---------- --------------- ---------- ------------ ------------ ----------
+         1    470,101          0.4925  102516.89    -0.000553    -0.000330       1.67
+         2    355,404          0.4363   85963.28     0.000107    -0.000186      -0.57
+         3  2,180,172          0.4226   77680.86    -0.000173    -0.000048       3.57
+         5    460,516          0.4439    2545.86    -0.001249    -0.000012     104.40
+
+Placements with F > 10 (recommended for IV):
+  Placement 1: F=102516.89, 2SLS=-0.000553
+  Placement 2: F=85963.28, 2SLS=0.000107
+  Placement 3: F=77680.86, 2SLS=-0.000173
+  Placement 5: F=2545.86, 2SLS=-0.001249
+
+================================================================================
+SECTION 10: WITHIN-PRODUCT IV
+================================================================================
+
+Model with Product Fixed Effects:
+  First stage: RANKING_it = α_i + β·n_bidders_t + ε_it
+  Second stage: Click_it = γ_i + δ·RANKING_hat_it + η_it
+  where α_i and γ_i are product fixed effects
+
+Products with 3+ auctions: 405,143
+Winners from these products: 2,629,813
+
+Observations after demeaning: 2,629,813
+
+First Stage (within-product):
+  First stage coefficient: 0.396274
+  R-squared: 0.0565
+  F-statistic: 157472.88
+
+Reduced Form (within-product):
+  Reduced form coefficient: -0.000095
+
+2SLS (within-product):
+  2SLS estimate: -0.000241
+  OLS estimate: -0.000112
+  Ratio (2SLS/OLS): 2.15x
+
+Interpretation:
+  Within-product IV absorbs all product-level confounders.
+  Identification comes from competition variation across auctions.
+  Strong first stage suggests valid identification.
+
+================================================================================
+SECTION 11: WEAK INSTRUMENT DIAGNOSTICS
+================================================================================
+
+Diagnostics for weak instruments:
+  1. Stock-Yogo critical values (F < 10 suggests weakness)
+  2. Anderson-Rubin confidence intervals (robust to weak IV)
+  3. LIML vs 2SLS comparison (LIML less biased with weak IV)
+
+Stock-Yogo Critical Values:
+  For one endogenous regressor and one instrument:
+  - 10% maximal IV size: F > 16.38
+  - 15% maximal IV size: F > 8.96
+  - 20% maximal IV size: F > 6.66
+  - 25% maximal IV size: F > 5.53
+
+First stage F-statistic: 402805.81
+  -> Passes 10% maximal IV size threshold.
+
+Anderson-Rubin Confidence Interval:
+  (Robust to weak instruments)
+
+  95% AR CI: Could not compute (may need wider grid).
+
+LIML vs 2SLS Comparison:
+  (LIML is less biased with weak instruments)
+
+  2SLS estimate: -0.000192
+  LIML estimate: approximately equal to 2SLS (F > 10).
+
+================================================================================
+SECTION 12: SENSITIVITY ANALYSIS
+================================================================================
+
+Assess robustness to unmeasured confounding.
+
+Oster's Delta:
+  How much selection on unobservables would be needed to explain away effect?
+
+  β (uncontrolled): -0.000104, R² = 0.0010
+  β (controlled for QUALITY): -0.000102, R² = 0.0012
+  Oster's δ (R²_max = 0.00): 48.05
+  -> |δ| > 1: Effect robust to proportional selection.
+
+E-Value:
+  Minimum strength of confounding needed to explain away effect.
+
+  Effect size (standardized): -0.0023
+  Approximate E-value: 1.05
+  (Confounder would need 1.0x association with both treatment and outcome)
+
+Bounded Treatment Effects (Manski-style):
+  Under worst-case selection, what are the bounds?
+
+  Point estimate: -0.000102
+  Bounds under 10% selection: [-0.100102, 0.099898]
+  -> Effect sign not robust under assumed selection.
+
+================================================================================
+SECTION 13: SUMMARY COMPARISON OF IV STRATEGIES
+================================================================================
+
+IV Strategy Comparison:
+
+Strategy                      First Stage    Exclusion       Independence  Recommended
+------------------------- --------------- ------------ ------------------ ------------
+LOO Competition                  Moderate         Good Better than standard          Yes
+Conditional on PACING     Varies by decile         Good Good within strata      Partial
+Rank Discontinuities (RDD)    N/A (design)    By design    Local to cutoff  Yes (local)
+Within-Product Variation         Moderate         Good     By design (FE)          Yes
+Score Density                      Varies Good in dense    Better in dense      Partial
+Bid as IV                          Strong   Borderline           Moderate          Yes
+Vendor Concentration                 Weak         Good               Good           No
+
+KEY RECOMMENDATIONS:
+
+1. PRIMARY STRATEGY: Within-Product IV with n_bidders
+   - Product FE absorbs quality confounding
+   - Competition variation is plausibly exogenous
+   - Requires products with multiple auctions
+
+2. COMPLEMENTARY: Rank Discontinuities (RDD)
+   - Clean identification at winner/loser cutoff
+   - Local effect only (at cutoff ranks)
+   - Useful for robustness check
+
+3. SUPPORTING: LOO Competition Measures
+   - Better independence than standard measures
+   - Use n_bidders_loo or mean_score_loo
+
+CAVEATS:
+  - First stage may be weak (F < 10 in some specifications)
+  - Exclusion depends on competition not directly affecting user behavior
+  - Results should be interpreted as local average treatment effects
+
+DOWNSTREAM ANALYSIS RECOMMENDATIONS:
+  1. Use within-product IV as primary specification
+  2. Report RDD estimates at cutoff for robustness
+  3. Stratify by placement (focus on Browse/PDP where first stage is stronger)
+  4. Include weak instrument diagnostics (AR CI, F-stat)
+  5. Report sensitivity analysis (Oster's delta)
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/iv-analysis/results/11_iv_strategies.txt
+

@@ -1,0 +1,340 @@
+================================================================================
+AUCTION PRESSURE ANALYSIS
+Competition Measures as Potential Instrumental Variables
+================================================================================
+
+OBJECTIVE:
+  Identify competition measures that can serve as instruments for RANKING
+  in estimating causal position effects on click-through rates.
+
+INSTRUMENT REQUIREMENTS:
+  1. Relevance: Strong correlation with RANKING (first stage)
+  2. Exclusion: No direct effect on clicks conditional on RANKING
+  3. Independence: Uncorrelated with focal product quality
+
+----------------------------------------
+LOADING DATA
+----------------------------------------
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/auctions_results_r2.parquet...
+    4,337,598 bids in 91,641 auctions
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/clicks_r2.parquet...
+    7,151 clicks
+  Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data_r2/auctions_users_r2.parquet...
+    91,802 auction-user records
+
+Merging PLACEMENT from auctions_users...
+  Matched placements: 4,337,598 / 4,337,598
+
+Creating click indicator for winners...
+  Winners: 3,466,193
+  Clicked: 6,533 (0.188%)
+
+================================================================================
+COMPUTING COMPETITION MEASURES
+================================================================================
+
+Total bids: 4,337,598
+Total auctions: 91,641
+
+Computing auction-level aggregates...
+Computing count-based measures...
+Computing score-based measures...
+  Computing max_competitor_score (this may take a moment)...
+Computing gap-based measures...
+Computing concentration measures...
+Computing threat measures...
+  Computing threat_score (this may take a moment)...
+  Using vectorized approximation for large dataset...
+Computing quality vs bid decomposition...
+
+Competition measures computed.
+
+================================================================================
+SECTION 1: COMPETITION MEASURE SUMMARY STATISTICS
+================================================================================
+
+Measure                                   N         Mean          Std          Min          Max
+------------------------------ ------------ ------------ ------------ ------------ ------------
+n_bidders                         4,337,598      50.8240       8.8421       1.0000      74.0000
+n_winners                         4,337,598      41.0048       8.4890       0.0000      64.0000
+winner_rate                       4,337,598       0.7991       0.0671       0.0000       1.0000
+mean_competitor_score             4,337,598       0.1698       0.3315       0.0000       6.0079
+max_competitor_score              4,337,598       0.6580       1.4708       0.0000      45.8639
+median_competitor_score           4,337,598       0.1399       0.2785       0.0000      16.5740
+std_score                         4,337,089       0.1075       0.2275       0.0000       6.6771
+score_percentile                  4,337,598       0.4999       0.2944       0.0000       1.0000
+score_zscore                      4,337,598       0.0000       0.9893      -4.7846       8.1867
+gap_above                         4,337,598       0.0103       0.1558     -11.3443      35.6493
+gap_below                         4,337,598       0.0103       0.1558     -11.3443      35.6493
+gap_ratio                         4,337,598     666.9278 1331023.1794 -2499905.1914 2772009792.3554
+local_density                     4,337,598     310.1560     313.7230       0.0280    1000.0000
+hhi_score                         4,337,598       0.0506       0.0735       0.0000       1.0000
+gini_score                        4,337,598       0.3528       0.1581       0.0000       0.9790
+top3_share                        4,337,598       0.2336       0.1432       0.0000       1.0000
+effective_competitors             4,337,598      31.5192      13.7440       1.0000      72.9004
+n_better                          4,337,598      24.9120      15.5317       0.0000      73.0000
+threat_score                      4,337,598       7.2425      22.4132       0.0000    1252.5061
+closest_challenger                4,337,598       0.0103       0.1558     -11.3443      35.6493
+corr_quality_bid                  4,334,146      -0.3935       0.2021      -1.0000       1.0000
+quality_dominance                 4,337,598       0.0003       0.0095       0.0000       0.9938
+bid_dominance                     4,337,598       0.9997       0.0095       0.0062       1.0000
+
+Measure descriptions:
+  n_bidders: Count: Total bidders in auction
+  n_winners: Count: Total winners in auction
+  winner_rate: Count: Winner rate (n_winners/n_bidders)
+  mean_competitor_score: Score: Mean competitor score
+  max_competitor_score: Score: Max competitor score
+  median_competitor_score: Score: Median competitor score
+  std_score: Score: Std dev of scores in auction
+  score_percentile: Score: Focal percentile (0=worst, 1=best)
+  score_zscore: Score: Focal z-score in auction
+  gap_above: Gap: Score gap to better product
+  gap_below: Gap: Score gap to worse product
+  gap_ratio: Gap: gap_above / gap_below
+  local_density: Gap: 1/(gap_above + gap_below)
+  hhi_score: Conc: HHI of scores
+  gini_score: Conc: Gini coefficient
+  top3_share: Conc: Top 3 bidders share
+  effective_competitors: Conc: 1/HHI
+  n_better: Threat: Count scoring higher
+  threat_score: Threat: Sum of score gaps above
+  closest_challenger: Threat: Gap to next worse
+  corr_quality_bid: Decomp: Corr(quality, bid) in auction
+  quality_dominance: Decomp: Quality share of variance
+  bid_dominance: Decomp: Bid share of variance
+
+================================================================================
+SECTION 2: FIRST STAGE - CORRELATION WITH RANKING
+================================================================================
+
+For a valid instrument, we need strong correlation with RANKING.
+
+Measure                           Corr(M,Rank)      p-value       Partial|Q     Partial|Q,B
+------------------------------ --------------- ------------ --------------- ---------------
+n_bidders                               0.2846***     0.00e+00          0.3049          0.3258
+n_winners                               0.2825***     0.00e+00          0.3046          0.3242
+winner_rate                             0.1878***     0.00e+00          0.1963          0.2054
+mean_competitor_score                   0.0899***     0.00e+00          0.1752          0.2472
+max_competitor_score                    0.0713***     0.00e+00          0.1368          0.1778
+median_competitor_score                 0.0889***     0.00e+00          0.1700          0.2436
+std_score                               0.0620***     0.00e+00          0.1324          0.1774
+score_percentile                       -0.8590***     0.00e+00         -0.8597         -0.8570
+score_zscore                           -0.6509***     0.00e+00         -0.6499         -0.6420
+gap_above                              -0.0763***     0.00e+00         -0.0701         -0.0596
+gap_below                              -0.0805***     0.00e+00         -0.0690         -0.0568
+gap_ratio                              -0.0007        1.22e-01         -0.0008         -0.0008
+local_density                           0.3723***     0.00e+00          0.3705          0.3531
+hhi_score                              -0.0858***     0.00e+00         -0.0933         -0.1029
+gini_score                             -0.0732***     0.00e+00         -0.0868         -0.1078
+top3_share                             -0.1186***     0.00e+00         -0.1331         -0.1521
+effective_competitors                   0.1558***     0.00e+00          0.1811          0.2081
+n_better                                1.0000***     0.00e+00          1.0000          1.0000
+threat_score                            0.2717***     0.00e+00          0.3176          0.3330
+closest_challenger                     -0.0805***     0.00e+00         -0.0690         -0.0568
+corr_quality_bid                       -0.0198***     0.00e+00         -0.0299         -0.0570
+quality_dominance                      -0.0264***     0.00e+00         -0.0244         -0.0271
+bid_dominance                           0.0264***     0.00e+00          0.0244          0.0271
+
+Interpretation:
+  Strong instruments: |Corr| > 0.3, significant p-value
+  Partial|Q: Correlation after controlling for QUALITY
+  Partial|Q,B: Correlation after controlling for QUALITY and BID (should be ~0)
+
+================================================================================
+SECTION 3: EXCLUSION CHECK - CORRELATION WITH CLICK
+================================================================================
+
+For exclusion restriction, we need measures to NOT correlate with clicks
+AFTER controlling for RANKING (the endogenous variable).
+
+Analyzing 3,466,193 winners (6,533 clicks)
+
+Measure                          Corr(M,Click)      p-value    Partial|Rank
+------------------------------ --------------- ------------ ---------------
+n_bidders                              -0.0137***    3.00e-144         -0.0046 [GOOD]
+n_winners                              -0.0126***    3.44e-122         -0.0034 [GOOD]
+winner_rate                            -0.0177***    1.71e-238         -0.0119 [GOOD]
+mean_competitor_score                  -0.0001        9.22e-01          0.0031 [GOOD]
+max_competitor_score                   -0.0013*       1.28e-02          0.0012 [GOOD]
+std_score                               0.0004        4.27e-01          0.0026 [GOOD]
+score_percentile                        0.0265***     0.00e+00          0.0017 [GOOD]
+score_zscore                            0.0309***     0.00e+00          0.0140 [GOOD]
+gap_above                               0.0054***     6.63e-24          0.0030 [GOOD]
+gap_below                               0.0048***     1.82e-19          0.0022 [GOOD]
+gap_ratio                              -0.0000        9.81e-01         -0.0000 [GOOD]
+local_density                          -0.0217***     0.00e+00         -0.0113 [GOOD]
+hhi_score                               0.0050***     2.82e-20          0.0028 [GOOD]
+gini_score                             -0.0059***     5.71e-28         -0.0081 [GOOD]
+top3_share                              0.0011*       4.56e-02         -0.0023 [GOOD]
+effective_competitors                   0.0056***     1.31e-25          0.0108 [GOOD]
+n_better                               -0.0308***     0.00e+00          0.0000 [GOOD]
+threat_score                           -0.0065***     1.88e-33          0.0023 [GOOD]
+closest_challenger                      0.0048***     1.82e-19          0.0022 [GOOD]
+corr_quality_bid                       -0.0071***     6.48e-40         -0.0078 [GOOD]
+quality_dominance                       0.0083***     3.71e-54          0.0078 [GOOD]
+
+Interpretation:
+  GOOD: |Partial|Rank| < 0.05 - measure doesn't directly affect clicks
+  WEAK: |Partial|Rank| < 0.10 - borderline exclusion
+  BAD: |Partial|Rank| >= 0.10 - measure directly affects clicks, invalid instrument
+
+================================================================================
+SECTION 4: INDEPENDENCE - CORRELATION WITH FOCAL CHARACTERISTICS
+================================================================================
+
+Good instruments should be independent of focal product quality/bid.
+High correlation suggests the instrument is not exogenous.
+
+Measure                           Corr(M,QUALITY)  Corr(M,FINAL_BID)  Corr(M,PLACEMENT)
+------------------------------ ------------------ ------------------ ------------------
+n_bidders                                  0.2008             0.1106             0.3268 [GOOD]
+n_winners                                  0.2155             0.1019             0.3226 [GOOD]
+winner_rate                                0.1052             0.0494             0.2494 [GOOD]
+mean_competitor_score                      0.6488             0.2716             0.4086 [WEAK]
+max_competitor_score                       0.5878             0.1868             0.3179 [WEAK]
+std_score                                  0.6222             0.1963             0.3118 [WEAK]
+gap_above                                  0.1003             0.0810             0.0372 [GOOD]
+gap_below                                  0.1946             0.0897             0.0372 [GOOD]
+local_density                             -0.3052            -0.1994            -0.1423 [WEAK]
+hhi_score                                 -0.1023            -0.0606            -0.0935 [GOOD]
+gini_score                                -0.1803            -0.1354            -0.1099 [GOOD]
+effective_competitors                      0.2722             0.1527             0.1848 [GOOD]
+n_better                                  -0.0666            -0.1294             0.0930 [GOOD]
+threat_score                               0.3600             0.0681             0.2351 [WEAK]
+corr_quality_bid                          -0.1458            -0.1856             0.0185 [GOOD]
+quality_dominance                          0.0305            -0.0196            -0.0306 [GOOD]
+
+Interpretation:
+  GOOD: |Corr| < 0.3 for both QUALITY and FINAL_BID
+  WEAK: Higher correlations suggest endogeneity concerns
+
+================================================================================
+SECTION 5: WITHIN-PRODUCT VARIATION
+================================================================================
+
+Products appearing in multiple auctions provide within-product variation.
+This helps isolate competition effects from product characteristics.
+
+Product auction frequency:
+  1 auction: 387,963 products
+  2-4 auctions: 573,076 products
+  5-9 auctions: 136,040 products
+  10+ auctions: 63,420 products
+
+Analyzing 199,460 products with 5+ auctions (2,500,732 bids)
+
+Measure                           Within-Prod Var    Across-Prod Var  Within Corr(M,Rank)
+------------------------------ ------------------ ------------------ --------------------
+n_bidders                                 34.6158            41.4957               0.2115
+n_winners                                 32.7063            35.5670               0.2082
+mean_competitor_score                      0.0577             0.1031               0.0514
+max_competitor_score                       1.7879             1.3318               0.0345
+std_score                                  0.0408             0.0314               0.0362
+gap_above                                  0.0302             0.0069              -0.0521
+gap_below                                  0.0283             0.0090              -0.0501
+local_density                          49827.3685         41078.0264               0.4342
+hhi_score                                  0.0025             0.0020              -0.0442
+effective_competitors                     77.2689           115.7551               0.0705
+n_better                                 132.5688           112.9368               1.0000
+threat_score                             426.9170           267.1665               0.2150
+
+Interpretation:
+  High within-product variance: Measure varies across auctions for same product
+  Within Corr(M,Rank): Correlation after removing product fixed effects
+  Strong within-product correlation suggests measure can identify position effects
+
+================================================================================
+SECTION 6: COMPETITION BY PLACEMENT
+================================================================================
+
+Placements: ['1', '2', '3', '5']
+
+Placement               N       n_bidders       n_winners mean_competitor       hhi_score effective_compe
+------------ ------------ --------------- --------------- --------------- --------------- ---------------
+1                 632,211         44.4965         34.5954          0.1191          0.0540         31.8831
+2                 416,452         55.8103         47.5152          0.2721          0.0448         38.5247
+3               2,732,076         50.1254         40.1255          0.0534          0.0562         27.5631
+5                 556,859         57.7067         47.7268          0.7224          0.0232         45.2764
+
+First stage correlation (Corr with RANKING) by placement:
+
+Placement          n_bidders mean_competitor       hhi_score        n_better
+------------ --------------- --------------- --------------- ---------------
+1                     0.4188          0.1320         -0.2647          1.0000
+2                     0.4307          0.1565         -0.2709          1.0000
+3                     0.1724         -0.0167          0.0001          1.0000
+5                     0.0689          0.0120         -0.0349          1.0000
+
+================================================================================
+SECTION 7: INSTRUMENT QUALITY RANKING
+================================================================================
+
+Ranking measures by:
+  1. First stage strength: |Corr(M, RANKING)|
+  2. Exclusion plausibility: |Corr(M, Click | RANKING)| (lower is better)
+  3. Independence: |Corr(M, QUALITY)| (lower is better)
+
+Rank Measure                     FirstStage    Exclusion Independence      Score
+---- ------------------------- ------------ ------------ ------------ ----------
+   1 n_better                        1.0000       0.0000       0.0666     0.9658
+   2 score_percentile                0.8590       0.0017       0.1322     0.8456
+   3 gap_ratio                       0.0007       0.0000       0.0003     0.6659
+   4 hhi_score                       0.0858       0.0028       0.1023     0.5769
+   5 gap_above                       0.0763       0.0030       0.1003     0.5702
+   6 n_winners                       0.2825       0.0034       0.2155     0.5699
+   7 top3_share                      0.1186       0.0023       0.1808     0.5575
+   8 n_bidders                       0.2846       0.0046       0.2008     0.5481
+   9 gap_below                       0.0805       0.0022       0.1946     0.5411
+  10 closest_challenger              0.0805       0.0022       0.1946     0.5411
+  11 threat_score                    0.2717       0.0023       0.3600     0.5179
+  12 quality_dominance               0.0264       0.0078       0.0305     0.4743
+  13 score_zscore                    0.6509       0.0140       0.1557     0.4703
+  14 corr_quality_bid                0.0198       0.0078       0.1458     0.4130
+  15 gini_score                      0.0732       0.0081       0.1803     0.4055
+  16 winner_rate                     0.1878       0.0119       0.1052     0.3921
+  17 local_density                   0.3723       0.0113       0.3052     0.3645
+  18 max_competitor_score            0.0713       0.0012       0.5878     0.3602
+  19 effective_competitors           0.1558       0.0108       0.2722     0.3220
+  20 std_score                       0.0620       0.0026       0.6222     0.3046
+  21 mean_competitor_score           0.0899       0.0031       0.6488     0.2890
+
+TOP INSTRUMENT CANDIDATES:
+
+1. n_better
+   First stage: Corr(M, RANKING) = 1.0000
+   Exclusion: Partial Corr(M, Click | RANKING) = 0.0000
+   Independence: Corr(M, QUALITY) = -0.0666
+
+2. score_percentile
+   First stage: Corr(M, RANKING) = -0.8590
+   Exclusion: Partial Corr(M, Click | RANKING) = 0.0017
+   Independence: Corr(M, QUALITY) = 0.1322
+
+3. gap_ratio
+   First stage: Corr(M, RANKING) = -0.0007
+   Exclusion: Partial Corr(M, Click | RANKING) = -0.0000
+   Independence: Corr(M, QUALITY) = -0.0003
+
+4. hhi_score
+   First stage: Corr(M, RANKING) = -0.0858
+   Exclusion: Partial Corr(M, Click | RANKING) = 0.0028
+   Independence: Corr(M, QUALITY) = -0.1023
+
+5. gap_above
+   First stage: Corr(M, RANKING) = -0.0763
+   Exclusion: Partial Corr(M, Click | RANKING) = 0.0030
+   Independence: Corr(M, QUALITY) = 0.1003
+
+INTERPRETATION:
+  Good instruments have:
+    - Strong first stage (|Corr with RANKING| > 0.3)
+    - Low exclusion violation (|Partial with Click| < 0.05)
+    - Low correlation with focal quality (|Corr with QUALITY| < 0.3)
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/results/10_auction_pressure.txt
+

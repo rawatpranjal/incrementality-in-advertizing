@@ -1,0 +1,264 @@
+================================================================================
+CTR PREDICTION MODEL WITH FEATURE IMPORTANCES
+================================================================================
+
+================================================================================
+SECTION 1: DATA SUMMARY
+----------------------------------------
+
+Data source: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data/session_items.parquet
+Total rows: 222,890
+Total clicks: 6,279
+Overall CTR: 2.82%
+Unique auctions: 31,501
+Unique products: 158,664
+
+Raw column statistics:
+  auction_id     : 31501 unique values
+  placement      : 4 unique values
+  position       : min=1.0000, max=64.0000, mean=9.1634
+  product_id     : 158664 unique values
+  rank           : min=1.0000, max=64.0000, mean=12.4828
+  clicked        : min=0.0000, max=1.0000, mean=0.0282
+  quality        : min=0.0000, max=0.9993, mean=0.0343
+  bid            : min=1.0000, max=100.0000, mean=10.0008
+  n_items        : min=1.0000, max=64.0000, mean=17.3268
+  n_clicks       : min=0.0000, max=17.0000, mean=0.5073
+
+Placements distribution:
+  Placement 1: 108,078 (48.5%)
+  Placement 2: 61,386 (27.5%)
+  Placement 3: 48,420 (21.7%)
+  Placement 5: 5,006 (2.2%)
+
+================================================================================
+SECTION 2: FEATURE MATRIX
+----------------------------------------
+
+Creating features...
+Total features: 21
+
+FEATURES INCLUDED:
+  - position            : [1.0000, 64.0000], mean=9.1634
+  - log_position        : [0.0000, 4.1589], mean=1.6834
+  - relative_position   : [0.0156, 1.0000], mean=0.5707
+  - row                 : [0.0000, 31.0000], mean=3.8355
+  - col                 : [0.0000, 1.0000], mean=0.4925
+  - is_top_row          : [0.0000, 1.0000], mean=0.2772
+  - is_first_col        : [0.0000, 1.0000], mean=0.5075
+  - quality_filled      : [0.0000, 0.9993], mean=0.0343
+  - log_quality         : [-12.9255, -0.0007], mean=-3.9190
+  - bid                 : [1.0000, 100.0000], mean=10.0008
+  - log_bid             : [0.6931, 4.6151], mean=2.0946
+  - relative_quality    : [0.0002, 22.4201], mean=0.9999
+  - relative_bid        : [0.0198, 19.0476], mean=1.0000
+  - quality_rank        : [1.0000, 64.0000], mean=9.1634
+  - bid_rank            : [1.0000, 64.0000], mean=9.1634
+  - n_items             : [1.0000, 64.0000], mean=17.3268
+  - log_n_items         : [0.0000, 4.1589], mean=2.4443
+  - placement_1         : [0.0000, 1.0000], mean=0.4849
+  - placement_2         : [0.0000, 1.0000], mean=0.2754
+  - placement_3         : [0.0000, 1.0000], mean=0.2172
+  - placement_5         : [0.0000, 1.0000], mean=0.0225
+
+FEATURES EXCLUDED (leakage prevention):
+  - n_clicks: session-level aggregate of target variable
+  - clicked: this IS the target variable
+
+Leakage check PASSED: n_clicks and clicked are not in feature list.
+
+Feature categories:
+  position: ['position', 'log_position', 'relative_position', 'row', 'col', 'is_top_row', 'is_first_col']
+  product_quality: ['quality_filled', 'log_quality', 'relative_quality', 'quality_rank']
+  product_bid: ['bid', 'log_bid', 'relative_bid', 'bid_rank']
+  session_context: ['n_items', 'log_n_items', 'placement_1', 'placement_2', 'placement_3', 'placement_5']
+
+================================================================================
+SECTION 3: TRAIN/TEST SPLIT
+----------------------------------------
+
+Splitting by auction_id (80/20)...
+Train set: 178,336 items, 4,973 clicks (2.79% CTR)
+Test set:  44,554 items, 1,306 clicks (2.93% CTR)
+
+Feature matrix shape: (178336, 21)
+
+================================================================================
+SECTION 4: MODEL TRAINING
+----------------------------------------
+
+Model: sklearn GradientBoosting
+Hyperparameters:
+  n_estimators: 200
+  max_depth: 5
+  learning_rate: 0.1
+
+Training model...
+Training complete.
+
+================================================================================
+SECTION 5: MODEL PERFORMANCE
+----------------------------------------
+
+TRAIN SET METRICS:
+  Log Loss: 0.109726
+  AUC:      0.746547
+  Brier:    0.024140
+
+TEST SET METRICS:
+  Log Loss: 0.133055
+  AUC:      0.598421
+  Brier:    0.029086
+
+AUC check PASSED: 0.5984 > 0.5 (better than random)
+
+Overfitting check: Train AUC / Test AUC = 1.2475
+  Warning: Possible overfitting (ratio > 1.1)
+
+================================================================================
+SECTION 6: FEATURE IMPORTANCES
+----------------------------------------
+
+Feature importances (sorted by importance):
+  Feature                   Importance   Percentage
+  ------------------------- ------------ ----------
+  relative_quality          0.236460      23.65%
+  log_quality               0.167061      16.71%
+  quality_filled            0.150001      15.00%
+  relative_bid              0.126835      12.68%
+  relative_position         0.059781       5.98%
+  bid_rank                  0.047449       4.74%
+  quality_rank              0.037854       3.79%
+  bid                       0.029128       2.91%
+  n_items                   0.026099       2.61%
+  log_n_items               0.025878       2.59%
+  log_bid                   0.020980       2.10%
+  position                  0.016822       1.68%
+  log_position              0.013139       1.31%
+  placement_2               0.011310       1.13%
+  row                       0.006992       0.70%
+  is_first_col              0.006953       0.70%
+  placement_3               0.005187       0.52%
+  col                       0.004655       0.47%
+  placement_5               0.003282       0.33%
+  placement_1               0.002388       0.24%
+  is_top_row                0.001747       0.17%
+
+Total percentage: 100.00% (should be ~100%)
+
+================================================================================
+SECTION 7: FEATURE CATEGORY ANALYSIS
+----------------------------------------
+
+Aggregate importance by feature category:
+
+  Category             Features   Total Importance   Percentage  
+  -------------------- ---------- ------------------ ------------
+  product_quality      4          0.591375              59.14%
+  product_bid          4          0.224392              22.44%
+  position             7          0.110088              11.01%
+  session_context      6          0.074144               7.41%
+
+DOMINANT CATEGORY: product_quality (59.1%)
+
+================================================================================
+SECTION 8: LOGISTIC REGRESSION BASELINE
+----------------------------------------
+
+Fitting Logistic Regression for interpretable coefficients...
+
+LOGISTIC REGRESSION PERFORMANCE:
+  Log Loss: 0.130507
+  AUC:      0.598705
+  Brier:    0.028337
+
+COEFFICIENTS (standardized features):
+  Intercept: -3.622255
+
+  Feature                   Coefficient  Direction      
+  ------------------------- ------------ ---------------
+  log_n_items                  +0.273895 increases CTR  
+  log_bid                      -0.188280 decreases CTR  
+  quality_rank                 -0.178874 decreases CTR  
+  log_quality                  +0.150956 increases CTR  
+  n_items                      -0.140435 decreases CTR  
+  placement_5                  -0.095246 decreases CTR  
+  relative_position            -0.077197 decreases CTR  
+  relative_quality             +0.071981 increases CTR  
+  relative_bid                 +0.064503 increases CTR  
+  log_position                 +0.063265 increases CTR  
+  placement_2                  +0.060639 increases CTR  
+  placement_1                  -0.044886 decreases CTR  
+  quality_filled               -0.032758 decreases CTR  
+  bid_rank                     -0.032669 decreases CTR  
+  placement_3                  +0.022003 increases CTR  
+  is_top_row                   +0.020914 increases CTR  
+  bid                          +0.019215 increases CTR  
+  row                          -0.015535 decreases CTR  
+  position                     -0.015329 decreases CTR  
+  col                          +0.003592 increases CTR  
+  is_first_col                 -0.003592 decreases CTR  
+
+COEFFICIENT INTERPRETATION:
+  (Coefficients are for standardized features: 1 unit = 1 std dev)
+
+  log_position (+0.0633):
+    Position has weak/positive effect (counterintuitive).
+
+  quality_filled (-0.0328):
+    Quality has negative/weak effect.
+
+  log_bid (-0.1883):
+    Bid has negative/weak effect.
+
+================================================================================
+SECTION 9: MODEL COMPARISON
+----------------------------------------
+
+  Model                     Log Loss     AUC          Brier       
+  ------------------------- ------------ ------------ ------------
+  sklearn GradientBoosting  0.133055     0.598421     0.029086    
+  Logistic Regression       0.130507     0.598705     0.028337    
+
+Logistic Regression performs comparably or better.
+
+================================================================================
+SECTION 10: SUMMARY
+================================================================================
+
+DATA:
+  - 222,890 item impressions
+  - 2.82% CTR
+  - 21 features used
+
+MODEL PERFORMANCE:
+  - sklearn GradientBoosting Test AUC: 0.5984
+  - sklearn GradientBoosting Test Log Loss: 0.1331
+  - Logistic Test AUC: 0.5987
+
+TOP 5 FEATURES BY IMPORTANCE:
+  1. relative_quality: 23.6%
+  2. log_quality: 16.7%
+  3. quality_filled: 15.0%
+  4. relative_bid: 12.7%
+  5. relative_position: 6.0%
+
+FEATURE CATEGORY BREAKDOWN:
+  - product_quality: 59.1%
+  - product_bid: 22.4%
+  - position: 11.0%
+  - session_context: 7.4%
+
+KEY FINDINGS:
+  - QUALITY features dominate (59.1% of importance)
+    Product quality is the primary driver of CTR.
+
+COEFFICIENT DIRECTIONS:
+  - log_position: POSITIVE/ZERO (no position decay)
+  - quality: NEGATIVE/ZERO
+  - bid: NEGATIVE/ZERO
+
+================================================================================
+ANALYSIS COMPLETE
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/click_models/results/16_ctr_feature_importance.txt
+================================================================================

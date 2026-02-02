@@ -1,0 +1,319 @@
+================================================================================
+CROSS-PLACEMENT CO-FIRING ANALYSIS
+================================================================================
+Purpose: Identify which placements fire simultaneously (<1s apart)
+         to determine if they share the same page
+Data source: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/0_data/round1
+Output: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/eda/results/14_cross_placement_cofiring.txt
+
+================================================================================
+SECTION 1: DATA LOADING
+================================================================================
+
+Loading auctions_users_all.parquet...
+  Shape: (78318, 4)
+  Columns: ['AUCTION_ID', 'USER_ID', 'PLACEMENT', 'CREATED_AT']
+
+Placement distribution:
+  P1: 14,543 auctions (18.6%)
+  P2: 8,325 auctions (10.6%)
+  P3: 46,844 auctions (59.8%)
+  P5: 8,606 auctions (11.0%)
+
+Unique users: 7,239
+Date range: 2026-02-01 16:16:55.424000 to 2026-02-02 00:25:25.267000
+
+================================================================================
+SECTION 2: CO-FIRING DETECTION
+================================================================================
+
+Definition: Two auctions 'co-fire' if they occur within <1 second
+            for the same user but with DIFFERENT placements.
+
+Interpretation:
+  - High co-firing rate (>5%) = same page, different ad slots
+  - Low co-firing rate (<2%) = different pages
+
+Total different-placement transitions: 16,479
+
+================================================================================
+SECTION 3: CO-FIRING MATRIX (< 1 SECOND)
+================================================================================
+
+--- Co-firing within 0.5s ---
+
+Co-firing counts (row -> column within 0.5s):
+         P    1  P    2  P    3  P    5
+  P1       -        3       2       0 
+  P2        1      -        1     126 
+  P3        0       1      -        0 
+  P5        1     125       0      -  
+
+Co-firing rates (% of row placement's auctions):
+         P    1  P    2  P    3  P    5
+  P1       -    0.02%   0.01%   0.00% 
+  P2    0.01%      -    0.01%   1.51% 
+  P3    0.00%   0.00%      -    0.00% 
+  P5    0.01%   1.45%   0.00%      -  
+
+--- Co-firing within 1.0s ---
+
+Co-firing counts (row -> column within 1.0s):
+         P    1  P    2  P    3  P    5
+  P1       -        3       5       0 
+  P2        1      -        1     239 
+  P3        0       4      -        1 
+  P5        2     259       0      -  
+
+Co-firing rates (% of row placement's auctions):
+         P    1  P    2  P    3  P    5
+  P1       -    0.02%   0.03%   0.00% 
+  P2    0.01%      -    0.01%   2.87% 
+  P3    0.00%   0.01%      -    0.00% 
+  P5    0.02%   3.01%   0.00%      -  
+
+--- Co-firing within 2.0s ---
+
+Co-firing counts (row -> column within 2.0s):
+         P    1  P    2  P    3  P    5
+  P1       -        4       7       0 
+  P2        1      -        1     456 
+  P3        1      22      -        1 
+  P5        2     541       0      -  
+
+Co-firing rates (% of row placement's auctions):
+         P    1  P    2  P    3  P    5
+  P1       -    0.03%   0.05%   0.00% 
+  P2    0.01%      -    0.01%   5.48% 
+  P3    0.00%   0.05%      -    0.00% 
+  P5    0.02%   6.29%   0.00%      -  
+
+--- Co-firing within 5.0s ---
+
+Co-firing counts (row -> column within 5.0s):
+         P    1  P    2  P    3  P    5
+  P1       -       14      49       1 
+  P2        6      -       14     968 
+  P3       29      74      -        3 
+  P5        3    1066       1      -  
+
+Co-firing rates (% of row placement's auctions):
+         P    1  P    2  P    3  P    5
+  P1       -    0.10%   0.34%   0.01% 
+  P2    0.07%      -    0.17%  11.63% 
+  P3    0.06%   0.16%      -    0.01% 
+  P5    0.03%  12.39%   0.01%      -  
+
+================================================================================
+SECTION 4: BIDIRECTIONAL CO-FIRING ANALYSIS
+================================================================================
+
+If A co-fires with B, we should see both A->B and B->A at similar rates.
+Asymmetric rates suggest timing/causality (one triggers the other).
+
+Bidirectional co-firing rates (within 1.0s):
+
+  Pair     A->B         B->A         Symmetric?   Interpretation
+  -------- ------------ ------------ ------------ ------------------------------
+  P1<->P2  0.02%      0.01%      58%          DIFFERENT PAGES (rare co-fire)
+  P1<->P3  0.03%      0.00%      N/A          DIFFERENT PAGES (rare co-fire)
+  P1<->P5  0.00%      0.02%      N/A          DIFFERENT PAGES (rare co-fire)
+  P2<->P3  0.01%      0.01%      71%          DIFFERENT PAGES (rare co-fire)
+  P2<->P5  2.87%      3.01%      95%          Possibly same page
+  P3<->P5  0.00%      0.00%      N/A          DIFFERENT PAGES (rare co-fire)
+
+================================================================================
+SECTION 5: TIME GAP DISTRIBUTION BY PAIR
+================================================================================
+
+For pairs that DO co-fire, what's the typical gap?
+
+
+P1 <-> P2 transitions (n=779):
+  Median gap: 75.96s
+  Mean gap: 1064.58s
+  Gap < 1s: 0.5%
+  Gap < 5s: 2.6%
+  Gap < 30s: 29.5%
+  Distribution:
+    0-0.5s      (0.5%)
+    0.5-1s      (0.0%)
+    1-2s        (0.1%)
+    2-5s        (1.9%)
+    5-10s      ### (6.3%)
+    10-30s     ########## (20.7%)
+    30-60s     ######## (16.0%)
+    >60s       ########################### (54.4%)
+
+P1 <-> P3 transitions (n=7,369):
+  Median gap: 67.35s
+  Mean gap: 886.38s
+  Gap < 1s: 0.1%
+  Gap < 5s: 1.1%
+  Gap < 30s: 27.4%
+  Distribution:
+    0-0.5s      (0.0%)
+    0.5-1s      (0.0%)
+    1-2s        (0.0%)
+    2-5s        (0.9%)
+    5-10s      ## (4.3%)
+    10-30s     ########## (22.0%)
+    30-60s     ######### (19.6%)
+    >60s       ########################## (53.0%)
+
+P1 <-> P5 transitions (n=89):
+  Median gap: 41.85s
+  Mean gap: 922.23s
+  Gap < 1s: 2.2%
+  Gap < 5s: 4.5%
+  Gap < 30s: 40.4%
+  Distribution:
+    0-0.5s      (1.1%)
+    0.5-1s      (1.1%)
+    1-2s        (0.0%)
+    2-5s       # (2.2%)
+    5-10s      ### (7.9%)
+    10-30s     ############## (28.1%)
+    30-60s     ########## (21.3%)
+    >60s       ################### (38.2%)
+
+P2 <-> P3 transitions (n=3,096):
+  Median gap: 66.42s
+  Mean gap: 930.97s
+  Gap < 1s: 0.2%
+  Gap < 5s: 2.8%
+  Gap < 30s: 28.2%
+  Distribution:
+    0-0.5s      (0.1%)
+    0.5-1s      (0.1%)
+    1-2s        (0.6%)
+    2-5s       # (2.1%)
+    5-10s      ## (4.4%)
+    10-30s     ########## (21.0%)
+    30-60s     ######### (19.4%)
+    >60s       ########################## (52.5%)
+
+P2 <-> P5 transitions (n=4,972):
+  Median gap: 6.54s
+  Mean gap: 11.88s
+  Gap < 1s: 10.0%
+  Gap < 5s: 40.9%
+  Gap < 30s: 96.5%
+  Distribution:
+    0-0.5s     ## (5.0%)
+    0.5-1s     ## (5.0%)
+    1-2s       ##### (10.0%)
+    2-5s       ########## (20.9%)
+    5-10s      ############# (26.6%)
+    10-30s     ############## (29.0%)
+    30-60s     # (2.5%)
+    >60s        (1.0%)
+
+P3 <-> P5 transitions (n=174):
+  Median gap: 66.37s
+  Mean gap: 819.88s
+  Gap < 1s: 0.6%
+  Gap < 5s: 2.3%
+  Gap < 30s: 23.0%
+  Distribution:
+    0-0.5s      (0.0%)
+    0.5-1s      (0.6%)
+    1-2s        (0.0%)
+    2-5s        (1.7%)
+    5-10s      # (3.4%)
+    10-30s     ######## (17.2%)
+    30-60s     ########## (21.8%)
+    >60s       ########################### (55.2%)
+
+================================================================================
+SECTION 6: P1 IDENTITY DETERMINATION
+================================================================================
+
+Based on co-firing patterns, what page is P1 on?
+
+P1 co-firing within 1s:
+  With P2: 4 (0.03%)
+  With P3: 5 (0.03%)
+  With P5: 2 (0.01%)
+
+Baseline (P3 <-> P5, known different pages):
+  P3 <-> P5: 1 (0.00%)
+
+Conclusion:
+  -> P1 is on a SEPARATE PAGE (low co-firing with all placements)
+  -> P1 may be Homepage/Feed or an undocumented placement
+
+================================================================================
+SECTION 7: MULTI-PLACEMENT SESSIONS
+================================================================================
+
+Do users typically encounter multiple placements in sequence?
+
+Placements per user:
+  1 placement(s): 4,193 users (57.9%)
+  2 placement(s): 2,382 users (32.9%)
+  3 placement(s): 643 users (8.9%)
+  4 placement(s): 21 users (0.3%)
+
+Most common placement sequences (first 3 placements per user):
+  3-3-3           1,669 (23.1%)
+  3-3             1,116 (15.4%)
+  1-1-1           661 (9.1%)
+  1-3-3           534 (7.4%)
+  3               517 (7.1%)
+  1               481 (6.6%)
+  2               323 (4.5%)
+  3-3-1           318 (4.4%)
+  1-1-3           251 (3.5%)
+  1-1             242 (3.3%)
+  2-3-3           202 (2.8%)
+  3-3-2           178 (2.5%)
+  2-2-2           178 (2.5%)
+  2-2-3           82 (1.1%)
+  2-2             59 (0.8%)
+
+================================================================================
+SECTION 8: SIMULTANEOUS AUCTIONS (EXACT TIMESTAMP MATCHES)
+================================================================================
+
+Auctions with identical timestamps strongly indicate same-page co-loading.
+
+Timestamps with 2+ auctions: 334
+Average auctions per multi-auction timestamp: 2.00
+
+Most common placement combinations at identical timestamps:
+  P3              334 (100.0%)
+
+================================================================================
+SECTION 9: SUMMARY & IMPLICATIONS
+================================================================================
+
+CO-FIRING INTERPRETATION:
+
+If two placements co-fire at >5% rate, they're likely:
+  - On the SAME page (different ad slots)
+  - Loading simultaneously on page render
+
+If two placements co-fire at <2% rate, they're likely:
+  - On DIFFERENT pages
+  - User navigated between pages
+
+KEY FINDINGS:
+
+  1. P1 co-fires most with P3 (0.03%)
+     -> P1 may be on Search alongside P3
+
+  2. P3 <-> P5 baseline co-firing: 0.00%
+     -> Confirms Search (P3) and Brand Page (P5) are separate pages
+
+REVISED PLACEMENT MAPPING:
+
+  P3 = Search Results (high self-transition, 2 slots/page)
+  P5 = Brand Page (official Poshmark placement)
+  P2 = PDP Ad Section (low self-transition, high CTR)
+  P1 = TBD based on co-firing analysis above
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/eda/results/14_cross_placement_cofiring.txt

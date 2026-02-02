@@ -1,0 +1,1190 @@
+================================================================================
+SEARCH PAGINATION EVIDENCE: P3 SELF-TRANSITION ANALYSIS
+================================================================================
+
+Objective: Prove P3 is search pagination via the diagnostic self-transition pattern.
+If P3 = search results, users viewing multiple pages will generate P3 → P3 → P3 sequences.
+This 'self-transition' rate should be much higher than other placements.
+
+================================================================================
+DATASET: _all (All placements dataset)
+================================================================================
+
+Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data/auctions_users_all.parquet...
+Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data/auctions_results_all.parquet...
+Loaded 3,748,381 auction results
+Loaded 78,318 auctions from 7,239 users
+Placements: ['1', '2', '3', '5']
+
+============================================================
+SECTION 1: FULL TRANSITION MATRIX
+============================================================
+
+--- Dataset: _all ---
+
+Total transitions: 71,079
+Users with 2+ auctions: 5,906
+
+Raw transition counts:
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1       8,357         337       3,964          35
+         2         442       2,998       1,562       2,490
+         3       3,405       1,534      37,311          91
+         5          54       2,482          83       5,934
+
+Transition probabilities (row percentages):
+P(next_placement = Y | current_placement = X)
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1       65.8%        2.7%       31.2%        0.3%
+         2        5.9%       40.0%       20.8%       33.2%
+         3        8.0%        3.6%       88.1%        0.2%
+         5        0.6%       29.0%        1.0%       69.4%
+
+Self-transition rates (DIAGONAL):
+  P1 → P1: 65.8% <-- PAGINATION SIGNAL
+  P2 → P2: 40.0%
+  P3 → P3: 88.1% <-- PAGINATION SIGNAL
+  P5 → P5: 69.4% <-- PAGINATION SIGNAL
+
+============================================================
+SECTION 2: CONSECUTIVE P3 RUN LENGTHS
+============================================================
+
+--- Consecutive 3 Run Lengths (_all) ---
+Interpretation: "How many pages does a user view in one search session?"
+
+Total runs: 9,533
+Mean run length: 4.91
+Median run length: 2
+Max run length: 226
+
+  Run Length        Count   Percentage   Cumulative
+------------ ------------ ------------ ------------
+           1          951        10.0%        10.0% (single page view)
+           2        4,067        42.7%        52.6% (page 1 → page 2)
+           3          313         3.3%        55.9% (deep pagination: 3 pages)
+           4        1,573        16.5%        72.4% (deep pagination: 4 pages)
+           5          158         1.7%        74.1% (deep pagination: 5 pages)
+           6          784         8.2%        82.3% (deep pagination: 6 pages)
+           7           92         1.0%        83.3% (deep pagination: 7 pages)
+           8          449         4.7%        88.0% (deep pagination: 8 pages)
+           9           66         0.7%        88.7% (deep pagination: 9 pages)
+          10          242         2.5%        91.2% (deep pagination: 10 pages)
+         11+          838         8.8%       100.0% (very deep pagination)
+
+============================================================
+SECTION 3: TIME GAPS WITHIN P3 RUNS
+============================================================
+
+--- Time Gaps Within 3 Runs (_all) ---
+
+Time gap between consecutive P3 auctions (seconds):
+  Count: 41,224
+  Median: 1.98s
+  Mean: 497.86s
+  P25: 0.02s
+  P75: 75.05s
+  P95: 2338.08s
+
+  Interpretation: Median gap of 2.0s indicates rapid page turns,
+  consistent with search result pagination behavior.
+
+Gap distribution:
+  <2s (instant):          20,614 (  50.0%)
+  2-5s (fast):               371 (   0.9%)
+  5-10s (moderate):          896 (   2.2%)
+  10-30s (browsing):       3,906 (   9.5%)
+  30s+ (new session):     15,437 (  37.4%)
+
+--- Time Gaps Within 1 Runs (_all) ---
+
+Time gap between consecutive P1 auctions (seconds):
+  Count: 11,077
+  Median: 43.69s
+  Mean: 787.10s
+  P25: 9.23s
+  P75: 307.39s
+  P95: 4883.05s
+
+Gap distribution:
+  <2s (instant):             459 (   4.1%)
+  2-5s (fast):             1,054 (   9.5%)
+  5-10s (moderate):        1,418 (  12.8%)
+  10-30s (browsing):       2,016 (  18.2%)
+  30s+ (new session):      6,130 (  55.3%)
+
+--- Time Gaps Within 2 Runs (_all) ---
+
+Time gap between consecutive P2 auctions (seconds):
+  Count: 6,561
+  Median: 21.34s
+  Mean: 602.90s
+  P25: 14.44s
+  P75: 116.02s
+  P95: 3079.50s
+
+Gap distribution:
+  <2s (instant):             145 (   2.2%)
+  2-5s (fast):               546 (   8.3%)
+  5-10s (moderate):          535 (   8.2%)
+  10-30s (browsing):       2,260 (  34.4%)
+  30s+ (new session):      3,075 (  46.9%)
+
+--- Time Gaps Within 3 Runs (_all) ---
+
+Time gap between consecutive P3 auctions (seconds):
+  Count: 41,224
+  Median: 1.98s
+  Mean: 497.86s
+  P25: 0.02s
+  P75: 75.05s
+  P95: 2338.08s
+
+  Interpretation: Median gap of 2.0s indicates rapid page turns,
+  consistent with search result pagination behavior.
+
+Gap distribution:
+  <2s (instant):          20,614 (  50.0%)
+  2-5s (fast):               371 (   0.9%)
+  5-10s (moderate):          896 (   2.2%)
+  10-30s (browsing):       3,906 (   9.5%)
+  30s+ (new session):     15,437 (  37.4%)
+
+--- Time Gaps Within 5 Runs (_all) ---
+
+Time gap between consecutive P5 auctions (seconds):
+  Count: 8,486
+  Median: 8.09s
+  Mean: 33.08s
+  P25: 6.35s
+  P75: 16.78s
+  P95: 75.53s
+
+Gap distribution:
+  <2s (instant):             721 (   8.5%)
+  2-5s (fast):               977 (  11.5%)
+  5-10s (moderate):        3,470 (  40.9%)
+  10-30s (browsing):       2,133 (  25.1%)
+  30s+ (new session):      1,185 (  14.0%)
+
+============================================================
+SECTION 4: SAMPLE USER SEQUENCES
+============================================================
+
+--- Sample User Sequences (_all) ---
+Format: Placement(time since prev)
+
+ext1:00069a0b-c6c7-4...:
+  P3(start) → P3(0.0s) → P1(10.8s) → P3(20.2s) → P3(0.0s) → P3(28.8s) → P3(0.0s) → P3(149.4s) → P3(0.0s) → P3(42.9s) → P3(0.0s) → P3(66.2s) → P3(0.0s) → P3(51.4s) → P3(0.0s)
+
+ext1:001541e4-23a4-4...:
+  P3(start) → P3(0.0s) → P3(3.0s) → P3(0.0s) → P1(81.1s) → P3(17.1s) → P3(0.0s) → P3(263.8s) → P3(0.0s)
+
+ext1:003b01a5-3750-4...:
+  P3(start) → P3(138.7s) → P3(982.4s) → P3(0.0s) → P3(28.5s) → P3(4409.6s) → P3(0.0s) → P3(19.9s) → P3(0.0s) → P3(12.1s) → P3(0.1s) → P3(53.2s) → P3(0.0s) → P3(9.2s) → P3(0.1s)
+
+ext1:0076aa35-c546-4...:
+  P1(start) → P3(27.9s) → P3(0.0s) → P3(16.7s) → P3(0.0s) → P3(72.4s) → P3(0.0s) → P1(4246.3s) → P3(24.7s) → P3(0.0s) → P1(6175.3s) → P1(6.4s) → P3(12.1s) → P3(0.0s) → P1(1224.9s)
+
+ext1:00864f69-09b9-4...:
+  P3(start) → P3(0.0s) → P3(26.9s)
+
+ext1:0094fd6c-763c-4...:
+  P3(start) → P3(0.0s) → P3(70.3s) → P3(94.9s) → P3(0.0s)
+
+ext1:00a75cb7-e7ef-4...:
+  P1(start) → P3(13.4s) → P3(0.1s) → P3(17.7s) → P3(0.0s) → P3(71.7s) → P3(0.1s) → P1(1175.3s)
+
+ext1:00ca4a75-a393-4...:
+  P3(start) → P3(335.7s) → P3(0.0s) → P3(42.2s) → P3(0.0s) → P3(2526.1s) → P3(0.0s) → P3(35.2s) → P3(0.0s) → P1(3640.4s) → P3(7.3s) → P3(0.0s) → P2(72.7s) → P3(20.6s) → P3(0.1s)
+
+ext1:00ffca12-4885-4...:
+  P3(start) → P3(0.0s) → P3(219.5s) → P3(0.1s) → P3(2.2s) → P3(0.0s) → P3(29.8s) → P3(0.0s) → P3(47.2s) → P3(0.0s) → P3(157.0s) → P3(0.0s) → P3(6.9s) → P3(0.0s) → P3(33.1s)
+
+ext1:01043f14-ce24-4...:
+  P3(start) → P3(4056.2s) → P3(15.6s) → P3(0.0s) → P3(2916.3s) → P2(5824.1s) → P2(40.8s) → P3(17.3s) → P3(0.0s) → P2(17.6s) → P3(62.8s) → P3(0.0s) → P1(172.7s) → P1(3.7s) → P3(10.5s)
+
+============================================================
+SECTION 5: CROSS-PLACEMENT COMPARISON
+============================================================
+
+--- Cross-Placement Comparison (_all) ---
+
+Metric                   P           1P           2P           3P           5
+-------------------------------------------------------------------------
+Self-transition rate            65.8%       40.0%       88.1%       69.4%
+Median gap (within P)          43.7s       21.3s        2.0s        8.1s 
+Mean gap (within P)           787.1s      602.9s      497.9s       33.1s 
+Total auctions                 14,543       8,325      46,844       8,606
+% with next auction             87.3%       90.0%       90.4%       99.4%
+
+============================================================
+SECTION 6: TIMESTAMP CLUSTERING ANALYSIS
+============================================================
+
+--- Timestamp Clustering Analysis (_all) ---
+Question: Do multiple auctions share the exact same timestamp within a user?
+If yes → auctions are ad slots batched together (1 auction = 1 slot)
+If no → auctions are page loads (1 auction = 1 page)
+
+Total (user, timestamp, placement) combinations: 77,984
+
+Placement 1 - Auctions per (user, timestamp):
+  Total timestamp clusters: 14,543
+  Mean auctions per cluster: 1.00
+  Median auctions per cluster: 1
+  Max auctions per cluster: 1
+
+  Cluster Size        Count   Percentage
+  ------------ ------------ ------------
+             1       14,543       100.0%
+
+Placement 2 - Auctions per (user, timestamp):
+  Total timestamp clusters: 8,325
+  Mean auctions per cluster: 1.00
+  Median auctions per cluster: 1
+  Max auctions per cluster: 1
+
+  Cluster Size        Count   Percentage
+  ------------ ------------ ------------
+             1        8,325       100.0%
+
+Placement 3 - Auctions per (user, timestamp):
+  Total timestamp clusters: 46,510
+  Mean auctions per cluster: 1.01
+  Median auctions per cluster: 1
+  Max auctions per cluster: 2
+
+  Cluster Size        Count   Percentage
+  ------------ ------------ ------------
+             1       46,176        99.3%
+             2          334         0.7%
+
+Placement 5 - Auctions per (user, timestamp):
+  Total timestamp clusters: 8,606
+  Mean auctions per cluster: 1.00
+  Median auctions per cluster: 1
+  Max auctions per cluster: 1
+
+  Cluster Size        Count   Percentage
+  ------------ ------------ ------------
+             1        8,606       100.0%
+
+--- KEY DIAGNOSTIC: Batching Prevalence ---
+  P1: 0.0% of auctions in clusters >1 → MINIMAL BATCHING (1 auction = 1 page)
+  P2: 0.0% of auctions in clusters >1 → MINIMAL BATCHING (1 auction = 1 page)
+  P3: 1.4% of auctions in clusters >1 → MINIMAL BATCHING (1 auction = 1 page)
+  P5: 0.0% of auctions in clusters >1 → MINIMAL BATCHING (1 auction = 1 page)
+
+============================================================
+SECTION 7: TIME GAPS EXCLUDING INSTANT (<0.5s)
+============================================================
+
+--- Time Gaps Excluding Instant (<0.5s) for P1 ---
+
+Original gap statistics (all gaps):
+  N: 11,077
+  Median: 43.69s
+  Mean: 787.10s
+  % gaps = 0.0s: 0.0%
+  % gaps < 0.5s: 2.2%
+
+Filtered gap statistics (gaps >= 0.5s):
+  N: 10,833 (97.8% of original)
+  Median: 47.01s
+  Mean: 804.82s
+  P25: 10.13s
+  P75: 309.95s
+  P95: 5013.63s
+
+  Median shift: 43.69s → 47.01s (Δ = +3.31s)
+  Interpretation: After filtering, median jumps to 47.0s.
+  → The 'rapid pagination' was largely a BATCHING ARTIFACT.
+
+Filtered gap distribution:
+  0.5-2s:                  215 (   2.0%)
+  2-5s (fast page):        1,054 (   9.7%)
+  5-10s (moderate):        1,418 (  13.1%)
+  10-30s (browsing):       2,016 (  18.6%)
+  30s+ (new session):      6,130 (  56.6%)
+
+--- Time Gaps Excluding Instant (<0.5s) for P2 ---
+
+Original gap statistics (all gaps):
+  N: 6,561
+  Median: 21.34s
+  Mean: 602.90s
+  % gaps = 0.0s: 0.0%
+  % gaps < 0.5s: 0.7%
+
+Filtered gap statistics (gaps >= 0.5s):
+  N: 6,515 (99.3% of original)
+  Median: 22.04s
+  Mean: 607.15s
+  P25: 14.70s
+  P75: 118.29s
+  P95: 3188.72s
+
+  Median shift: 21.34s → 22.04s (Δ = +0.70s)
+  Interpretation: Median gap is moderate (22.0s).
+  → Mix of real pagination and batching.
+
+Filtered gap distribution:
+  0.5-2s:                   99 (   1.5%)
+  2-5s (fast page):          546 (   8.4%)
+  5-10s (moderate):          535 (   8.2%)
+  10-30s (browsing):       2,260 (  34.7%)
+  30s+ (new session):      3,075 (  47.2%)
+
+--- Time Gaps Excluding Instant (<0.5s) for P3 ---
+
+Original gap statistics (all gaps):
+  N: 41,224
+  Median: 1.98s
+  Mean: 497.86s
+  % gaps = 0.0s: 0.8%
+  % gaps < 0.5s: 49.7%
+
+Filtered gap statistics (gaps >= 0.5s):
+  N: 20,755 (50.3% of original)
+  Median: 74.07s
+  Mean: 988.84s
+  P25: 29.21s
+  P75: 257.47s
+  P95: 6296.60s
+
+  Median shift: 1.98s → 74.07s (Δ = +72.09s)
+  Interpretation: After filtering, median jumps to 74.1s.
+  → The 'rapid pagination' was largely a BATCHING ARTIFACT.
+
+Filtered gap distribution:
+  0.5-2s:                  145 (   0.7%)
+  2-5s (fast page):          371 (   1.8%)
+  5-10s (moderate):          896 (   4.3%)
+  10-30s (browsing):       3,906 (  18.8%)
+  30s+ (new session):     15,437 (  74.4%)
+
+--- Time Gaps Excluding Instant (<0.5s) for P5 ---
+
+Original gap statistics (all gaps):
+  N: 8,486
+  Median: 8.09s
+  Mean: 33.08s
+  % gaps = 0.0s: 0.0%
+  % gaps < 0.5s: 1.9%
+
+Filtered gap statistics (gaps >= 0.5s):
+  N: 8,327 (98.1% of original)
+  Median: 8.15s
+  Mean: 33.71s
+  P25: 6.44s
+  P75: 16.94s
+  P95: 75.59s
+
+  Median shift: 8.09s → 8.15s (Δ = +0.06s)
+  Interpretation: Even after filtering batched events, gaps remain short.
+  → Rapid pagination is REAL, not an artifact of batching.
+
+Filtered gap distribution:
+  0.5-2s:                  562 (   6.7%)
+  2-5s (fast page):          977 (  11.7%)
+  5-10s (moderate):        3,470 (  41.7%)
+  10-30s (browsing):       2,133 (  25.6%)
+  30s+ (new session):      1,185 (  14.2%)
+
+============================================================
+SECTION 8: REVERSE TRANSITION MATRIX
+============================================================
+
+--- Reverse Transition Matrix (_all) ---
+P(came from X | now in Y) - Column percentages
+Read: 'Of users who are now at Y, X% came from placement X'
+
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1       68.2%        4.6%        9.2%        0.4%
+         2        3.6%       40.8%        3.6%       29.1%
+         3       27.8%       20.9%       86.9%        1.1%
+         5        0.4%       33.8%        0.2%       69.4%
+
+Key insight for P3 (where do P3 visitors come from?):
+  P(from P1 | now at P3): 9.2%
+  P(from P2 | now at P3): 3.6%
+  P(from P3 | now at P3): 86.9% ← MOST P3 VISITS COME FROM P3 (pagination)
+  P(from P5 | now at P3): 0.2%
+
+============================================================
+SECTION 9: WINNERS PER AUCTION BY PLACEMENT
+============================================================
+
+--- Winners Per Auction by Placement (_all) ---
+Question: How many products are shown (IS_WINNER=TRUE) per auction?
+
+Total auctions with winners: 77,957
+
+Placement 1:
+  Auctions with winners: 14,279
+  Mean winners per auction: 29.25
+  Median winners per auction: 36
+  Max winners per auction: 48
+
+       Winners        Count   Percentage
+  ------------ ------------ ------------
+             1          493         3.5%
+             2          413         2.9%
+             3          331         2.3%
+             4          248         1.7%
+             5          244         1.7%
+             6          253         1.8%
+             7          227         1.6%
+             8          239         1.7%
+             9          198         1.4%
+            10          204         1.4%
+           11+       11,429        80.0%
+
+Placement 2:
+  Auctions with winners: 8,239
+  Mean winners per auction: 38.77
+  Median winners per auction: 35
+  Max winners per auction: 64
+
+       Winners        Count   Percentage
+  ------------ ------------ ------------
+             1          216         2.6%
+             2          144         1.7%
+             3          111         1.3%
+             4          116         1.4%
+             5           90         1.1%
+             6           97         1.2%
+             7           70         0.8%
+             8           61         0.7%
+             9           74         0.9%
+            10           66         0.8%
+           11+        7,194        87.3%
+
+Placement 3:
+  Auctions with winners: 46,838
+  Mean winners per auction: 39.47
+  Median winners per auction: 40
+  Max winners per auction: 48
+
+       Winners        Count   Percentage
+  ------------ ------------ ------------
+           11+       46,838       100.0%
+
+Placement 5:
+  Auctions with winners: 8,601
+  Mean winners per auction: 47.45
+  Median winners per auction: 48
+  Max winners per auction: 48
+
+       Winners        Count   Percentage
+  ------------ ------------ ------------
+             1           13         0.2%
+             2            7         0.1%
+             3            6         0.1%
+             4            2         0.0%
+             5            4         0.0%
+             7            6         0.1%
+             8            3         0.0%
+            10            3         0.0%
+           11+        8,557        99.5%
+
+--- Summary: Winners Per Auction ---
+   Placement       Mean     Median        Max
+------------ ---------- ---------- ----------
+          P1      29.25         36         48
+          P2      38.77         35         64
+          P3      39.47         40         48
+          P5      47.45         48         48
+
+============================================================
+SECTION 10: NEAR-TIMESTAMP CLUSTERING (0.5s THRESHOLD)
+============================================================
+
+--- Near-Timestamp Clustering Analysis (_all) ---
+Threshold: 0.5s (cluster auctions within 0.5s of each other)
+
+Resolution: Exact timestamps are unique (Section 6), but 49.7% of P3 gaps are <0.5s.
+This means auctions arrive in rapid succession but with slightly different timestamps.
+Clustering them reveals 'page load events' - groups of auctions fired together.
+
+Placement 1:
+  Total auctions: 14,543
+  Total page-load clusters: 14,299
+  Mean auctions per cluster: 1.02
+  Median auctions per cluster: 1
+  Max auctions per cluster: 4
+
+  Cluster Size        Count   Percentage                 Interpretation
+  ------------ ------------ ------------ ------------------------------
+             1       14,060        98.3%               (single auction)
+             2          235         1.6%              (paired ad slots)
+             3            3         0.0%           (3 ad slots on page)
+             4            1         0.0%           (4 ad slots on page)
+
+  KEY METRIC: 1.7% of page loads have multiple ad slots
+
+Placement 2:
+  Total auctions: 8,325
+  Total page-load clusters: 8,279
+  Mean auctions per cluster: 1.01
+  Median auctions per cluster: 1
+  Max auctions per cluster: 3
+
+  Cluster Size        Count   Percentage                 Interpretation
+  ------------ ------------ ------------ ------------------------------
+             1        8,234        99.5%               (single auction)
+             2           44         0.5%              (paired ad slots)
+             3            1         0.0%           (3 ad slots on page)
+
+  KEY METRIC: 0.5% of page loads have multiple ad slots
+
+Placement 3:
+  Total auctions: 46,844
+  Total page-load clusters: 26,375
+  Mean auctions per cluster: 1.78
+  Median auctions per cluster: 2
+  Max auctions per cluster: 4
+
+  Cluster Size        Count   Percentage                 Interpretation
+  ------------ ------------ ------------ ------------------------------
+             1        5,947        22.5%               (single auction)
+             2       20,407        77.4%              (paired ad slots)
+             3            1         0.0%           (3 ad slots on page)
+             4           20         0.1%           (4 ad slots on page)
+
+  KEY METRIC: 77.5% of page loads have multiple ad slots
+
+Placement 5:
+  Total auctions: 8,606
+  Total page-load clusters: 8,447
+  Mean auctions per cluster: 1.02
+  Median auctions per cluster: 1
+  Max auctions per cluster: 2
+
+  Cluster Size        Count   Percentage                 Interpretation
+  ------------ ------------ ------------ ------------------------------
+             1        8,288        98.1%               (single auction)
+             2          159         1.9%              (paired ad slots)
+
+  KEY METRIC: 1.9% of page loads have multiple ad slots
+
+--- Summary: Near-Timestamp Clustering ---
+   Placement     Auctions     Clusters    Mean Size  Multi-Slot%
+------------ ------------ ------------ ------------ ------------
+          P1       14,543       14,299         1.02         1.7%
+          P2        8,325        8,279         1.01         0.5%
+          P3       46,844       26,375         1.78        77.5%
+          P5        8,606        8,447         1.02         1.9%
+
+============================================================
+SECTION 11: PRODUCT OVERLAP IN NEAR-SIMULTANEOUS AUCTIONS
+============================================================
+
+--- Product Overlap in Near-Simultaneous Auctions (_all) ---
+Question: Do paired auctions show different or same products?
+
+If different products → different ad slots on same page
+If same products → duplicate logging or caching artifact
+
+Placement 1:
+  Multi-auction clusters to analyze: 239
+  Auction pairs analyzed: 239
+
+  Jaccard Similarity (0=no overlap, 1=identical):
+    Mean: 0.695
+    Median: 0.778
+    % with zero overlap: 4.2%
+    % with perfect overlap: 14.6%
+
+  Product Overlap Count:
+    Mean overlapping products: 22.54
+    Median overlapping products: 25
+    Max overlapping products: 48
+
+  INTERPRETATION: Partial overlap in paired auctions.
+  → Some shared products, some unique - mixed behavior.
+
+Placement 2:
+  Multi-auction clusters to analyze: 45
+  Auction pairs analyzed: 47
+
+  Jaccard Similarity (0=no overlap, 1=identical):
+    Mean: 0.743
+    Median: 0.800
+    % with zero overlap: 2.1%
+    % with perfect overlap: 12.8%
+
+  Product Overlap Count:
+    Mean overlapping products: 30.51
+    Median overlapping products: 32
+    Max overlapping products: 64
+
+  INTERPRETATION: Partial overlap in paired auctions.
+  → Some shared products, some unique - mixed behavior.
+
+Placement 3:
+  Multi-auction clusters to analyze: 20,428
+  Auction pairs analyzed: 20,528
+
+  Jaccard Similarity (0=no overlap, 1=identical):
+    Mean: 0.697
+    Median: 0.714
+    % with zero overlap: 0.0%
+    % with perfect overlap: 1.5%
+
+  Product Overlap Count:
+    Mean overlapping products: 32.54
+    Median overlapping products: 33
+    Max overlapping products: 48
+
+  INTERPRETATION: Partial overlap in paired auctions.
+  → Some shared products, some unique - mixed behavior.
+
+Placement 5:
+  Multi-auction clusters to analyze: 159
+  Auction pairs analyzed: 159
+
+  Jaccard Similarity (0=no overlap, 1=identical):
+    Mean: 0.649
+    Median: 0.655
+    % with zero overlap: 0.0%
+    % with perfect overlap: 5.0%
+
+  Product Overlap Count:
+    Mean overlapping products: 36.25
+    Median overlapping products: 38
+    Max overlapping products: 48
+
+  INTERPRETATION: Partial overlap in paired auctions.
+  → Some shared products, some unique - mixed behavior.
+
+============================================================
+SECTION 12: CORRECTED RUN LENGTHS (PAGE LOADS, NOT AUCTIONS)
+============================================================
+
+--- Corrected Run Lengths: Page Loads, Not Auctions (_all) ---
+Target placement: 3
+
+Original analysis counted AUCTION runs. If auctions are paired,
+a 'run of 8' is really 4 page loads, not 8 page turns.
+This section recomputes using page-load clusters.
+
+Page load events for P3:
+  Total page loads: 26,375
+  Original auctions: 46,844
+  Ratio: 1.78 auctions per page load
+
+Page-load run statistics (session break = 30 min):
+  Total runs: 7,953
+  Mean run length: 3.32 page loads
+  Median run length: 2 page loads
+  Max run length: 117 page loads
+
+  Run Length        Count   Percentage   Cumulative            Interpretation
+------------ ------------ ------------ ------------ -------------------------
+           1        3,898        49.0%        49.0%             (single page)
+           2        1,431        18.0%        67.0%         (page 1 → page 2)
+           3          781         9.8%        76.8%          (3 pages viewed)
+           4          451         5.7%        82.5%          (4 pages viewed)
+           5          299         3.8%        86.3%          (5 pages viewed)
+           6          194         2.4%        88.7%          (6 pages viewed)
+           7          157         2.0%        90.7%          (7 pages viewed)
+           8          119         1.5%        92.2%          (8 pages viewed)
+           9          106         1.3%        93.5%          (9 pages viewed)
+          10           78         1.0%        94.5%         (10 pages viewed)
+          11           49         0.6%        95.1%         (11 pages viewed)
+          12           55         0.7%        95.8%         (12 pages viewed)
+          13           44         0.6%        96.3%         (13 pages viewed)
+          14           38         0.5%        96.8%         (14 pages viewed)
+          15           37         0.5%        97.3%         (15 pages viewed)
+         16+          216         2.7%       100.0% (deep pagination)
+
+--- Comparison to Original Auction-Level Analysis ---
+  Page-load mean run length: 3.32
+  Auctions per page load: 1.78
+  Implied correction factor: 1.78x
+
+============================================================
+SECTION 13: CHARACTERIZING THE 0.5-30s MIDDLE GAPS
+============================================================
+
+--- Characterizing the 0.5-30s Middle Gaps (_all) ---
+Target placement: 3
+
+Gap distribution recap:
+  <0.5s: ~50% (within-page slots)
+  0.5-30s: ~12% (the 'middle' - what is this?)
+  30s+: ~37% (actual page transitions/sessions)
+
+This section investigates the 0.5-30s gaps.
+
+Middle gaps (0.5-30s):
+  Count: 5,318 (12.9% of all P3 gaps)
+  Median: 16.28s
+  Mean: 16.07s
+  P25: 9.51s
+  P75: 22.69s
+
+Fine-grained distribution within 0.5-30s:
+         Range      Count  % of Middle     % of All
+  ------------ ---------- ------------ ------------
+    0.5-1.0  s         41         0.8%         0.1%
+    1.0-2.0  s        104         2.0%         0.3%
+    2.0-5.0  s        371         7.0%         0.9%
+    5.0-10.0 s        896        16.8%         2.2%
+   10.0-20.0 s      2,041        38.4%         5.0%
+   20.0-30.0 s      1,865        35.1%         4.5%
+
+--- Hypotheses for Middle Gaps ---
+
+1. Fast pagination hypothesis:
+   Gaps 0.5-5s (plausible page turns): 516 (1.3%)
+
+2. Scroll-triggered loading hypothesis:
+   Gaps 2-10s (scroll-triggered): 1,267 (3.1%)
+
+3. Pattern analysis:
+   Mode (most common gap): 7.04s
+   Below median (16.3s): 2,659 gaps, mean 9.31s
+   Above median (16.3s): 2,659 gaps, mean 22.83s
+
+--- Interpretation ---
+Middle gaps cluster around 16.3s - consistent with:
+  - Extended browsing sessions
+  - Users who take breaks but return within 30s
+
+================================================================================
+DATASET: _p5 (P5-filtered dataset)
+================================================================================
+
+Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data/auctions_users_p5.parquet...
+Loading /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data/auctions_results_p5.parquet...
+Loaded 482,413 auction results
+Loaded 8,400 auctions from 116 users
+Placements: ['5']
+
+============================================================
+SECTION 1: FULL TRANSITION MATRIX
+============================================================
+
+--- Dataset: _p5 ---
+
+Total transitions: 8,284
+Users with 2+ auctions: 67
+
+Raw transition counts:
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1           0           0           0           0
+         2           0           0           0           0
+         3           0           0           0           0
+         5           0           0           0       8,284
+
+Transition probabilities (row percentages):
+P(next_placement = Y | current_placement = X)
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1        0.0%        0.0%        0.0%        0.0%
+         2        0.0%        0.0%        0.0%        0.0%
+         3        0.0%        0.0%        0.0%        0.0%
+         5        0.0%        0.0%        0.0%      100.0%
+
+Self-transition rates (DIAGONAL):
+  P1 → P1: 0.0%
+  P2 → P2: 0.0%
+  P3 → P3: 0.0%
+  P5 → P5: 100.0% <-- PAGINATION SIGNAL
+
+============================================================
+SECTION 2: CONSECUTIVE P3 RUN LENGTHS
+============================================================
+
+--- Consecutive 3 Run Lengths (_p5) ---
+Interpretation: "How many pages does a user view in one search session?"
+
+Total runs: 0
+Mean run length: nan
+Median run length: nan
+Max run length: nan
+
+  Run Length        Count   Percentage   Cumulative
+------------ ------------ ------------ ------------
+           1            0         nan%         nan% (single page view)
+           2            0         nan%         nan% (page 1 → page 2)
+           3            0         nan%         nan% (deep pagination: 3 pages)
+           4            0         nan%         nan% (deep pagination: 4 pages)
+           5            0         nan%         nan% (deep pagination: 5 pages)
+           6            0         nan%         nan% (deep pagination: 6 pages)
+           7            0         nan%         nan% (deep pagination: 7 pages)
+           8            0         nan%         nan% (deep pagination: 8 pages)
+           9            0         nan%         nan% (deep pagination: 9 pages)
+          10            0         nan%         nan% (deep pagination: 10 pages)
+
+============================================================
+SECTION 3: TIME GAPS WITHIN P3 RUNS
+============================================================
+
+--- Time Gaps Within 3 Runs (_p5) ---
+No consecutive 3 auctions found.
+
+--- Time Gaps Within 1 Runs (_p5) ---
+No consecutive 1 auctions found.
+
+--- Time Gaps Within 2 Runs (_p5) ---
+No consecutive 2 auctions found.
+
+--- Time Gaps Within 3 Runs (_p5) ---
+No consecutive 3 auctions found.
+
+--- Time Gaps Within 5 Runs (_p5) ---
+
+Time gap between consecutive P5 auctions (seconds):
+  Count: 8,284
+  Median: 8.13s
+  Mean: 31.35s
+  P25: 6.36s
+  P75: 16.62s
+  P95: 75.30s
+
+Gap distribution:
+  <2s (instant):             701 (   8.5%)
+  2-5s (fast):               948 (  11.4%)
+  5-10s (moderate):        3,379 (  40.8%)
+  10-30s (browsing):       2,101 (  25.4%)
+  30s+ (new session):      1,155 (  13.9%)
+
+============================================================
+SECTION 4: SAMPLE USER SEQUENCES
+============================================================
+
+--- Sample User Sequences (_p5) ---
+Format: Placement(time since prev)
+
+ext1:21519306-d654-4...:
+  P5(start) → P5(9.2s) → P5(9.3s) → P5(7.7s) → P5(10.3s) → P5(6.3s) → P5(11.7s) → P5(5.3s) → P5(12.3s) → P5(4.3s) → P5(13.4s) → P5(3.4s) → P5(14.4s) → P5(2.2s) → P5(15.5s)
+
+ext1:7d50ecba-126e-4...:
+  P5(start) → P5(9.1s) → P5(8.6s) → P5(9.1s) → P5(8.4s) → P5(8.8s) → P5(8.7s) → P5(8.2s) → P5(8.8s) → P5(8.2s) → P5(9.1s) → P5(8.5s) → P5(8.7s) → P5(8.4s) → P5(8.3s)
+
+ext1:d2d65979-c9b6-4...:
+  P5(start) → P5(14.2s) → P5(20.9s) → P5(15.0s) → P5(20.7s) → P5(14.9s) → P5(20.0s) → P5(15.6s) → P5(19.3s) → P5(16.4s) → P5(18.5s) → P5(17.2s) → P5(17.8s) → P5(17.8s) → P5(16.8s)
+
+ext1:83df5751-5982-4...:
+  P5(start) → P5(72.6s) → P5(72.4s) → P5(73.0s) → P5(72.0s) → P5(71.8s) → P5(71.5s) → P5(71.3s) → P5(70.6s) → P5(70.5s) → P5(70.0s) → P5(69.3s) → P5(68.7s) → P5(67.9s) → P5(66.7s)
+
+ext1:e33d7f2b-9267-4...:
+  P5(start) → P5(148.6s) → P5(147.9s) → P5(147.6s) → P5(146.9s) → P5(146.3s) → P5(144.8s) → P5(144.1s) → P5(153.5s) → P5(152.7s) → P5(152.2s) → P5(152.0s) → P5(151.7s) → P5(152.2s) → P5(151.6s)
+
+ext1:c6f46aa1-c789-4...:
+  P5(start) → P5(3.9s) → P5(25.0s) → P5(0.4s) → P5(7.3s) → P5(322.4s) → P5(308.6s) → P5(167.2s) → P5(1126.2s) → P5(63.4s) → P5(5.7s) → P5(29.2s) → P5(44.8s) → P5(428.5s) → P5(5.3s)
+
+ext1:5caa3415-7c66-4...:
+  P5(start) → P5(2.4s) → P5(102.2s) → P5(4.4s) → P5(6.2s) → P5(317.1s) → P5(40.9s) → P5(4.6s) → P5(90.0s) → P5(2.7s) → P5(312.9s) → P5(313.7s) → P5(116.1s) → P5(41.8s) → P5(4.5s)
+
+ext1:f7d2430e-a3cc-4...:
+  P5(start) → P5(2869.6s) → P5(98.1s) → P5(28.5s) → P5(1758.3s) → P5(122.4s) → P5(15.5s) → P5(0.0s) → P5(6.1s) → P5(60.5s) → P5(9.9s) → P5(14.1s) → P5(84.2s) → P5(55.7s) → P5(348.1s)
+
+ext1:9bd578c8-e037-4...:
+  P5(start) → P5(102.9s) → P5(9753.8s) → P5(8.0s) → P5(6.1s) → P5(0.6s) → P5(0.7s) → P5(4.4s) → P5(5.3s) → P5(3.0s) → P5(4.1s) → P5(5.2s) → P5(3.3s) → P5(4.3s) → P5(3.3s)
+
+ext1:fe0f5738-b520-4...:
+  P5(start) → P5(2.3s) → P5(8282.1s) → P5(3.7s) → P5(319.7s) → P5(303.4s) → P5(3727.3s) → P5(3.3s) → P5(146.6s) → P5(3.2s) → P5(5736.9s) → P5(11.2s) → P5(990.1s) → P5(2.9s) → P5(716.7s)
+
+============================================================
+SECTION 5: CROSS-PLACEMENT COMPARISON
+============================================================
+
+--- Cross-Placement Comparison (_p5) ---
+
+Metric                   P           1P           2P           3P           5
+-------------------------------------------------------------------------
+Self-transition rate             0.0%        0.0%        0.0%      100.0%
+Median gap (within P)             N/A         N/A         N/A       8.1s 
+Mean gap (within P)               N/A         N/A         N/A      31.4s 
+Total auctions                      0           0           0       8,400
+% with next auction              0.0%        0.0%        0.0%       98.6%
+
+============================================================
+SECTION 6: TIMESTAMP CLUSTERING ANALYSIS
+============================================================
+
+--- Timestamp Clustering Analysis (_p5) ---
+Question: Do multiple auctions share the exact same timestamp within a user?
+If yes → auctions are ad slots batched together (1 auction = 1 slot)
+If no → auctions are page loads (1 auction = 1 page)
+
+Total (user, timestamp, placement) combinations: 8,400
+
+Placement 5 - Auctions per (user, timestamp):
+  Total timestamp clusters: 8,400
+  Mean auctions per cluster: 1.00
+  Median auctions per cluster: 1
+  Max auctions per cluster: 1
+
+  Cluster Size        Count   Percentage
+  ------------ ------------ ------------
+             1        8,400       100.0%
+
+--- KEY DIAGNOSTIC: Batching Prevalence ---
+  P5: 0.0% of auctions in clusters >1 → MINIMAL BATCHING (1 auction = 1 page)
+
+============================================================
+SECTION 7: TIME GAPS EXCLUDING INSTANT (<0.5s)
+============================================================
+
+--- Time Gaps Excluding Instant (<0.5s) for P5 ---
+
+Original gap statistics (all gaps):
+  N: 8,284
+  Median: 8.13s
+  Mean: 31.35s
+  % gaps = 0.0s: 0.0%
+  % gaps < 0.5s: 1.9%
+
+Filtered gap statistics (gaps >= 0.5s):
+  N: 8,127 (98.1% of original)
+  Median: 8.19s
+  Mean: 31.95s
+  P25: 6.44s
+  P75: 16.84s
+  P95: 75.47s
+
+  Median shift: 8.13s → 8.19s (Δ = +0.06s)
+  Interpretation: Even after filtering batched events, gaps remain short.
+  → Rapid pagination is REAL, not an artifact of batching.
+
+Filtered gap distribution:
+  0.5-2s:                  544 (   6.7%)
+  2-5s (fast page):          948 (  11.7%)
+  5-10s (moderate):        3,379 (  41.6%)
+  10-30s (browsing):       2,101 (  25.9%)
+  30s+ (new session):      1,155 (  14.2%)
+
+============================================================
+SECTION 8: REVERSE TRANSITION MATRIX
+============================================================
+
+--- Reverse Transition Matrix (_p5) ---
+P(came from X | now in Y) - Column percentages
+Read: 'Of users who are now at Y, X% came from placement X'
+
+   From\To           1           2           3           5
+----------------------------------------------------------
+         1        0.0%        0.0%        0.0%        0.0%
+         2        0.0%        0.0%        0.0%        0.0%
+         3        0.0%        0.0%        0.0%        0.0%
+         5        0.0%        0.0%        0.0%      100.0%
+
+Key insight for P3 (where do P3 visitors come from?):
+  P(from P1 | now at P3): 0.0%
+  P(from P2 | now at P3): 0.0%
+  P(from P3 | now at P3): 0.0%
+  P(from P5 | now at P3): 0.0%
+
+============================================================
+SECTION 9: WINNERS PER AUCTION BY PLACEMENT
+============================================================
+
+--- Winners Per Auction by Placement (_p5) ---
+Question: How many products are shown (IS_WINNER=TRUE) per auction?
+
+Total auctions with winners: 8,396
+
+Placement 1: No data
+
+Placement 2: No data
+
+Placement 3: No data
+
+Placement 5:
+  Auctions with winners: 8,396
+  Mean winners per auction: 47.51
+  Median winners per auction: 48
+  Max winners per auction: 48
+
+       Winners        Count   Percentage
+  ------------ ------------ ------------
+             1           13         0.2%
+             2            5         0.1%
+             3            4         0.0%
+             4            2         0.0%
+             5            3         0.0%
+             7            6         0.1%
+             8            1         0.0%
+            10            3         0.0%
+           11+        8,359        99.6%
+
+--- Summary: Winners Per Auction ---
+   Placement       Mean     Median        Max
+------------ ---------- ---------- ----------
+          P5      47.51         48         48
+
+============================================================
+SECTION 10: NEAR-TIMESTAMP CLUSTERING (0.5s THRESHOLD)
+============================================================
+
+--- Near-Timestamp Clustering Analysis (_p5) ---
+Threshold: 0.5s (cluster auctions within 0.5s of each other)
+
+Resolution: Exact timestamps are unique (Section 6), but 49.7% of P3 gaps are <0.5s.
+This means auctions arrive in rapid succession but with slightly different timestamps.
+Clustering them reveals 'page load events' - groups of auctions fired together.
+
+Placement 5:
+  Total auctions: 8,400
+  Total page-load clusters: 8,243
+  Mean auctions per cluster: 1.02
+  Median auctions per cluster: 1
+  Max auctions per cluster: 2
+
+  Cluster Size        Count   Percentage                 Interpretation
+  ------------ ------------ ------------ ------------------------------
+             1        8,086        98.1%               (single auction)
+             2          157         1.9%              (paired ad slots)
+
+  KEY METRIC: 1.9% of page loads have multiple ad slots
+
+--- Summary: Near-Timestamp Clustering ---
+   Placement     Auctions     Clusters    Mean Size  Multi-Slot%
+------------ ------------ ------------ ------------ ------------
+          P5        8,400        8,243         1.02         1.9%
+
+============================================================
+SECTION 11: PRODUCT OVERLAP IN NEAR-SIMULTANEOUS AUCTIONS
+============================================================
+
+--- Product Overlap in Near-Simultaneous Auctions (_p5) ---
+Question: Do paired auctions show different or same products?
+
+If different products → different ad slots on same page
+If same products → duplicate logging or caching artifact
+
+Placement 5:
+  Multi-auction clusters to analyze: 157
+  Auction pairs analyzed: 157
+
+  Jaccard Similarity (0=no overlap, 1=identical):
+    Mean: 0.648
+    Median: 0.655
+    % with zero overlap: 0.0%
+    % with perfect overlap: 5.1%
+
+  Product Overlap Count:
+    Mean overlapping products: 36.23
+    Median overlapping products: 38
+    Max overlapping products: 48
+
+  INTERPRETATION: Partial overlap in paired auctions.
+  → Some shared products, some unique - mixed behavior.
+
+============================================================
+SECTION 12: CORRECTED RUN LENGTHS (PAGE LOADS, NOT AUCTIONS)
+============================================================
+Skipped: cluster results for P3 not available.
+
+============================================================
+SECTION 13: CHARACTERIZING THE 0.5-30s MIDDLE GAPS
+============================================================
+
+--- Characterizing the 0.5-30s Middle Gaps (_p5) ---
+Target placement: 3
+
+Gap distribution recap:
+  <0.5s: ~50% (within-page slots)
+  0.5-30s: ~12% (the 'middle' - what is this?)
+  30s+: ~37% (actual page transitions/sessions)
+
+This section investigates the 0.5-30s gaps.
+
+No gap data for placement 3.
+
+================================================================================
+CONCLUSION
+================================================================================
+
+Evidence for P3 = Search Pagination:
+
+1. SELF-TRANSITION RATE: If P3 shows ~80%+ self-transition rate while other
+   placements show <50%, this indicates users repeatedly trigger P3 events
+   in sequence - consistent with paginating through search results.
+
+2. RUN LENGTHS: If users commonly have 2-5+ consecutive P3 events, this
+   corresponds to viewing pages 1, 2, 3... of search results.
+
+3. TIME GAPS: If gaps between consecutive P3 events are ~1-3 seconds,
+   this matches rapid pagination behavior (not content consumption).
+
+4. COMPARISON: Other placements (P1=homepage, P2=PDP, P5=carousel?) should
+   show lower self-transition and longer gaps (content viewing time).
+
+The combination of high self-transition + short gaps + multi-page runs
+is pathognomonic for search pagination. No other page type produces this.
+
+
+================================================================================
+EXTENDED ANALYSIS FINDINGS (SECTIONS 6-9)
+================================================================================
+
+5. TIMESTAMP CLUSTERING (Section 6):
+   - If many auctions share exact same timestamp within user → batching detected
+   - 'Auction' = ad slot, not page load
+   - 'Run of 4' = one search page with 4 ad slots, not 4 page loads
+   - If auctions mostly have unique timestamps → 'Auction' = page load
+
+6. TIME GAPS EXCLUDING INSTANT (Section 7):
+   - After filtering 0.0s gaps (batched events), what is 'true' pagination speed?
+   - If median still 2-5s → rapid pagination is real behavior
+   - If median jumps to 30s+ → 'rapid pagination' was batching artifact
+
+7. REVERSE TRANSITIONS (Section 8):
+   - P(came from X | now at P3) shows entry points to search
+   - High P(from P3) → most P3 visits are self-pagination
+   - High P(from P1) → homepage is major entry to search
+
+8. WINNERS PER AUCTION (Section 9):
+   - How many products shown per auction by placement?
+   - Search results typically show more items than carousel/PDP
+   - If P3 has many winners → search results page (multiple ad slots)
+
+================================================================================
+EXTENDED ANALYSIS FINDINGS (SECTIONS 10-13) - ROUND 2
+================================================================================
+
+Resolution of the core uncertainty from Round 1:
+  - Section 6 showed 99.3% unique timestamps (minimal exact batching)
+  - Section 7 showed 49.7% of P3 gaps are <0.5s
+  - This means auctions are near-simultaneous but not identical timestamps
+
+9. NEAR-TIMESTAMP CLUSTERING (Section 10):
+   - Cluster auctions within 0.5s of each other as 'page load events'
+   - Shows how many auctions fire per page load
+   - If P3 shows 2 auctions per cluster → paired ad slots on search page
+
+10. PRODUCT OVERLAP IN CLUSTERS (Section 11):
+    - Do paired auctions show different or same products?
+    - Different products → different ad slots on same page
+    - Same products → duplicate logging or caching artifact
+
+11. CORRECTED RUN LENGTHS (Section 12):
+    - Recompute run lengths at page-load level, not auction level
+    - If auctions are paired, original runs are 2x inflated
+    - 'Run of 8 auctions' → '4 page loads' (4 pages viewed)
+
+12. MIDDLE GAPS (Section 13):
+    - Characterize the 0.5-30s gaps (~12% of P3 gaps)
+    - Are these fast pagination, scroll-loading, or mixed behavior?
+
+KEY RESOLUTION:
+  The bimodal gap distribution (<0.5s: 50%, 0.5-30s: 12%, 30s+: 37%) suggests:
+  - <0.5s gaps: Multiple ad slots firing together on same page load
+  - 30s+ gaps: New page loads (actual pagination or session breaks)
+  - 0.5-30s gaps: Edge cases (network delays, scroll-loading, etc.)
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+Output written to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/results/12_search_pagination_evidence.txt

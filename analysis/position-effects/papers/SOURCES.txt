@@ -1,0 +1,37 @@
+Position Effects Analysis: Paper References
+===========================================
+
+DOWNLOADED PAPERS:
+------------------
+
+1. ai_2018_unbiased_propensity_estimation.pdf
+   Ai, Q., Bi, K., Luo, C., Guo, J., & Croft, W. B. (2018). Unbiased learning to rank with unbiased propensity estimation. SIGIR.
+   Source: https://arxiv.org/abs/1804.05938
+
+2. joachims_2017_unbiased_learning_to_rank.pdf
+   Joachims, T., Swaminathan, A., & Schnabel, T. (2017). Unbiased learning-to-rank with biased feedback. WSDM.
+   Source: https://arxiv.org/abs/1608.04468
+
+3. chapelle_zhang_2009_dbn_click_model.pdf
+   Chapelle, O., & Zhang, Y. (2009). A dynamic Bayesian network click model for web search ranking. WWW.
+   Source: https://web-archive.southampton.ac.uk/www2009.eprints.org/1/1/p1.pdf
+
+4. yang_ghose_2010_organic_sponsored.pdf
+   Yang, S., & Ghose, A. (2010). Analyzing the relationship between organic and sponsored search advertising. Marketing Science.
+   Source: https://pages.stern.nyu.edu/~aghose/paidorganic.pdf
+
+
+NOT DOWNLOADED (require institutional access):
+----------------------------------------------
+
+5. Craswell, N., Zoeter, O., Taylor, M., & Ramsey, B. (2008). An experimental comparison of click position-bias models. WSDM.
+   Access: https://dl.acm.org/doi/10.1145/1341531.1341545
+
+6. Narayanan, S., & Kalyanam, K. (2015). Position effects in search advertising and their moderators: A regression discontinuity approach. Marketing Science.
+   Access: https://pubsonline.informs.org/doi/10.1287/mksc.2014.0893 or https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1857247
+
+7. Agarwal, A., Hosanagar, K., & Smith, M. D. (2011). Location, location, location: An analysis of profitability of position in online advertising markets. JMR.
+   Access: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1151537
+
+8. Manski, C. F. (2003). Partial Identification of Probability Distributions. Springer.
+   Note: Book, not a journal paper. Available via institutional library access.

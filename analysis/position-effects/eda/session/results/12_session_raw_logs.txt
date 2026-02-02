@@ -1,0 +1,958 @@
+================================================================================
+SEARCH SESSION RAW LOGS
+================================================================================
+
+Sampling 10 random auctions where clicks occurred.
+Shows full user journey: auction → impressions → clicks.
+
+----------------------------------------
+LOADING DATA
+----------------------------------------
+  Auctions results: 4,337,598 bids
+  Auctions users: 91,802 records
+  Impressions: 226,939
+  Clicks: 7,151
+  Catalog: 159,888 products
+
+Auctions with clicks: 4,430
+
+Clicked auctions by placement:
+  Placement 1: 1,954 auctions
+  Placement 2: 1,255 auctions
+  Placement 3: 1,098 auctions
+  Placement 5: 66 auctions
+
+Sampled 10 auctions for detailed logs.
+
+================================================================================
+DETAILED SESSION LOGS
+================================================================================
+
+[1/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697fe6f4109712fa904c4a3a92a3e0a
+--------------------------------------------------------------------------------
+Placement: 1 (Homepage/Search)
+User: ext1:43c021c3-3c55-4b4c-a924-2a9ff2c82c09
+Auction Created: 2026-02-01 23:51:16.061000
+
+AUCTION RESULTS (50 bids, 40 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Vintage Disney Goofy Hoodie                |     $45 |   0.0738 |    4.00
+   2 |    YES | Vintage Disney T-Shirt                     |     $20 |   0.0172 |   10.00
+   3 |    YES | Vintage Disney bucket hat                  |     $25 |   0.0305 |    5.00
+   4 |    YES | Vintage Disney Sports Recreation Denim ... |     $56 |   0.0190 |    8.00
+   5 |    YES | Vintage Disney Bedding                     |     $55 |   0.0286 |    5.00
+   6 |    YES | VINTAGE 1980's Disney Parks Notecards      |     $15 |   0.0117 |   12.00
+   7 |    YES | Vintage Disney Sleepy Mickey Morning Co... |     $18 |   0.0102 |   13.00
+   8 |    YES | Vintage Disney Colorful Character Mug Trio |     $11 |   0.0244 |    5.00
+   9 |    YES | Disney Parks Pets Cats Ceramic Photo Pi... |    $124 |   0.0136 |    9.00
+  10 |    YES | Oversized Vintage 2000s/Y2K Disney Stor... |     $15 |   0.0080 |   15.00
+  11 |    YES | Vintage Disney Dumbo Elephant Plush        |     $20 |   0.0080 |   15.00
+  12 |    YES | Vintage Disney Zip-Up Fleece               |     $35 |   0.0296 |    4.00
+  13 |    YES | Vintage Disney Blue and Beige Tigger Je... |    $350 |   0.0260 |    4.00
+  14 |    YES | Vintage Disney Store Exclusive Embroide... |     $25 |   0.0337 |    3.00
+  15 |    YES | RARE - VINTAGE - Disney White Short Sle... |     $50 |   0.0252 |    4.00
+  16 |    YES | Vintage Disney Classic Pooh snow globe     |     $20 |   0.0125 |    8.00
+  17 |    YES | [Unknown]                                  |      -- |   0.0099 |   10.00
+  18 |    YES | [Unknown]                                  |      -- |   0.0137 |    7.00
+  19 |    YES | Vintage Disney Store Green Grumpy Sweat... |     $22 |   0.0239 |    4.00
+  20 |    YES | VINTAGE Disney Princess Ariel Overalls ... |     $65 |   0.0064 |   15.00
+  21 |    YES | Vintage Disney Princess Jacket             |     $35 |   0.0156 |    6.00
+  22 |    YES | Vintage Disney fossil Dumbo watch          |     $60 |   0.0310 |    3.00
+  23 |    YES | Vintage Disney Tigger Vintage Watch        |     $26 |   0.0488 |    2.00
+  24 |    YES | Vintage Disney The Little Mermaid Story... |    $126 |   0.0222 |    4.00
+  25 |    YES | Vintage Disney Hakuna Matata Hat The Li... |     $85 |   0.0098 |    9.00
+  26 |    YES | Disney World Reunion Disney World Vinta... |     $28 |   0.0218 |    4.00
+  27 |    YES | Vintage Disney Parks Mickey Mouse Red S... |     $89 |   0.0173 |    5.00
+  28 |    YES | Vintage Disney Black Shirt with Blue Ac... |     $36 |   0.0143 |    6.00
+  29 |    YES | Vintage Disney Figment Purple Dragon St... |     $20 |   0.0142 |    6.00
+  30 |    YES | Vintage 1964 Disney Mary Poppins Record    |     $50 |   0.0093 |    9.00
+  31 |    YES | Disney Chip And Dale Chip Plush 7-inch ... |     $32 |   0.0105 |    8.00
+  32 |    YES | Vintage 2000 Disney embroidered sweatshirt |     $45 |   0.0418 |    2.00
+  33 |    YES | Vintage Disney Collectible Ceramic Pino... |     $17 |   0.0102 |    8.00
+  34 |    YES | Kids Vintage Disney’s Princesses denim ... |     $45 |   0.0163 |    5.00
+  35 |    YES | Disney Vintage Shirt                       |     $29 |   0.0200 |    4.00
+  36 |    YES | Vintage Disney Mickey Mouse Velcro Wallet  |     $25 |   0.0099 |    8.00
+  37 |    YES | Disney Blue and Pink Vintage Weighted S... |     $30 |   0.0088 |    9.00
+  38 |    YES | Vintage Disney Mickey Mouse Red Hoodie ... |     $18 |   0.0079 |   10.00
+  39 |    YES | [Unknown]                                  |      -- |   0.0195 |    4.00
+  40 |    YES | [Unknown]                                  |      -- |   0.0097 |    8.00
+  41 |     NO | [Unknown]                                  |      -- |   0.0155 |    5.00
+  42 |     NO | [Unknown]                                  |      -- |   0.0096 |    8.00
+  43 |     NO | [Unknown]                                  |      -- |   0.0107 |    7.00
+  44 |     NO | [Unknown]                                  |      -- |   0.0093 |    8.00
+  45 |     NO | [Unknown]                                  |      -- |   0.0248 |    3.00
+  46 |     NO | [Unknown]                                  |      -- |   0.0123 |    6.00
+  47 |     NO | [Unknown]                                  |      -- |   0.0146 |    5.00
+  48 |     NO | [Unknown]                                  |      -- |   0.0073 |   10.00
+  49 |     NO | [Unknown]                                  |      -- |   0.0179 |    4.00
+  50 |     NO | [Unknown]                                  |      -- |   0.0179 |    4.00
+
+IMPRESSIONS (36 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+23:51:17.000 |    2 | Vintage Disney T-Shirt                     |     $20 |      +0.0s
+23:51:17.000 |    1 | Vintage Disney Goofy Hoodie                |     $45 |      +0.0s ← batched
+23:51:20.000 |    4 | Vintage Disney Sports Recreation Denim ... |     $56 |      +3.0s ← scrolled
+23:51:20.000 |    3 | Vintage Disney bucket hat                  |     $25 |      +3.0s ← batched
+23:51:22.000 |    5 | Vintage Disney Bedding                     |     $55 |      +5.0s ← scrolled
+23:51:22.000 |    6 | VINTAGE 1980's Disney Parks Notecards      |     $15 |      +5.0s ← batched
+23:51:27.000 |    8 | Vintage Disney Colorful Character Mug Trio |     $11 |     +10.0s ← scrolled
+23:51:27.000 |    7 | Vintage Disney Sleepy Mickey Morning Co... |     $18 |     +10.0s ← batched
+23:51:29.000 |    9 | Disney Parks Pets Cats Ceramic Photo Pi... |    $124 |     +12.0s ← scrolled
+23:51:29.000 |   10 | Oversized Vintage 2000s/Y2K Disney Stor... |     $15 |     +12.0s ← batched
+23:51:37.000 |   12 | Vintage Disney Zip-Up Fleece               |     $35 |     +20.0s ← scrolled
+23:51:37.000 |   11 | Vintage Disney Dumbo Elephant Plush        |     $20 |     +20.0s ← batched
+23:51:40.000 |   14 | Vintage Disney Store Exclusive Embroide... |     $25 |     +23.0s ← scrolled
+23:51:40.000 |   13 | Vintage Disney Blue and Beige Tigger Je... |    $350 |     +23.0s ← batched
+23:51:46.000 |   16 | Vintage Disney Classic Pooh snow globe     |     $20 |     +29.0s ← scrolled
+23:51:46.000 |   15 | RARE - VINTAGE - Disney White Short Sle... |     $50 |     +29.0s ← batched
+23:51:52.000 |   19 | Vintage Disney Store Green Grumpy Sweat... |     $22 |     +35.0s ← scrolled
+23:51:52.000 |   20 | VINTAGE Disney Princess Ariel Overalls ... |     $65 |     +35.0s ← batched
+23:51:55.000 |   22 | Vintage Disney fossil Dumbo watch          |     $60 |     +38.0s ← scrolled
+23:51:55.000 |   21 | Vintage Disney Princess Jacket             |     $35 |     +38.0s ← batched
+23:52:00.000 |   23 | Vintage Disney Tigger Vintage Watch        |     $26 |     +43.0s ← scrolled
+23:52:00.000 |   24 | Vintage Disney The Little Mermaid Story... |    $126 |     +43.0s ← batched
+23:52:18.000 |   26 | Disney World Reunion Disney World Vinta... |     $28 |      +1m1s ← scrolled
+23:52:18.000 |   25 | Vintage Disney Hakuna Matata Hat The Li... |     $85 |      +1m1s ← batched
+23:52:24.000 |   27 | Vintage Disney Parks Mickey Mouse Red S... |     $89 |      +1m7s ← scrolled
+23:52:24.000 |   28 | Vintage Disney Black Shirt with Blue Ac... |     $36 |      +1m7s ← batched
+23:52:36.000 |   30 | Vintage 1964 Disney Mary Poppins Record    |     $50 |     +1m19s ← scrolled
+23:52:36.000 |   29 | Vintage Disney Figment Purple Dragon St... |     $20 |     +1m19s ← batched
+23:53:02.000 |   32 | Vintage 2000 Disney embroidered sweatshirt |     $45 |     +1m45s ← scrolled
+23:53:02.000 |   31 | Disney Chip And Dale Chip Plush 7-inch ... |     $32 |     +1m45s ← batched
+23:53:05.000 |   33 | Vintage Disney Collectible Ceramic Pino... |     $17 |     +1m48s ← scrolled
+23:53:05.000 |   34 | Kids Vintage Disney’s Princesses denim ... |     $45 |     +1m48s ← batched
+23:53:43.000 |   36 | Vintage Disney Mickey Mouse Velcro Wallet  |     $25 |     +2m26s ← scrolled
+23:53:43.000 |   35 | Disney Vintage Shirt                       |     $29 |     +2m26s ← batched
+23:54:15.000 |   37 | Disney Blue and Pink Vintage Weighted S... |     $30 |     +2m58s ← scrolled
+23:54:15.000 |   38 | Vintage Disney Mickey Mouse Red Hoodie ... |     $18 |     +2m58s ← batched
+
+CLICKS (2 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+23:52:03.000 |   24 | Vintage Disney The Little Mermaid Story... |    $126 |          +46.0s
+23:52:53.000 |   29 | Vintage Disney Figment Purple Dragon St... |     $20 |          +1m36s
+
+SUMMARY:
+  - Total bids: 50
+  - Winners (shown): 40
+  - Impressions: 36
+  - Clicks: 2
+  - Session duration: 178.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+[2/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0698014ac82a75ff8c0467f22a9a0451
+--------------------------------------------------------------------------------
+Placement: 1 (Homepage/Search)
+User: ext1:ba46e1bc-8b44-4785-9910-ad387e49fc71
+Auction Created: 2026-02-02 03:06:20.531000
+
+AUCTION RESULTS (11 bids, 1 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Spanx Heavy Air Essentials Tapered Pant... |     $58 |   0.0136 |    4.00
+   2 |     NO | SPANX | Look At Me Now Leggings            |     $22 |   0.0010 |   32.00
+   3 |     NO | [Unknown]                                  |      -- |   0.0055 |    5.00
+   4 |     NO | SPANX Black Suit Coat                      |     $50 |   0.0009 |   24.00
+   5 |     NO | [Unknown]                                  |      -- |   0.0072 |    3.00
+   6 |     NO | Spanx                                      |     $15 |   0.0014 |   13.00
+   7 |     NO | Air Wick essential mist diffuser. Sleek... |     $35 |   0.0021 |    8.00
+   8 |     NO | City Essentials Small Shoulder Bag 3L      |     $48 |   0.0009 |   17.00
+   9 |     NO | Mac ⅜" Drive Air Wrench                    |    $110 |   0.0002 |   45.00
+  10 |     NO | SPANX                                      |     $50 |   0.0036 |    3.00
+  11 |     NO | Spanx High Waist Essential Leggings Sie... |     $39 |   0.0035 |    3.00
+
+IMPRESSIONS (1 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+03:06:22.000 |    1 | Spanx Heavy Air Essentials Tapered Pant... |     $58 |      +0.0s
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+03:06:24.000 |    1 | Spanx Heavy Air Essentials Tapered Pant... |     $58 |           +2.0s
+
+SUMMARY:
+  - Total bids: 11
+  - Winners (shown): 1
+  - Impressions: 1
+  - Clicks: 1
+  - Session duration: 0.0 seconds
+  - Scroll pattern: SINGLE (0% of impressions have unique timestamps)
+
+
+[3/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697fced4b9c70ae9804fadd860beb4a
+--------------------------------------------------------------------------------
+Placement: 2 (PDP (Product Detail Page))
+User: ext1:13efca43-98a9-4edc-aae5-84fa383e46d1
+Auction Created: 2026-02-01 22:08:20.777000
+
+AUCTION RESULTS (46 bids, 36 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Shopper Tote Peanuts                       |     $25 |   0.0382 |    6.00
+   2 |    YES | NWOT Harvey’s Seatbelt Bag Strap Blackb... |     $35 |   0.0559 |    4.00
+   3 |    YES | LKNW Harveys Seatbelt TRICK Lola CNC Cl... |    $175 |   0.0466 |    4.00
+   4 |    YES | Vtg Harveys Seatbelt Black Tote Bag Han... |     $35 |   0.0383 |    4.00
+   5 |    YES | Harveys Pink sweetheart Barbie Crossbod... |    $200 |   0.0281 |    5.00
+   6 |    YES | Harveys Park Hopper / Disney You Can Fl... |    $375 |   0.0198 |    7.00
+   7 |    YES | Disney Parks Designer Collection – Limi... |    $180 |   0.0198 |    7.00
+   8 |    YES | Harveys Meowy Christmas Classic Wallet ... |    $155 |   0.0268 |    5.00
+   9 |    YES | Harveys Blue Star Pattern Women's Seatb... |    $200 |   0.0202 |    6.00
+  10 |    YES | Disney Parks Blue Mickey Retro Ride Bac... |    $125 |   0.0284 |    4.00
+  11 |    YES | EUC Harveys Disney Silver Screen Coutur... |    $250 |   0.0146 |    7.00
+  12 |    YES | Harvey’s Seatbelt Disney Black and Whit... |    $175 |   0.0242 |    4.00
+  13 |    YES | Harveys The Original Seatbelt Bag Brown... |     $54 |   0.0242 |    4.00
+  14 |    YES | Harveys Treecycle Black, Grey, and Tan ... |     $70 |   0.0237 |    4.00
+  15 |    YES | Harveys Gold Classic mini Tote Bag         |    $220 |   0.0314 |    3.00
+  16 |    YES | Harveys Original Seatbelt Bag Purse Dis... |     $97 |   0.0230 |    4.00
+  17 |    YES | Vintage: HARVEYS Original Seatbelt bag     |     $38 |   0.0205 |    4.00
+  18 |    YES | Harveys Seatbelt Handbag Black Shoulder... |     $58 |   0.0203 |    4.00
+  19 |    YES | Harveys Lacey Black and Gray Zip Around... |    $432 |   0.0265 |    3.00
+  20 |    YES | Y2K Harvey's The Original Black Seatbel... |     $67 |   0.0198 |    4.00
+  21 |    YES | Harvey's Tan Seatbelt Shoulder Bag         |     $75 |   0.0156 |    5.00
+  22 |    YES | Harvey’s magic kingdom tote                |    $180 |   0.0236 |    3.00
+  23 |    YES | Harveys The Original Seatbelt Bag Small... |     $55 |   0.0167 |    4.00
+  24 |    YES | Harvey's Seatbelt Handbag   used. vintage  |     $39 |   0.0334 |    2.00
+  25 |    YES | Harveys black Seatbeltbag purse            |     $38 |   0.0328 |    2.00
+  26 |    YES | Y2K Harvey's The Original Red Seatbelt ... |     $67 |   0.0212 |    3.00
+  27 |    YES | HARVEYS : 3 Piece Pink Lingerie Set        |     $52 |   0.0148 |    4.00
+  28 |    YES | Harveys Blue Donald Duck Keychain          |     $45 |   0.0196 |    3.00
+  29 |    YES | Harvey’s Disney Peter Pan set              |    $345 |   0.0190 |    3.00
+  30 |    YES | Harveys California Pixar cars NEW NWT C... |     $38 |   0.0270 |    2.00
+  31 |    YES | Harveys Original Seatbelt Baguette Purs... |     $59 |   0.0246 |    2.00
+  32 |    YES | Harveys Original Seatbelt Bag In Blue      |     $80 |   0.0157 |    3.00
+  33 |    YES | Minnie Mouse and Mickey Mouse Crossbody... |    $100 |   0.0231 |    2.00
+  34 |    YES | Charcoal Color Small Harveys Tote Bag w... |     $60 |   0.0169 |    2.00
+  35 |    YES | Harveys Tulip Style Skirt                  |     $10 |   0.0111 |    2.00
+  36 |    YES | Goofy and Pixar Up Harveys of Californi... |      $9 |   0.0114 |    1.00
+  37 |     NO | GENUINE VINTAGE HARVEY'S SEATBELT BAG L... |     $85 |   0.0423 |    0.00
+  38 |     NO | Disney Parks Harveys 2021 Halloween Mic... |     $90 |   0.0204 |    0.00
+  39 |     NO | Harveys Mini Messenger Seat Belt Bag Es... |     $75 |   0.0190 |    0.00
+  40 |     NO | Harvey’s Boba Fett Convertible Streamli... |    $300 |   0.0216 |    0.00
+  41 |     NO | Harveys Vamp Coffin Convertible Crossbo... |    $400 |   0.0322 |    0.00
+  42 |     NO | Vintage Harveys Scarlet Red Crossbody M... |     $90 |   0.0225 |    0.00
+  43 |     NO | Vintage Harvey's Champagne large tote      |     $35 |   0.0273 |    0.00
+  44 |     NO | [Unknown]                                  |      -- |   0.0166 |    0.00
+  45 |     NO | [Unknown]                                  |      -- |   0.0164 |    0.00
+  46 |     NO | [Unknown]                                  |      -- |   0.0265 |    0.00
+
+IMPRESSIONS (12 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+22:10:30.000 |    8 | Harveys Meowy Christmas Classic Wallet ... |    $155 |      +0.0s
+22:11:14.000 |   14 | Harveys Treecycle Black, Grey, and Tan ... |     $70 |     +44.0s ← scrolled
+22:11:45.000 |   16 | Harveys Original Seatbelt Bag Purse Dis... |     $97 |     +1m15s ← scrolled
+22:11:59.000 |   20 | Y2K Harvey's The Original Black Seatbel... |     $67 |     +1m29s ← scrolled
+22:12:44.000 |   24 | Harvey's Seatbelt Handbag   used. vintage  |     $39 |     +2m14s ← scrolled
+22:12:54.000 |   27 | HARVEYS : 3 Piece Pink Lingerie Set        |     $52 |     +2m24s ← scrolled
+22:12:58.000 |   30 | Harveys California Pixar cars NEW NWT C... |     $38 |     +2m28s ← scrolled
+22:13:06.000 |   32 | Harveys Original Seatbelt Bag In Blue      |     $80 |     +2m36s ← scrolled
+22:13:09.000 |   33 | Minnie Mouse and Mickey Mouse Crossbody... |    $100 |     +2m39s ← scrolled
+22:13:09.000 |   34 | Charcoal Color Small Harveys Tote Bag w... |     $60 |     +2m39s ← batched
+22:13:12.000 |   35 | Harveys Tulip Style Skirt                  |     $10 |     +2m42s ← scrolled
+22:13:12.000 |   36 | Goofy and Pixar Up Harveys of Californi... |      $9 |     +2m42s ← batched
+
+CLICKS (3 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+22:10:01.000 |    4 | Vtg Harveys Seatbelt Black Tote Bag Han... |     $35 |         +-29.0s
+22:11:17.000 |   13 | Harveys The Original Seatbelt Bag Brown... |     $54 |          +47.0s
+22:11:41.000 |   13 | Harveys The Original Seatbelt Bag Brown... |     $54 |          +1m11s
+
+SUMMARY:
+  - Total bids: 46
+  - Winners (shown): 36
+  - Impressions: 12
+  - Clicks: 3
+  - Session duration: 162.0 seconds
+  - Scroll pattern: SEQUENTIAL (83% of impressions have unique timestamps)
+
+
+[4/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0698005bfa4d7e928004c2262b3b2c5c
+--------------------------------------------------------------------------------
+Placement: 2 (PDP (Product Detail Page))
+User: ext1:10873a5d-b6f1-4b42-b925-a9ba3ae211d0
+Auction Created: 2026-02-02 02:02:39.678000
+
+AUCTION RESULTS (66 bids, 56 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Old Navy Cream Blouse with Navy Embroidery |     $10 |   0.7105 |    9.00
+   2 |    YES | 🎉5 for $45 🎉 Old Navy Quick Dry Pants W... |     $26 |   0.7352 |    7.00
+   3 |    YES | Old Navy Denim Jumpsuit with Yellow Sti... |     $15 |   0.4208 |   11.00
+   4 |    YES | Old Navy Women's Straight Leg Blue Jeans   |     $18 |   0.7556 |    6.00
+   5 |    YES | Old Navy Women’s High Rise Straight Tap... |     $22 |   0.7448 |    6.00
+   6 |    YES | Old Navy Activewear  (XL) - Wide Leg       |     $16 |   0.7431 |    6.00
+   7 |    YES | *NWT* Old Navy Size Large Sunday Sleep ... |     $15 |   0.2928 |   15.00
+   8 |    YES | EUC: Old Navy Sz XL Black High-Rise Lin... |     $15 |   0.7117 |    6.00
+   9 |    YES | Old Navy Light Blue Knit Pullover          |     $14 |   0.7026 |    6.00
+  10 |    YES | Old Navy Powersoft Extra High-Rise Flar... |     $13 |   0.8214 |    5.00
+  11 |    YES | [Unknown]                                  |      -- |   0.8184 |    5.00
+  12 |    YES | NWT Women’s Old Navy Vibrant Red Midi D... |     $18 |   0.7549 |    5.00
+  13 |    YES | Old Navy Women's High Rise OG Chino Bro... |     $25 |   0.7533 |    5.00
+  14 |    YES | Old Navy Denim Stretch Low-Rise Capri P... |     $12 |   0.7527 |    5.00
+  15 |    YES | Old Navy Slim Women's Size 14 Straight ... |      $6 |   0.5344 |    7.00
+  16 |    YES | Old Navy Women's Straight Leg Jeans in ... |     $15 |   0.7389 |    5.00
+  17 |    YES | NWT Old Navy High Waisted Wide Leg Legg... |     $21 |   0.7113 |    5.00
+  18 |    YES | Old Navy Classic Black Button-Up Maxi S... |     $25 |   0.7049 |    5.00
+  19 |    YES | Old Navy Black Chemise                     |     $23 |   0.5744 |    6.00
+  20 |    YES | Old Navy Women's Mauve Crew Neck Sweater   |     $20 |   0.8156 |    4.00
+  21 |    YES | Old Navy Active Black High-Rise Joggers... |     $20 |   0.4396 |    7.00
+  22 |    YES | OLD NAVY Extra High Rise Baggy Wide Leg... |     $38 |   0.6034 |    5.00
+  23 |    YES | Old Navy Women's High Rise Dark Blue Jeans |     $15 |   0.7461 |    4.00
+  24 |    YES | Old Navy Maroon Corduroy Trousers          |     $20 |   0.7357 |    4.00
+  25 |    YES | Old Navy green coat                        |     $30 |   0.7181 |    4.00
+  26 |    YES | Old Navy Olive Green cardigan Sweater      |     $15 |   0.7144 |    4.00
+  27 |    YES | Old Navy Women's Navy and White Crew Ne... |     $15 |   0.5665 |    5.00
+  28 |    YES | Old Navy V-Neck Sweater - Cream with Gr... |     $25 |   0.7074 |    4.00
+  29 |    YES | [Unknown]                                  |      -- |   0.5182 |    5.00
+  30 |    YES | [Unknown]                                  |      -- |   0.5174 |    5.00
+  31 |    YES | Old Navy Women's High Rise Go Dry yoga ... |     $20 |   0.3546 |    7.00
+  32 |    YES | [Unknown]                                  |      -- |   0.7599 |    3.00
+  33 |    YES | 7 sets of Old Navy thermal pjs             |     $69 |   0.7561 |    3.00
+  34 |    YES | [Unknown]                                  |      -- |   0.5659 |    4.00
+  35 |    YES | Brown Sweater                              |     $20 |   0.3711 |    6.00
+  36 |    YES | [Unknown]                                  |      -- |   0.7039 |    3.00
+  37 |    YES | Old Navy Midnight Blue Ripped Skinny Jeans |     $15 |   0.5275 |    4.00
+  38 |    YES | Old Navy High Waisted Pixie Pull On Wid... |     $46 |   0.4199 |    5.00
+  39 |    YES | [Unknown]                                  |      -- |   0.2955 |    7.00
+  40 |    YES | [Unknown]                                  |      -- |   0.5166 |    4.00
+  41 |    YES | [Unknown]                                  |      -- |   0.5156 |    4.00
+  42 |    YES | [Unknown]                                  |      -- |   0.5099 |    4.00
+  43 |    YES | Old Navy Women's Red and Black Plaid Pa... |     $35 |   0.0562 |   36.00
+  44 |    YES | [Unknown]                                  |      -- |   0.5776 |    3.00
+  45 |    YES | [Unknown]                                  |      -- |   0.5667 |    3.00
+  46 |    YES | [Unknown]                                  |      -- |   0.4213 |    4.00
+  47 |    YES | [Unknown]                                  |      -- |   0.4042 |    4.00
+  48 |    YES | NWT Old Navy Camouflage and Green Leggings |     $24 |   0.5293 |    3.00
+  49 |    YES | [Unknown]                                  |      -- |   0.3876 |    4.00
+  50 |    YES | [Unknown]                                  |      -- |   0.5049 |    3.00
+  51 |    YES | [Unknown]                                  |      -- |   0.5043 |    3.00
+  52 |    YES | Old Navy Cream V-Neck Sweater              |     $16 |   0.0562 |   26.00
+  53 |    YES | [Unknown]                                  |      -- |   0.3573 |    4.00
+  54 |    YES | [Unknown]                                  |      -- |   0.3918 |    3.00
+  55 |    YES | Women's Old Navy Mauve Dynamic Fleece 1... |     $35 |   0.5224 |    2.00
+  56 |    YES | Old Navy Women's V-Neck Sweater in Gray    |     $16 |   0.0562 |   15.00
+  57 |     NO | [Unknown]                                  |      -- |   0.4001 |    2.00
+  58 |     NO | [Unknown]                                  |      -- |   0.3812 |    2.00
+  59 |     NO | Maternity Black Leggings                   |     $20 |   0.1494 |    5.00
+  60 |     NO | Linen Blend Cuffed Tapered Wide Leg Pan... |     $25 |   0.1016 |    7.00
+  61 |     NO | [Unknown]                                  |      -- |   0.0573 |   11.00
+  62 |     NO | [Unknown]                                  |      -- |   0.1484 |    4.00
+  63 |     NO | [Unknown]                                  |      -- |   0.0573 |   10.00
+  64 |     NO | Old Navy Longsleeve Sleep Shirt            |      $7 |   0.0559 |   10.00
+  65 |     NO | [Unknown]                                  |      -- |   0.0563 |    9.00
+  66 |     NO | [Unknown]                                  |      -- |   0.0568 |    8.00
+
+IMPRESSIONS (26 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+02:02:41.000 |    1 | Old Navy Cream Blouse with Navy Embroidery |     $10 |      +0.0s
+02:02:41.000 |    2 | 🎉5 for $45 🎉 Old Navy Quick Dry Pants W... |     $26 |      +0.0s ← batched
+02:02:58.000 |    4 | Old Navy Women's Straight Leg Blue Jeans   |     $18 |     +17.0s ← scrolled
+02:02:58.000 |    3 | Old Navy Denim Jumpsuit with Yellow Sti... |     $15 |     +17.0s ← batched
+02:03:56.000 |    6 | Old Navy Activewear  (XL) - Wide Leg       |     $16 |     +1m15s ← scrolled
+02:03:56.000 |    5 | Old Navy Women’s High Rise Straight Tap... |     $22 |     +1m15s ← batched
+02:04:14.000 |    8 | EUC: Old Navy Sz XL Black High-Rise Lin... |     $15 |     +1m33s ← scrolled
+02:04:14.000 |    7 | *NWT* Old Navy Size Large Sunday Sleep ... |     $15 |     +1m33s ← batched
+02:04:16.000 |   10 | Old Navy Powersoft Extra High-Rise Flar... |     $13 |     +1m35s ← scrolled
+02:04:16.000 |    9 | Old Navy Light Blue Knit Pullover          |     $14 |     +1m35s ← batched
+02:04:24.000 |   14 | Old Navy Denim Stretch Low-Rise Capri P... |     $12 |     +1m43s ← scrolled
+02:04:24.000 |   13 | Old Navy Women's High Rise OG Chino Bro... |     $25 |     +1m43s ← batched
+02:04:26.000 |   16 | Old Navy Women's Straight Leg Jeans in ... |     $15 |     +1m45s ← scrolled
+02:04:26.000 |   15 | Old Navy Slim Women's Size 14 Straight ... |      $6 |     +1m45s ← batched
+02:04:30.000 |   18 | Old Navy Classic Black Button-Up Maxi S... |     $25 |     +1m49s ← scrolled
+02:04:30.000 |   17 | NWT Old Navy High Waisted Wide Leg Legg... |     $21 |     +1m49s ← batched
+02:05:06.000 |   20 | Old Navy Women's Mauve Crew Neck Sweater   |     $20 |     +2m25s ← scrolled
+02:05:06.000 |   19 | Old Navy Black Chemise                     |     $23 |     +2m25s ← batched
+02:05:09.000 |   21 | Old Navy Active Black High-Rise Joggers... |     $20 |     +2m28s ← scrolled
+02:05:09.000 |   22 | OLD NAVY Extra High Rise Baggy Wide Leg... |     $38 |     +2m28s ← batched
+02:05:12.000 |   24 | Old Navy Maroon Corduroy Trousers          |     $20 |     +2m31s ← scrolled
+02:05:12.000 |   23 | Old Navy Women's High Rise Dark Blue Jeans |     $15 |     +2m31s ← batched
+02:05:14.000 |   25 | Old Navy green coat                        |     $30 |     +2m33s ← scrolled
+02:05:14.000 |   26 | Old Navy Olive Green cardigan Sweater      |     $15 |     +2m33s ← batched
+02:05:35.000 |   28 | Old Navy V-Neck Sweater - Cream with Gr... |     $25 |     +2m54s ← scrolled
+02:05:35.000 |   27 | Old Navy Women's Navy and White Crew Ne... |     $15 |     +2m54s ← batched
+
+CLICKS (3 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+02:04:53.000 |   17 | NWT Old Navy High Waisted Wide Leg Legg... |     $21 |          +2m12s
+02:05:21.000 |   26 | Old Navy Olive Green cardigan Sweater      |     $15 |          +2m40s
+02:05:27.000 |   26 | Old Navy Olive Green cardigan Sweater      |     $15 |          +2m46s
+
+SUMMARY:
+  - Total bids: 66
+  - Winners (shown): 56
+  - Impressions: 26
+  - Clicks: 3
+  - Session duration: 174.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+[5/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697facf6413786a8f04ccaf2a9a0451
+--------------------------------------------------------------------------------
+Placement: 3 (Category/Listing)
+User: ext1:05c73a15-0876-4f72-9aae-13688123e2e7
+Auction Created: 2026-02-01 19:43:50.264000
+
+AUCTION RESULTS (50 bids, 40 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | FP Movement Free People Long Sleeve Cro... |     $25 |   0.0445 |   18.00
+   2 |    YES | FP Movement by Free People Lavender Lon... |     $30 |   0.0314 |   11.00
+   3 |    YES | [Unknown]                                  |      -- |   0.0491 |    6.00
+   4 |    YES | Free People FP Movement Athletic Tank T... |     $22 |   0.0124 |   16.00
+   5 |    YES | [Unknown]                                  |      -- |   0.0077 |   21.00
+   6 |    YES | FP Movement by Free People Navy Long Sl... |     $27 |   0.0117 |   13.00
+   7 |    YES | [Unknown]                                  |      -- |   0.0063 |   21.00
+   8 |    YES | [Unknown]                                  |      -- |   0.0201 |    5.00
+   9 |    YES | [Unknown]                                  |      -- |   0.0124 |    8.00
+  10 |    YES | [Unknown]                                  |      -- |   0.0106 |    9.00
+  11 |    YES | FP MOVEMENT by FREE PEOPLE Bail Out Lon... |     $65 |   0.0105 |    9.00
+  12 |    YES | Free People Cream Long Sleeve Cut Out B... |     $20 |   0.0069 |   13.00
+  13 |    YES | FP Movement by Free People Bail Out Kni... |     $30 |   0.0068 |   12.00
+  14 |    YES | [Unknown]                                  |      -- |   0.0095 |    8.00
+  15 |    YES | NWT FP Movement Women's Bail Out Long S... |     $50 |   0.0043 |   16.00
+  16 |    YES | Free People Coral Long Sleeve Top with ... |     $50 |   0.0031 |   21.00
+  17 |    YES | FP Movement by Free People Green Crop Top  |     $15 |   0.0107 |    6.00
+  18 |    YES | FP Movement by Free People Black Long S... |     $15 |   0.0042 |   14.00
+  19 |    YES | Free People Cut It Out Seamless Long Sl... |     $36 |   0.0146 |    4.00
+  20 |    YES | FP Movement by Free People Cropped Run Top |     $18 |   0.0042 |   14.00
+  21 |    YES | Intimately Free People Cut Out Top (M/L)   |     $15 |   0.0090 |    6.00
+  22 |    YES | [Unknown]                                  |      -- |   0.0075 |    7.00
+  23 |    YES | [Unknown]                                  |      -- |   0.0074 |    7.00
+  24 |    YES | [Unknown]                                  |      -- |   0.0129 |    4.00
+  25 |    YES | [Unknown]                                  |      -- |   0.0048 |   10.00
+  26 |    YES | [Unknown]                                  |      -- |   0.0096 |    5.00
+  27 |    YES | [Unknown]                                  |      -- |   0.0060 |    8.00
+  28 |    YES | [Unknown]                                  |      -- |   0.0107 |    4.00
+  29 |    YES | [Unknown]                                  |      -- |   0.0028 |   15.00
+  30 |    YES | FP Movement by Free People Burnt Orange... |     $18 |   0.0098 |    4.00
+  31 |    YES | [Unknown]                                  |      -- |   0.0038 |   10.00
+  32 |    YES | FP Movement by Free People White Top       |     $25 |   0.0040 |    9.00
+  33 |    YES | [Unknown]                                  |      -- |   0.0047 |    7.00
+  34 |    YES | [Unknown]                                  |      -- |   0.0046 |    7.00
+  35 |    YES | [Unknown]                                  |      -- |   0.0039 |    8.00
+  36 |    YES | FP MOVEMENT by FREE PEOPLE Go With It T... |     $45 |   0.0039 |    8.00
+  37 |    YES | FP MOVEMENT by FREE PEOPLE Smocked Crop... |     $40 |   0.0044 |    7.00
+  38 |    YES | FP Movement by Free People Pink Long Sl... |     $20 |   0.0044 |    7.00
+  39 |    YES | [Unknown]                                  |      -- |   0.0027 |   11.00
+  40 |    YES | [Unknown]                                  |      -- |   0.0037 |    8.00
+  41 |     NO | [Unknown]                                  |      -- |   0.0098 |    3.00
+  42 |     NO | [Unknown]                                  |      -- |   0.0058 |    5.00
+  43 |     NO | Free People Movement Long Sleeve Therma... |     $25 |   0.0013 |   22.00
+  44 |     NO | [Unknown]                                  |      -- |   0.0069 |    4.00
+  45 |     NO | [Unknown]                                  |      -- |   0.0034 |    8.00
+  46 |     NO | [Unknown]                                  |      -- |   0.0045 |    6.00
+  47 |     NO | FP MOVEMENT by FREE PEOPLE Field Tee TOP   |     $50 |   0.0033 |    8.00
+  48 |     NO | [Unknown]                                  |      -- |   0.0024 |   11.00
+  49 |     NO | [Unknown]                                  |      -- |   0.0066 |    4.00
+  50 |     NO | FP Movement by Free People Lime Green S... |     $48 |   0.0026 |   10.00
+
+IMPRESSIONS (2 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+19:43:52.000 |    1 | FP Movement Free People Long Sleeve Cro... |     $25 |      +0.0s
+19:43:52.000 |    2 | FP Movement by Free People Lavender Lon... |     $30 |      +0.0s ← batched
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+19:43:55.000 |    1 | FP Movement Free People Long Sleeve Cro... |     $25 |           +3.0s
+
+SUMMARY:
+  - Total bids: 50
+  - Winners (shown): 40
+  - Impressions: 2
+  - Clicks: 1
+  - Session duration: 0.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+[6/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697fe102baa797fbb0403d1166ba11a
+--------------------------------------------------------------------------------
+Placement: 3 (Category/Listing)
+User: ext1:46941e77-e2c3-49e8-abeb-65cb64fdb78c
+Auction Created: 2026-02-01 23:25:54.774000
+
+AUCTION RESULTS (42 bids, 32 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Women’s The North Face Brown Fleece Jacket |     $50 |   0.0292 |    9.00
+   2 |    YES | NORTH FACE Winter Coat with Detachable ... |     $65 |   0.0041 |   60.00
+   3 |    YES | The North Face Women's Cragmont Fleece ... |     $50 |   0.0256 |    8.00
+   4 |    YES | The North Face Osito Fleece Jacket Wome... |     $27 |   0.0395 |    5.00
+   5 |    YES | The North Face Women's Polartec Fleece ... |     $45 |   0.0419 |    4.00
+   6 |    YES | North Face Fleece jacket                   |     $30 |   0.0093 |   17.00
+   7 |    YES | The North Face Womens Osito Fleece Jack... |     $65 |   0.0315 |    5.00
+   8 |    YES | The North Face Women’s Hooded Rain Jack... |     $54 |   0.0202 |    7.00
+   9 |    YES | The North Face Jacket Women’s Medium Hy... |     $38 |   0.0348 |    4.00
+  10 |    YES | The North Face DryVent Jacket Women's M... |     $50 |   0.0335 |    4.00
+  11 |    YES | [Unknown]                                  |      -- |   0.0147 |    9.00
+  12 |    YES | [Unknown]                                  |      -- |   0.0322 |    4.00
+  13 |    YES | [Unknown]                                  |      -- |   0.0321 |    4.00
+  14 |    YES | The North Face Women's Cream Hooded Puf... |     $45 |   0.0415 |    3.00
+  15 |    YES | The North Face Women's Black Hooded Coat   |     $60 |   0.0175 |    7.00
+  16 |    YES | [Unknown]                                  |      -- |   0.0405 |    3.00
+  17 |    YES | [Unknown]                                  |      -- |   0.0303 |    4.00
+  18 |    YES | The North Face HyVent Brown Hooded Park... |     $45 |   0.0241 |    5.00
+  19 |    YES | [Unknown]                                  |      -- |   0.0237 |    5.00
+  20 |    YES | [Unknown]                                  |      -- |   0.0287 |    4.00
+  21 |    YES | The North Face Tan and Cream Fleece Jacket |     $35 |   0.0160 |    7.00
+  22 |    YES | [Unknown]                                  |      -- |   0.0187 |    6.00
+  23 |    YES | [Unknown]                                  |      -- |   0.0091 |   12.00
+  24 |    YES | [Unknown]                                  |      -- |   0.0269 |    4.00
+  25 |    YES | [Unknown]                                  |      -- |   0.0072 |   15.00
+  26 |    YES | [Unknown]                                  |      -- |   0.0267 |    4.00
+  27 |    YES | [Unknown]                                  |      -- |   0.0133 |    8.00
+  28 |    YES | The North Face Women's Pink Jacket         |     $35 |   0.0117 |    9.00
+  29 |    YES | The North Face Women's Jacket with hood... |    $190 |   0.0210 |    5.00
+  30 |    YES | The North Face Green Hooded Jacket         |     $55 |   0.0149 |    7.00
+  31 |    YES | The North Face Women's Charcoal Puffer ... |    $180 |   0.0208 |    5.00
+  32 |    YES | [Unknown]                                  |      -- |   0.0207 |    5.00
+  33 |     NO | [Unknown]                                  |      -- |   0.0146 |    7.00
+  34 |     NO | [Unknown]                                  |      -- |   0.0510 |    2.00
+  35 |     NO | NORTH FACE COAT FOR WOMEN IN BLACK WITH... |    $100 |   0.0085 |   12.00
+  36 |     NO | The North Face Charcoal Full-Zip Jacket    |     $40 |   0.0041 |   25.00
+  37 |     NO | [Unknown]                                  |      -- |   0.0203 |    5.00
+  38 |     NO | The North Face Women's Deep Blue Fleece... |     $40 |   0.0253 |    4.00
+  39 |     NO | [Unknown]                                  |      -- |   0.0167 |    6.00
+  40 |     NO | The North Face Lavendar Snow Jacket Wom... |    $120 |   0.0199 |    5.00
+  41 |     NO | [Unknown]                                  |      -- |   0.0162 |    6.00
+  42 |     NO | [Unknown]                                  |      -- |   0.0324 |    3.00
+
+IMPRESSIONS (4 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+23:26:30.000 |    2 | NORTH FACE Winter Coat with Detachable ... |     $65 |      +0.0s
+23:26:30.000 |    1 | Women’s The North Face Brown Fleece Jacket |     $50 |      +0.0s ← batched
+23:26:39.000 |    4 | The North Face Osito Fleece Jacket Wome... |     $27 |      +9.0s ← scrolled
+23:26:39.000 |    3 | The North Face Women's Cragmont Fleece ... |     $50 |      +9.0s ← batched
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+23:26:39.000 |    1 | Women’s The North Face Brown Fleece Jacket |     $50 |           +9.0s
+
+SUMMARY:
+  - Total bids: 42
+  - Winners (shown): 32
+  - Impressions: 4
+  - Clicks: 1
+  - Session duration: 9.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+[7/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 06980206552778aea5042699f9ea985c
+--------------------------------------------------------------------------------
+Placement: 5 (Cart/Checkout)
+User: ext1:5ec66cc2-33e6-4ba9-9adc-4630825e09ca
+Auction Created: 2026-02-02 03:56:21.335000
+
+AUCTION RESULTS (58 bids, 48 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | J. Crew Crinkle Ruffle Tiered Midi Dres... |     $35 |   0.0556 |   25.00
+   2 |    YES | Banana Republic Elegant Gray Midi Dress    |      $9 |   0.1253 |    5.00
+   3 |    YES | Banana Republic Scallop Dress              |     $28 |   0.0514 |    9.00
+   4 |    YES | BANANA REPUBLIC BLACK PENCIL DRESS SIZE 4  |     $48 |   0.0514 |    7.00
+   5 |    YES | Banana Republic sleeveless, black and w... |     $27 |   0.0602 |    6.00
+   6 |    YES | NWT Banana Republic Navy Blue Princess ... |     $40 |   0.0514 |    6.00
+   7 |    YES | Calvin Klein Black Cocktail Dress - Siz... |     $27 |   0.0589 |    5.00
+   8 |    YES | JCrew NWT Midi Black Dress                 |     $50 |   0.1145 |    3.00
+   9 |    YES | Floral Sleeveless Blue Dress               |     $17 |   0.0690 |    4.00
+  10 |    YES | 🖤 Banana Republic Floral Sleeveless Fit... |     $85 |   0.0514 |    5.00
+  11 |    YES | Calvin Klein Dress size 4P NWT             |     $60 |   0.0463 |    5.00
+  12 |    YES | Calvin Klein woman’s pink sheath dress ... |     $35 |   0.0463 |    5.00
+  13 |    YES | Calvin Klein Forest Green Dress Size 4     |     $49 |   0.0463 |    5.00
+  14 |    YES | Calvin Klein Women's Short Sleeved Prin... |     $49 |   0.0463 |    5.00
+  15 |    YES | CALVIN KLEIN Bright Red Dress Size 4       |     $29 |   0.0463 |    5.00
+  16 |    YES | Calvin Klein Charcoal Midi Dress           |     $30 |   0.0463 |    5.00
+  17 |    YES | 🍒 𝑷𝑹𝑰𝑪𝑬 ↓ Banana Republic 100% Linen Ca... |     $33 |   0.0921 |    3.00
+  18 |    YES | Anthropologie Peach Floral Midi Dress (... |     $54 |   0.0357 |    6.00
+  19 |    YES | Calvin Klein Faux Leather Dress Size 4     |     $26 |   0.0350 |    6.00
+  20 |    YES | Madewell Ditsy Floral Button-Front Dres... |     $24 |   0.0864 |    3.00
+  21 |    YES | J. Crew Liberty Fabric Pavillion MIDI L... |     $50 |   0.0556 |    4.00
+  22 |    YES | Calvin Klein Green Black Flowing Long V... |     $80 |   0.0799 |    3.00
+  23 |    YES | Banana Republic Business Dress with Twe... |     $43 |   0.0514 |    4.00
+  24 |    YES | Banana Republic Crew-Neckline Stretch P... |     $25 |   0.0514 |    4.00
+  25 |    YES | Banana Republic Size 4 Peplum Dress        |     $50 |   0.0514 |    4.00
+  26 |    YES | "NWT" Calvin Klein Fit & Flare Khaki Mi... |     $27 |   0.0463 |    4.00
+  27 |    YES | Calvin Klein Size 4 Classic Black Dress    |     $19 |   0.0463 |    4.00
+  28 |    YES | CALVIN Klein Cotton Halter Turquoise Bl... |     $48 |   0.0463 |    4.00
+  29 |    YES | Calvin Klein Womens Tan Linen/Rayon Dre... |     $45 |   0.0463 |    4.00
+  30 |    YES | Calvin Klein Gray Sleeveless Dress         |     $40 |   0.0463 |    4.00
+  31 |    YES | Calvin Klein Women's Pink Sleeveless Sh... |     $38 |   0.0463 |    4.00
+  32 |    YES | Calvin Klein Black Sleeveless Dress        |     $45 |   0.0463 |    4.00
+  33 |    YES | Calvin Klein size 4 black / gold / purp... |     $45 |   0.0463 |    4.00
+  34 |    YES | J Crew Black Long Sleeve Dress             |     $52 |   0.0343 |    5.00
+  35 |    YES | Calvin Klein Back Midi Dress               |     $38 |   0.0685 |    3.00
+  36 |    YES | .Tabitha Dress from Anthropologie          |     $49 |   0.1352 |    2.00
+  37 |    YES | Calvin Klein Coral Pink Midi Dress with... |     $22 |   0.0671 |    3.00
+  38 |    YES | Calvin Klein Beige Midi Dress with stun... |     $27 |   0.0667 |    3.00
+  39 |    YES | MADEWELL Pink Fleur Bow-Back Dress         |     $48 |   0.0438 |    4.00
+  40 |    YES | J. Crew Tan Leopard Print Silk Midi Dress  |     $65 |   0.0656 |    3.00
+  41 |    YES | J. Crew Pink and Orange Floral Midi Dress  |     $28 |   0.0640 |    3.00
+  42 |    YES | Calvin Klein Sleveless Black Dress Size 4  |     $20 |   0.0618 |    3.00
+  43 |    YES | Anthropologie X Hutch Amara Pink Corset... |    $155 |   0.0593 |    3.00
+  44 |    YES | J. Crew Navy Floral Midi Dress             |     $25 |   0.0390 |    4.00
+  45 |    YES | Anna Sui for Anthropologie Silk Dress sz 4 |     $37 |   0.0579 |    3.00
+  46 |    YES | Anthropologie Gold Leaf Patterned Sleev... |     $68 |   0.0574 |    3.00
+  47 |    YES | J. CREW Sleeveless Crinkle Dress, sz 4     |     $18 |   0.0556 |    3.00
+  48 |    YES | J. Crew Little Black Dress 👗               |     $29 |   0.0556 |    3.00
+  49 |     NO | J. Crew 100% Silk Striped Mini Blouson ... |     $88 |   0.0556 |    3.00
+  50 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  51 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  52 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  53 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  54 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  55 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  56 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  57 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+  58 |     NO | [Unknown]                                  |      -- |   0.0556 |    3.00
+
+IMPRESSIONS (48 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+03:56:23.000 |    1 | J. Crew Crinkle Ruffle Tiered Midi Dres... |     $35 |      +0.0s
+03:56:23.000 |    2 | Banana Republic Elegant Gray Midi Dress    |      $9 |      +0.0s ← batched
+03:56:23.000 |    3 | Banana Republic Scallop Dress              |     $28 |      +0.0s ← batched
+03:56:23.000 |    4 | BANANA REPUBLIC BLACK PENCIL DRESS SIZE 4  |     $48 |      +0.0s ← batched
+03:56:54.000 |    5 | Banana Republic sleeveless, black and w... |     $27 |     +31.0s ← scrolled
+03:56:54.000 |    7 | Calvin Klein Black Cocktail Dress - Siz... |     $27 |     +31.0s ← batched
+03:56:54.000 |    8 | JCrew NWT Midi Black Dress                 |     $50 |     +31.0s ← batched
+03:56:54.000 |    6 | NWT Banana Republic Navy Blue Princess ... |     $40 |     +31.0s ← batched
+03:57:02.000 |   10 | 🖤 Banana Republic Floral Sleeveless Fit... |     $85 |     +39.0s ← scrolled
+03:57:02.000 |   11 | Calvin Klein Dress size 4P NWT             |     $60 |     +39.0s ← batched
+03:57:02.000 |   12 | Calvin Klein woman’s pink sheath dress ... |     $35 |     +39.0s ← batched
+03:57:02.000 |    9 | Floral Sleeveless Blue Dress               |     $17 |     +39.0s ← batched
+03:57:10.000 |   13 | Calvin Klein Forest Green Dress Size 4     |     $49 |     +47.0s ← scrolled
+03:57:10.000 |   15 | CALVIN KLEIN Bright Red Dress Size 4       |     $29 |     +47.0s ← batched
+03:57:10.000 |   14 | Calvin Klein Women's Short Sleeved Prin... |     $49 |     +47.0s ← batched
+03:57:10.000 |   16 | Calvin Klein Charcoal Midi Dress           |     $30 |     +47.0s ← batched
+03:57:25.000 |   18 | Anthropologie Peach Floral Midi Dress (... |     $54 |      +1m2s ← scrolled
+03:57:25.000 |   20 | Madewell Ditsy Floral Button-Front Dres... |     $24 |      +1m2s ← batched
+03:57:25.000 |   19 | Calvin Klein Faux Leather Dress Size 4     |     $26 |      +1m2s ← batched
+03:57:25.000 |   17 | 🍒 𝑷𝑹𝑰𝑪𝑬 ↓ Banana Republic 100% Linen Ca... |     $33 |      +1m2s ← batched
+03:57:33.000 |   23 | Banana Republic Business Dress with Twe... |     $43 |     +1m10s ← scrolled
+03:57:33.000 |   24 | Banana Republic Crew-Neckline Stretch P... |     $25 |     +1m10s ← batched
+03:57:33.000 |   21 | J. Crew Liberty Fabric Pavillion MIDI L... |     $50 |     +1m10s ← batched
+03:57:33.000 |   22 | Calvin Klein Green Black Flowing Long V... |     $80 |     +1m10s ← batched
+03:57:44.000 |   28 | CALVIN Klein Cotton Halter Turquoise Bl... |     $48 |     +1m21s ← scrolled
+03:57:44.000 |   25 | Banana Republic Size 4 Peplum Dress        |     $50 |     +1m21s ← batched
+03:57:44.000 |   27 | Calvin Klein Size 4 Classic Black Dress    |     $19 |     +1m21s ← batched
+03:57:44.000 |   26 | "NWT" Calvin Klein Fit & Flare Khaki Mi... |     $27 |     +1m21s ← batched
+03:57:58.000 |   31 | Calvin Klein Women's Pink Sleeveless Sh... |     $38 |     +1m35s ← scrolled
+03:57:58.000 |   29 | Calvin Klein Womens Tan Linen/Rayon Dre... |     $45 |     +1m35s ← batched
+03:57:58.000 |   30 | Calvin Klein Gray Sleeveless Dress         |     $40 |     +1m35s ← batched
+03:57:58.000 |   32 | Calvin Klein Black Sleeveless Dress        |     $45 |     +1m35s ← batched
+03:58:09.000 |   36 | .Tabitha Dress from Anthropologie          |     $49 |     +1m46s ← scrolled
+03:58:09.000 |   33 | Calvin Klein size 4 black / gold / purp... |     $45 |     +1m46s ← batched
+03:58:09.000 |   35 | Calvin Klein Back Midi Dress               |     $38 |     +1m46s ← batched
+03:58:09.000 |   34 | J Crew Black Long Sleeve Dress             |     $52 |     +1m46s ← batched
+03:58:50.000 |   37 | Calvin Klein Coral Pink Midi Dress with... |     $22 |     +2m27s ← scrolled
+03:58:50.000 |   39 | MADEWELL Pink Fleur Bow-Back Dress         |     $48 |     +2m27s ← batched
+03:58:50.000 |   40 | J. Crew Tan Leopard Print Silk Midi Dress  |     $65 |     +2m27s ← batched
+03:58:50.000 |   38 | Calvin Klein Beige Midi Dress with stun... |     $27 |     +2m27s ← batched
+03:58:56.000 |   41 | J. Crew Pink and Orange Floral Midi Dress  |     $28 |     +2m33s ← scrolled
+03:58:56.000 |   44 | J. Crew Navy Floral Midi Dress             |     $25 |     +2m33s ← batched
+03:58:56.000 |   43 | Anthropologie X Hutch Amara Pink Corset... |    $155 |     +2m33s ← batched
+03:58:56.000 |   42 | Calvin Klein Sleveless Black Dress Size 4  |     $20 |     +2m33s ← batched
+03:59:05.000 |   46 | Anthropologie Gold Leaf Patterned Sleev... |     $68 |     +2m42s ← scrolled
+03:59:05.000 |   47 | J. CREW Sleeveless Crinkle Dress, sz 4     |     $18 |     +2m42s ← batched
+03:59:05.000 |   48 | J. Crew Little Black Dress 👗               |     $29 |     +2m42s ← batched
+03:59:05.000 |   45 | Anna Sui for Anthropologie Silk Dress sz 4 |     $37 |     +2m42s ← batched
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+03:58:23.000 |   39 | MADEWELL Pink Fleur Bow-Back Dress         |     $48 |           +2m0s
+
+SUMMARY:
+  - Total bids: 58
+  - Winners (shown): 48
+  - Impressions: 48
+  - Clicks: 1
+  - Session duration: 162.0 seconds
+  - Scroll pattern: MIXED (25% of impressions have unique timestamps)
+
+
+[8/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697fb8bf936787c9f045360860beb4a
+--------------------------------------------------------------------------------
+Placement: 5 (Cart/Checkout)
+User: ext1:241f06fb-be09-4964-b4d9-6897f39f737d
+Auction Created: 2026-02-01 20:34:07.611000
+
+AUCTION RESULTS (20 bids, 17 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Womans Brown Jeans                         |     $15 |   0.0486 |   25.00
+   2 |    YES | 7024A...Women's Lee Bootcut Jeans Size  8P |     $25 |   0.0486 |   22.00
+   3 |    YES | Lee Relaxed Fit Straight Leg Women's si... |     $24 |   0.0486 |   17.00
+   4 |    YES | Lee Relaxed Fit Straight Women's size 8... |     $20 |   0.0486 |   15.00
+   5 |    YES | Lee Straight Leg Women's size 8P Medium... |     $20 |   0.0486 |   15.00
+   6 |    YES | Lee Relaxed Fit Straight Leg Mid Rise W... |     $20 |   0.0486 |   15.00
+   7 |    YES | Lee Mid Rise Straight Leg Women's size ... |     $20 |   0.0486 |   15.00
+   8 |    YES | Lee Relaxed Fit Straight Leg Women's si... |     $20 |   0.0486 |   15.00
+   9 |    YES | Lee Black Straight Leg Jeans Classic St... |     $14 |   0.0486 |   13.00
+  10 |    YES | Lee Relaxed Fit Straight Leg Mid Rise W... |     $20 |   0.0486 |   13.00
+  11 |    YES | Lee Jeans Women 8 Petite Capri Straight... |     $12 |   0.0486 |   11.00
+  12 |    YES | Lee Women's Skare Blue Straight Leg Jea... |     $10 |   0.0486 |    9.00
+  13 |    YES | Lee Gray Straight Leg Jeans 8P             |     $25 |   0.0486 |    9.00
+  14 |    YES | Lee Women's Jeans Size 8 Petite Classic... |     $25 |   0.0486 |    8.00
+  15 |    YES | [Unknown]                                  |      -- |   0.0486 |    6.00
+  16 |    YES | [Unknown]                                  |      -- |   0.0486 |    6.00
+  17 |    YES | [Unknown]                                  |      -- |   0.0486 |    4.00
+  18 |     NO | [Unknown]                                  |      -- |   0.0494 |    0.00
+  19 |     NO | [Unknown]                                  |      -- |   0.0579 |    0.00
+  20 |     NO | [Unknown]                                  |      -- |   0.0100 |    0.00
+
+IMPRESSIONS (12 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+20:34:09.000 |    2 | 7024A...Women's Lee Bootcut Jeans Size  8P |     $25 |      +0.0s
+20:34:09.000 |    4 | Lee Relaxed Fit Straight Women's size 8... |     $20 |      +0.0s ← batched
+20:34:09.000 |    1 | Womans Brown Jeans                         |     $15 |      +0.0s ← batched
+20:34:09.000 |    3 | Lee Relaxed Fit Straight Leg Women's si... |     $24 |      +0.0s ← batched
+20:34:36.000 |    6 | Lee Relaxed Fit Straight Leg Mid Rise W... |     $20 |     +27.0s ← scrolled
+20:34:36.000 |    5 | Lee Straight Leg Women's size 8P Medium... |     $20 |     +27.0s ← batched
+20:34:36.000 |    7 | Lee Mid Rise Straight Leg Women's size ... |     $20 |     +27.0s ← batched
+20:34:36.000 |    9 | Lee Black Straight Leg Jeans Classic St... |     $14 |     +27.0s ← batched
+20:35:13.000 |   11 | Lee Jeans Women 8 Petite Capri Straight... |     $12 |      +1m4s ← scrolled
+20:35:13.000 |   14 | Lee Women's Jeans Size 8 Petite Classic... |     $25 |      +1m4s ← batched
+20:35:13.000 |   10 | Lee Relaxed Fit Straight Leg Mid Rise W... |     $20 |      +1m4s ← batched
+20:35:13.000 |   13 | Lee Gray Straight Leg Jeans 8P             |     $25 |      +1m4s ← batched
+
+CLICKS (2 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+20:34:42.000 |    5 | Lee Straight Leg Women's size 8P Medium... |     $20 |          +33.0s
+20:35:16.000 |   14 | Lee Women's Jeans Size 8 Petite Classic... |     $25 |           +1m7s
+
+SUMMARY:
+  - Total bids: 20
+  - Winners (shown): 17
+  - Impressions: 12
+  - Clicks: 2
+  - Session duration: 64.0 seconds
+  - Scroll pattern: MIXED (25% of impressions have unique timestamps)
+
+
+[9/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697ff6e648e7ea38c04b153860beb4a
+--------------------------------------------------------------------------------
+Placement: 1 (Homepage/Search)
+User: ext1:838cdaba-46c3-4299-bd78-c1a7fc041a73
+Auction Created: 2026-02-02 00:59:18.303000
+
+AUCTION RESULTS (35 bids, 25 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Hey Dude Womens Sneakers                   |     $30 |   0.0766 |    3.00
+   2 |    YES | Hey Dude Women's Karina breeze sneakers    |     $25 |   0.0188 |    7.00
+   3 |    YES | COPY - Hey Dude Cincinnati                 |     $64 |   0.0380 |    3.00
+   4 |    YES | Hey Dude Casual Shoes                      |     $60 |   0.0376 |    3.00
+   5 |    YES | COPY - Hey Dude Electric Pink              |     $52 |   0.0290 |    3.00
+   6 |    YES | Hey Dude Chambray White Slip-On Shoes      |     $10 |   0.0447 |    2.00
+   7 |    YES | Hey Dude Wally Toddler Fun Mono Black C... |     $29 |   0.0210 |    4.00
+   8 |    YES | Hey Dude Wendy Disco Sequin Shoes -Silver  |     $65 |   0.0169 |    4.00
+   9 |    YES | [Unknown]                                  |      -- |   0.0336 |    2.00
+  10 |    YES | [Unknown]                                  |      -- |   0.0324 |    2.00
+  11 |    YES | [Unknown]                                  |      -- |   0.0125 |    5.00
+  12 |    YES | [Unknown]                                  |      -- |   0.0153 |    4.00
+  13 |    YES | Hey Dude Aurora White shoes, size 7.       |     $27 |   0.0119 |    5.00
+  14 |    YES | [Unknown]                                  |      -- |   0.0116 |    5.00
+  15 |    YES | [Unknown]                                  |      -- |   0.0192 |    3.00
+  16 |    YES | [Unknown]                                  |      -- |   0.0191 |    3.00
+  17 |    YES | [Unknown]                                  |      -- |   0.0191 |    3.00
+  18 |    YES | [Unknown]                                  |      -- |   0.0184 |    3.00
+  19 |    YES | [Unknown]                                  |      -- |   0.0099 |    5.00
+  20 |    YES | [Unknown]                                  |      -- |   0.0245 |    2.00
+  21 |    YES | [Unknown]                                  |      -- |   0.0116 |    4.00
+  22 |    YES | [Unknown]                                  |      -- |   0.0152 |    3.00
+  23 |    YES | [Unknown]                                  |      -- |   0.0111 |    4.00
+  24 |    YES | [Unknown]                                  |      -- |   0.0082 |    5.00
+  25 |    YES | [Unknown]                                  |      -- |   0.0204 |    2.00
+  26 |     NO | [Unknown]                                  |      -- |   0.0525 |    0.00
+  27 |     NO | [Unknown]                                  |      -- |   0.0430 |    0.00
+  28 |     NO | [Unknown]                                  |      -- |   0.0423 |    0.00
+  29 |     NO | [Unknown]                                  |      -- |   0.0571 |    0.00
+  30 |     NO | [Unknown]                                  |      -- |   0.0100 |    0.00
+  31 |     NO | Hey Dudes Black Sirocco Active Sneakers    |     $50 |   0.0323 |    0.00
+  32 |     NO | [Unknown]                                  |      -- |   0.0443 |    0.00
+  33 |     NO | [Unknown]                                  |      -- |   0.0310 |    0.00
+  34 |     NO | [Unknown]                                  |      -- |   0.0396 |    0.00
+  35 |     NO | [Unknown]                                  |      -- |   0.0394 |    0.00
+
+IMPRESSIONS (8 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+00:59:19.000 |    1 | Hey Dude Womens Sneakers                   |     $30 |      +0.0s
+00:59:19.000 |    2 | Hey Dude Women's Karina breeze sneakers    |     $25 |      +0.0s ← batched
+00:59:25.000 |    3 | COPY - Hey Dude Cincinnati                 |     $64 |      +6.0s ← scrolled
+00:59:25.000 |    4 | Hey Dude Casual Shoes                      |     $60 |      +6.0s ← batched
+00:59:50.000 |    5 | COPY - Hey Dude Electric Pink              |     $52 |     +31.0s ← scrolled
+00:59:50.000 |    6 | Hey Dude Chambray White Slip-On Shoes      |     $10 |     +31.0s ← batched
+00:59:58.000 |    8 | Hey Dude Wendy Disco Sequin Shoes -Silver  |     $65 |     +39.0s ← scrolled
+00:59:58.000 |    7 | Hey Dude Wally Toddler Fun Mono Black C... |     $29 |     +39.0s ← batched
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+00:59:58.000 |    7 | Hey Dude Wally Toddler Fun Mono Black C... |     $29 |          +39.0s
+
+SUMMARY:
+  - Total bids: 35
+  - Winners (shown): 25
+  - Impressions: 8
+  - Clicks: 1
+  - Session duration: 39.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+[10/10]
+
+--------------------------------------------------------------------------------
+AUCTION: 0697fb07aa647472a10499bda92a3e0a
+--------------------------------------------------------------------------------
+Placement: 3 (Category/Listing)
+User: ext1:09454bde-7f4c-4941-ac84-086b65ef8b08
+Auction Created: 2026-02-01 19:58:50.690000
+
+AUCTION RESULTS (50 bids, 40 winners, sorted by RANKING):
+Rank | Winner | Product Name                               |   Price |  Quality |     Bid
+-----+--------+--------------------------------------------+---------+----------+--------
+   1 |    YES | Apple iPhone s black untested              |     $30 |   0.1036 |   13.00
+   2 |    YES | Apple iPhone 11 Pro Max Black              |    $285 |   0.1296 |    4.00
+   3 |    YES | Apple iPhone XR in Bright Yellow           |    $125 |   0.0615 |    7.00
+   4 |    YES | Apple iPhone 11 Pro - Space Gray           |    $390 |   0.0440 |    8.00
+   5 |    YES | Apple iPhone in Elegant Silver             |    $295 |   0.0822 |    4.00
+   6 |    YES | Apple iPhone XS Max-Gold 512GB Carrier ... |    $240 |   0.0109 |   25.00
+   7 |    YES | Apple iPhone Box                           |     $20 |   0.0313 |    7.00
+   8 |    YES | Apple🍎iPhone 11 Pro Leather Folio - Black🍎 |     $65 |   0.0190 |   11.00
+   9 |    YES | Apple Iphone 5 (A1429)                     |    $100 |   0.0618 |    3.00
+  10 |    YES | Apple iPhone 16 Smartphone Box in White... |     $25 |   0.0281 |    6.00
+  11 |    YES | Apple iPhone 14 Pro Black Silicone Case    |     $20 |   0.0401 |    4.00
+  12 |    YES | Apple iPhone 16 - Refurbished with used... |    $850 |   0.0320 |    5.00
+  13 |    YES | [Unknown]                                  |      -- |   0.0122 |   11.00
+  14 |    YES | Apple iPhone XS case                       |     $12 |   0.0413 |    3.00
+  15 |    YES | Apple iPhone 12 Pro Max Transparent Case   |     $20 |   0.0065 |   18.00
+  16 |    YES | Apple iPhone 15 Pro , natural titanium,... |    $800 |   0.0548 |    2.00
+  17 |    YES | Apple iPhone 12 Pro 128GB Pacific Blue ... |    $300 |   0.0136 |    8.00
+  18 |    YES | [Unknown]                                  |      -- |   0.0117 |    9.00
+  19 |    YES | Apple iPhone Xs Max Leather Case in Black  |     $29 |   0.0251 |    4.00
+  20 |    YES | Apple Iphone 6s Phone Case                 |     $10 |   0.0159 |    6.00
+  21 |    YES | [Unknown]                                  |      -- |   0.0155 |    6.00
+  22 |    YES | [Unknown]                                  |      -- |   0.0277 |    3.00
+  23 |    YES | [Unknown]                                  |      -- |   0.0202 |    4.00
+  24 |    YES | [Unknown]                                  |      -- |   0.0087 |    9.00
+  25 |    YES | [Unknown]                                  |      -- |   0.0077 |   10.00
+  26 |    YES | [Unknown]                                  |      -- |   0.0125 |    6.00
+  27 |    YES | [Unknown]                                  |      -- |   0.0246 |    3.00
+  28 |    YES | [Unknown]                                  |      -- |   0.0178 |    4.00
+  29 |    YES | [Unknown]                                  |      -- |   0.0236 |    3.00
+  30 |    YES | [Unknown]                                  |      -- |   0.0349 |    2.00
+  31 |    YES | Apple iPhone 11 Pro Navy Case              |     $18 |   0.0174 |    4.00
+  32 |    YES | ‼️APPLE IPHONE 6 (64 GB) - UNLOCKED‼️      |    $199 |   0.0138 |    5.00
+  33 |    YES | [Unknown]                                  |      -- |   0.0113 |    6.00
+  34 |    YES | [Unknown]                                  |      -- |   0.0084 |    8.00
+  35 |    YES | [Unknown]                                  |      -- |   0.0067 |   10.00
+  36 |    YES | Apple iPhone 17 Pro Max Techwoven Case     |     $30 |   0.0221 |    3.00
+  37 |    YES | Apple iPhone 7 Plus 32GB Black BOX ONLY... |     $17 |   0.0161 |    4.00
+  38 |    YES | [Unknown]                                  |      -- |   0.0123 |    5.00
+  39 |    YES | [Unknown]                                  |      -- |   0.0085 |    7.00
+  40 |    YES | Apple iPhone 11 Pro Max Case - Sky Blue    |     $10 |   0.0098 |    6.00
+  41 |     NO | [Unknown]                                  |      -- |   0.0294 |    2.00
+  42 |     NO | [Unknown]                                  |      -- |   0.0195 |    3.00
+  43 |     NO | [Unknown]                                  |      -- |   0.0291 |    2.00
+  44 |     NO | [Unknown]                                  |      -- |   0.0070 |    8.00
+  45 |     NO | [Unknown]                                  |      -- |   0.0271 |    2.00
+  46 |     NO | [Unknown]                                  |      -- |   0.0265 |    2.00
+  47 |     NO | [Unknown]                                  |      -- |   0.0265 |    2.00
+  48 |     NO | [Unknown]                                  |      -- |   0.0263 |    2.00
+  49 |     NO | [Unknown]                                  |      -- |   0.0263 |    2.00
+  50 |     NO | [Unknown]                                  |      -- |   0.0171 |    3.00
+
+IMPRESSIONS (2 total, chronological - shows scroll behavior):
+        Time | Rank | Product Name                               |   Price |        +Δt
+-------------+------+--------------------------------------------+---------+-----------
+19:58:52.000 |    2 | Apple iPhone 11 Pro Max Black              |    $285 |      +0.0s
+19:58:52.000 |    1 | Apple iPhone s black untested              |     $30 |      +0.0s ← batched
+
+CLICKS (1 total, chronological):
+        Time | Rank | Product Name                               |   Price | Since First Imp
+-------------+------+--------------------------------------------+---------+----------------
+19:59:00.000 |    1 | Apple iPhone s black untested              |     $30 |           +8.0s
+
+SUMMARY:
+  - Total bids: 50
+  - Winners (shown): 40
+  - Impressions: 2
+  - Clicks: 1
+  - Session duration: 0.0 seconds
+  - Scroll pattern: MIXED (50% of impressions have unique timestamps)
+
+
+================================================================================
+AGGREGATE STATISTICS
+================================================================================
+
+Scroll pattern distribution (sample of clicked auctions):
+  MIXED: 785 (78.5%)
+  SEQUENTIAL: 185 (18.5%)
+  SINGLE: 23 (2.3%)
+  BATCHED: 7 (0.7%)
+
+Click rate by ranking (all data):
+Rank |  Impressions |   Clicks |      CTR
+-----+--------------+----------+---------
+   1 |       24,660 |      723 |    2.93%
+   2 |       24,270 |      649 |    2.67%
+   3 |       13,548 |      385 |    2.84%
+   4 |       13,092 |      412 |    3.15%
+   5 |        9,693 |      317 |    3.27%
+   6 |        9,406 |      263 |    2.80%
+   7 |        8,562 |      239 |    2.79%
+   8 |        8,442 |      233 |    2.76%
+   9 |        6,753 |      199 |    2.95%
+  10 |        6,857 |      185 |    2.70%
+  11 |        6,440 |      182 |    2.83%
+  12 |        6,506 |      200 |    3.07%
+  13 |        6,006 |      195 |    3.25%
+  14 |        5,957 |      167 |    2.80%
+  15 |        5,573 |      146 |    2.62%
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/iv-analysis/results/12_session_raw_logs.txt

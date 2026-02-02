@@ -1,5 +1,68 @@
 # Ad-platform Incrementality Analysis
 
+## Notebook vs Script Convention
+
+- **Notebooks (.ipynb)**: Data pull ONLY. No analysis code.
+- **Scripts (.py)**: All analysis code. One .py creates one .txt output.
+- Run .py scripts via CLI, not in notebooks.
+- EDA: Single comprehensive file, all tables printed to stdout, no opinions.
+- Output: Raw dump of all data processing, models, results. No interpretation.
+
+## Snowflake Data Pull Pattern
+
+When pulling data from Snowflake, always use CTE-based deterministic user sampling. Each query must include the CTE so the same users are sampled consistently across all tables.
+
+```python
+# CONFIG
+SAMPLE_FRACTION = 0.01  # 1% of users
+TOTAL_BUCKETS = 10000
+SELECTION_THRESHOLD = int(TOTAL_BUCKETS * SAMPLE_FRACTION)
+
+# CTE - include in EVERY query
+CTE_SQL = f"""
+WITH SAMPLED_USERS AS (
+    SELECT OPAQUE_USER_ID FROM (
+        SELECT OPAQUE_USER_ID, MOD(ABS(HASH(OPAQUE_USER_ID)), {TOTAL_BUCKETS}) AS bucket
+        FROM (SELECT DISTINCT OPAQUE_USER_ID FROM AUCTIONS_USERS
+              WHERE CREATED_AT BETWEEN '{start_date}' AND '{end_date}')
+    ) WHERE bucket < {SELECTION_THRESHOLD}
+)
+"""
+
+# Each query joins to SAMPLED_USERS
+auctions_users = pd.read_sql(CTE_SQL + """
+SELECT ... FROM AUCTIONS_USERS au
+JOIN SAMPLED_USERS s ON au.OPAQUE_USER_ID = s.OPAQUE_USER_ID
+WHERE ...
+""", conn)
+
+auctions_results = pd.read_sql(CTE_SQL + """
+SELECT ... FROM AUCTIONS_RESULTS ar
+JOIN AUCTIONS_USERS au ON ar.AUCTION_ID = au.AUCTION_ID
+JOIN SAMPLED_USERS s ON au.OPAQUE_USER_ID = s.OPAQUE_USER_ID
+WHERE ...
+""", conn)
+
+impressions = pd.read_sql(CTE_SQL + """
+SELECT ... FROM IMPRESSIONS i
+JOIN SAMPLED_USERS s ON i.USER_ID = s.OPAQUE_USER_ID
+WHERE ...
+""", conn)
+
+clicks = pd.read_sql(CTE_SQL + """
+SELECT ... FROM CLICKS c
+JOIN SAMPLED_USERS s ON c.USER_ID = s.OPAQUE_USER_ID
+WHERE ...
+""", conn)
+```
+
+Key points:
+- CTE is included in each query (not stored as temp table)
+- Hash-based sampling is deterministic (same users every time)
+- AUCTIONS_RESULTS joins via AUCTIONS_USERS to get user filter
+- IMPRESSIONS and CLICKS join directly on USER_ID = OPAQUE_USER_ID
+- Adjust SAMPLE_FRACTION to control data volume (0.01 = 1%, 0.001 = 0.1%)
+
 ## Guidelines
 
 Claude prompt: 
@@ -20,6 +83,7 @@ Claude prompt:
 - When doing Statistical Model analysis: highlight unit of analysis, model equation, indep and indep vars why this equation? what is the purpose? interpretatino of coefficients? what is error expected to capture?
 - Always give a TLDR in paragraph form when done with a task. In full sentences, like an adult senior economist / data scientist: the context, what you tried, what you found, issues encountered, takeaways.
 - No shorthand anywhere in slides or writing. Explain properly with full words (e.g., "Clicks" not "C", "Spend" not "Y").
+- Always show full file paths when reporting outputs or results (e.g., "Output saved to: /path/to/file.txt").
 
 ## Data Dictionary
 

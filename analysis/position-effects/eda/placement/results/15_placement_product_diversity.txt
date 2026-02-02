@@ -1,0 +1,574 @@
+================================================================================
+PLACEMENT PRODUCT DIVERSITY ANALYSIS
+================================================================================
+
+Purpose: Validate placement-to-page mapping by analyzing product diversity
+         within auctions for each placement.
+
+Expected patterns:
+  P3 (Search): HIGH diversity - users search for anything
+  P5 (Brand Page): LOW brand diversity - single brand per page
+  P2 (PDP): SIMILAR categories - related product recommendations
+  P1 (Homepage): MODERATE diversity - personalized mix
+
+Data source: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/0_data/round1
+Output: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/eda/placement/results/15_placement_product_diversity.txt
+
+================================================================================
+SECTION 1: DATA LOADING
+================================================================================
+
+Loading auctions_users_all.parquet...
+  Shape: (78318, 4)
+  Columns: ['AUCTION_ID', 'USER_ID', 'PLACEMENT', 'CREATED_AT']
+
+Loading auctions_results_all.parquet...
+  Shape: (3748381, 12)
+  Columns: ['AUCTION_ID', 'VENDOR_ID', 'CAMPAIGN_ID', 'PRODUCT_ID', 'RANKING', 'IS_WINNER', 'FINAL_BID', 'QUALITY', 'CONVERSION_RATE', 'PACING', 'PRICE', 'CREATED_AT']
+
+Loading catalog_all.parquet...
+  Shape: (1039783, 7)
+  Columns: ['PRODUCT_ID', 'NAME', 'CATALOG_PRICE', 'ACTIVE', 'IS_DELETED', 'CATEGORIES', 'DESCRIPTION']
+
+Placement distribution in auctions:
+  P1: 14,543 auctions (18.6%)
+  P2: 8,325 auctions (10.6%)
+  P3: 46,844 auctions (59.8%)
+  P5: 8,606 auctions (11.0%)
+
+================================================================================
+SECTION 2: PARSE CATALOG CATEGORIES
+================================================================================
+
+Parsing CATEGORIES field for all catalog products...
+  Catalog lookup built: 1,039,783 products
+  Products with brand: 943,098 (90.7%)
+  Products with department: 1,039,783 (100.0%)
+  Products with category: 1,039,783 (100.0%)
+
+================================================================================
+SECTION 3: MERGE AUCTIONS WITH PLACEMENT
+================================================================================
+
+Grouping products by auction...
+  Auctions with products: 78,256
+  Auctions after merge: 78,256
+  P1: 14,543 -> 14,510 (99.8% coverage)
+  P2: 8,325 -> 8,304 (99.7% coverage)
+  P3: 46,844 -> 46,838 (100.0% coverage)
+  P5: 8,606 -> 8,604 (100.0% coverage)
+
+================================================================================
+SECTION 4: COMPUTE DIVERSITY METRICS PER AUCTION
+================================================================================
+
+Computing diversity metrics for each auction...
+  Computed metrics for 78,256 auctions
+
+================================================================================
+SECTION 5: DIVERSITY BY PLACEMENT
+================================================================================
+
+Unit of analysis: AUCTION
+Metrics computed for products competing in each auction.
+
+
+--- Placement 1 (n=14,510 auctions) ---
+
+Products per auction:
+  Mean: 38.2
+  Median: 44.0
+  Min: 1
+  Max: 58
+  Std: 16.4
+
+Brand diversity within auction:
+  Unique brands (mean): 11.37
+  Unique brands (median): 1.0
+  Single-brand auctions: 7,682 (52.9%)
+  Brand data coverage: 91.7%
+  Brand Gini (mean): 0.121
+  Brand Gini (median): 0.000
+  (Gini: 0=equal distribution, 1=one brand dominates)
+
+Department diversity within auction:
+  Unique departments (mean): 1.99
+  Unique departments (median): 2.0
+
+Category diversity within auction:
+  Unique categories (mean): 5.17
+  Unique categories (median): 3.0
+
+--- Placement 2 (n=8,304 auctions) ---
+
+Products per auction:
+  Mean: 46.1
+  Median: 41.0
+  Min: 1
+  Max: 74
+  Std: 21.2
+
+Brand diversity within auction:
+  Unique brands (mean): 1.01
+  Unique brands (median): 1.0
+  Single-brand auctions: 8,238 (99.2%)
+  Brand data coverage: 98.8%
+  Brand Gini (mean): 0.004
+  Brand Gini (median): 0.000
+  (Gini: 0=equal distribution, 1=one brand dominates)
+
+Department diversity within auction:
+  Unique departments (mean): 1.57
+  Unique departments (median): 1.0
+
+Category diversity within auction:
+  Unique categories (mean): 7.05
+  Unique categories (median): 9.0
+
+--- Placement 3 (n=46,838 auctions) ---
+
+Products per auction:
+  Mean: 49.5
+  Median: 50.0
+  Min: 30
+  Max: 58
+  Std: 5.5
+
+Brand diversity within auction:
+  Unique brands (mean): 18.14
+  Unique brands (median): 17.0
+  Single-brand auctions: 3,859 (8.2%)
+  Brand data coverage: 90.9%
+  Brand Gini (mean): 0.385
+  Brand Gini (median): 0.400
+  (Gini: 0=equal distribution, 1=one brand dominates)
+
+Department diversity within auction:
+  Unique departments (mean): 1.01
+  Unique departments (median): 1.0
+
+Category diversity within auction:
+  Unique categories (mean): 1.01
+  Unique categories (median): 1.0
+
+--- Placement 5 (n=8,604 auctions) ---
+
+Products per auction:
+  Mean: 57.4
+  Median: 58.0
+  Min: 1
+  Max: 58
+  Std: 4.6
+
+Brand diversity within auction:
+  Unique brands (mean): 45.53
+  Unique brands (median): 47.0
+  Single-brand auctions: 78 (0.9%)
+  Brand data coverage: 93.2%
+  Brand Gini (mean): 0.127
+  Brand Gini (median): 0.106
+  (Gini: 0=equal distribution, 1=one brand dominates)
+
+Department diversity within auction:
+  Unique departments (mean): 1.00
+  Unique departments (median): 1.0
+
+Category diversity within auction:
+  Unique categories (mean): 12.02
+  Unique categories (median): 13.0
+
+================================================================================
+SECTION 6: COMPARATIVE SUMMARY TABLE
+================================================================================
+
+| Placement | N       | Prods | Brands | Single-Brand | Depts | Cats  | Brand Gini |
+|-----------|---------|-------|--------|--------------|-------|-------|------------|
+| P1        | 14,510  | 38.2  | 11.37  | 52.9%        | 1.99  | 5.17  | 0.121      |
+| P2        | 8,304   | 46.1  | 1.01   | 99.2%        | 1.57  | 7.05  | 0.004      |
+| P3        | 46,838  | 49.5  | 18.14  | 8.2%         | 1.01  | 1.01  | 0.385      |
+| P5        | 8,604   | 57.4  | 45.53  | 0.9%         | 1.00  | 12.02 | 0.127      |
+
+================================================================================
+SECTION 7: BRAND DISTRIBUTION BY PLACEMENT
+================================================================================
+
+What brands appear in each placement?
+
+
+--- Placement 1 Top 20 Brands ---
+  Total products: 554,829
+  Products with brand: 505,744 (91.2%)
+  Unique brands: 25,498
+  Brand concentration (Gini): 0.890
+
+  Top 20 brands:
+     1. nike: 13,770 (2.7%)
+     2. lululemon athletica: 11,708 (2.3%)
+     3. coach: 9,983 (2.0%)
+     4. zara: 7,005 (1.4%)
+     5. free people: 6,551 (1.3%)
+     6. tiffany & co.: 5,919 (1.2%)
+     7. j. crew: 4,709 (0.9%)
+     8. adidas: 4,248 (0.8%)
+     9. levi's: 4,114 (0.8%)
+    10. the north face: 4,096 (0.8%)
+    11. gucci: 4,035 (0.8%)
+    12. anthropologie: 3,676 (0.7%)
+    13. patagonia: 3,557 (0.7%)
+    14. disney: 3,462 (0.7%)
+    15. louis vuitton: 3,448 (0.7%)
+    16. athleta: 3,183 (0.6%)
+    17. ugg: 3,121 (0.6%)
+    18. michael kors: 2,870 (0.6%)
+    19. skims: 2,758 (0.5%)
+    20. victoria's secret: 2,635 (0.5%)
+
+--- Placement 2 Top 20 Brands ---
+  Total products: 382,811
+  Products with brand: 380,418 (99.4%)
+  Unique brands: 1,371
+  Brand concentration (Gini): 0.793
+
+  Top 20 brands:
+     1. meet the posher: 103,675 (27.3%)
+     2. coach: 5,854 (1.5%)
+     3. free people: 5,617 (1.5%)
+     4. nike: 5,264 (1.4%)
+     5. lululemon athletica: 4,855 (1.3%)
+     6. louis vuitton: 4,541 (1.2%)
+     7. chanel: 3,592 (0.9%)
+     8. patagonia: 3,395 (0.9%)
+     9. j. crew: 3,010 (0.8%)
+    10. torrid: 2,899 (0.8%)
+    11. juicy couture: 2,766 (0.7%)
+    12. alo yoga: 2,681 (0.7%)
+    13. gucci: 2,675 (0.7%)
+    14. abercrombie & fitch: 2,575 (0.7%)
+    15. polo ralph lauren: 2,458 (0.6%)
+    16. madewell: 2,162 (0.6%)
+    17. the north face: 2,158 (0.6%)
+    18. adidas: 2,145 (0.6%)
+    19. sezane: 2,125 (0.6%)
+    20. dior: 2,053 (0.5%)
+
+--- Placement 3 Top 20 Brands ---
+  Total products: 2,317,124
+  Products with brand: 2,105,722 (90.9%)
+  Unique brands: 52,993
+  Brand concentration (Gini): 0.918
+
+  Top 20 brands:
+     1. nike: 48,871 (2.3%)
+     2. lululemon athletica: 46,483 (2.2%)
+     3. coach: 44,176 (2.1%)
+     4. free people: 30,542 (1.5%)
+     5. tory burch: 23,159 (1.1%)
+     6. the north face: 22,370 (1.1%)
+     7. louis vuitton: 21,704 (1.0%)
+     8. j. crew: 21,532 (1.0%)
+     9. kate spade: 20,357 (1.0%)
+    10. zara: 19,702 (0.9%)
+    11. michael kors: 19,336 (0.9%)
+    12. gucci: 18,180 (0.9%)
+    13. adidas: 17,752 (0.8%)
+    14. anthropologie: 15,451 (0.7%)
+    15. madewell: 14,686 (0.7%)
+    16. ugg: 14,132 (0.7%)
+    17. levi's: 13,572 (0.6%)
+    18. polo ralph lauren: 13,270 (0.6%)
+    19. disney: 11,675 (0.6%)
+    20. banana republic: 11,355 (0.5%)
+
+--- Placement 5 Top 20 Brands ---
+  Total products: 493,617
+  Products with brand: 459,948 (93.2%)
+  Unique brands: 5,287
+  Brand concentration (Gini): 0.847
+
+  Top 20 brands:
+     1. levi's: 8,761 (1.9%)
+     2. universal thread: 6,779 (1.5%)
+     3. lululemon athletica: 6,568 (1.4%)
+     4. nike: 6,414 (1.4%)
+     5. american eagle outfitters: 4,878 (1.1%)
+     6. athleta: 4,725 (1.0%)
+     7. old navy: 4,387 (1.0%)
+     8. free people: 3,882 (0.8%)
+     9. no brand: 3,857 (0.8%)
+    10. j. crew: 3,532 (0.8%)
+    11. vintage: 3,521 (0.8%)
+    12. anthropologie: 3,497 (0.8%)
+    13. banana republic: 3,456 (0.8%)
+    14. madewell: 3,309 (0.7%)
+    15. lucky brand: 3,165 (0.7%)
+    16. talbots: 3,114 (0.7%)
+    17. kate spade: 2,956 (0.6%)
+    18. a new day: 2,820 (0.6%)
+    19. loft: 2,737 (0.6%)
+    20. miss me: 2,504 (0.5%)
+
+================================================================================
+SECTION 8: CATEGORY DISTRIBUTION BY PLACEMENT
+================================================================================
+
+What departments appear in each placement?
+
+
+--- Placement 1 Departments ---
+  Total products: 554,829
+  Products with department: 554,006 (99.9%)
+  Unique departments: 6
+  Department concentration (Gini): 0.660
+
+  Top 10 departments:
+     1. 000e8975d97b4e80ef00a955: 383,220 (69.2%)
+     2. 01008c10d97b4e1245005764: 92,756 (16.7%)
+     3. 20008c10d97b4e1245005764: 43,947 (7.9%)
+     4. 5b3b13d30640fd0aeb9c5cb6: 29,885 (5.4%)
+     5. 583c7d134024035188906153: 3,659 (0.7%)
+     6. af08bf904024037d7a7b5fad: 539 (0.1%)
+
+--- Placement 2 Departments ---
+  Total products: 382,811
+  Products with department: 380,435 (99.4%)
+  Unique departments: 6
+  Department concentration (Gini): 0.761
+
+  Top 10 departments:
+     1. 000e8975d97b4e80ef00a955: 324,701 (85.3%)
+     2. 01008c10d97b4e1245005764: 38,118 (10.0%)
+     3. 20008c10d97b4e1245005764: 8,918 (2.3%)
+     4. 5b3b13d30640fd0aeb9c5cb6: 8,247 (2.2%)
+     5. 583c7d134024035188906153: 378 (0.1%)
+     6. af08bf904024037d7a7b5fad: 73 (0.0%)
+
+--- Placement 3 Departments ---
+  Total products: 2,317,124
+  Products with department: 2,313,852 (99.9%)
+  Unique departments: 6
+  Department concentration (Gini): 0.722
+
+  Top 10 departments:
+     1. 000e8975d97b4e80ef00a955: 1,869,654 (80.8%)
+     2. 01008c10d97b4e1245005764: 242,320 (10.5%)
+     3. 20008c10d97b4e1245005764: 96,150 (4.2%)
+     4. 5b3b13d30640fd0aeb9c5cb6: 88,492 (3.8%)
+     5. 583c7d134024035188906153: 15,299 (0.7%)
+     6. af08bf904024037d7a7b5fad: 1,937 (0.1%)
+
+--- Placement 5 Departments ---
+  Total products: 493,617
+  Products with department: 493,576 (100.0%)
+  Unique departments: 6
+  Department concentration (Gini): 0.827
+
+  Top 10 departments:
+     1. 000e8975d97b4e80ef00a955: 488,784 (99.0%)
+     2. 01008c10d97b4e1245005764: 2,555 (0.5%)
+     3. 5b3b13d30640fd0aeb9c5cb6: 866 (0.2%)
+     4. 20008c10d97b4e1245005764: 613 (0.1%)
+     5. 583c7d134024035188906153: 400 (0.1%)
+     6. af08bf904024037d7a7b5fad: 358 (0.1%)
+
+================================================================================
+SECTION 9: SAMPLE PRODUCTS BY PLACEMENT
+================================================================================
+
+10 random product names from each placement for visual inspection.
+
+
+--- Placement 1 Sample Products ---
+   1. [None] COWBOY WAY METAL STREET SIGN
+   2. [alo yoga] Alo Bra Top
+   3. [None] Vintage Austrian Leaf Clip-On Earrings with Amber Swarovski Crystals
+   4. [aldo] Aldo Tan and Cream Crossbody Bag
+   5. [nike] Nike Gray and Green Seahawks Jersey
+   6. [kate spade] ♠️Kate Spade Black Packable Down Jacket - NWT♠️
+   7. [helsi] NWT - HELSI “Greta” Puff Sleeve Black Fringe Midi Dress with Gold Accents
+   8. [moncler] Moncler coat
+   9. [hamilton] Vintage 1935 Hamilton Watch Accuracy Saves Eight Lives Ad Advertisement
+  10. [alfred angelo] Alfred Angelo Wedding gown
+
+--- Placement 2 Sample Products ---
+   1. [meet the posher] Coconut says Hi! I'm Laura!  Thanks for stopping by!
+   2. [kay jewelers] Elegant sterling silver Silver Inlay Love Claw Heart Ring Size 7 &9
+   3. [roundtree & yorke] Roundtree & Yorke Men’s Blue Button-Down Shirt Long Sleeve 2XL Casual
+   4. [ralph lauren] Lauren Ralph Lauren Navy Midi Dress: rib-knit with breathable stretch SZ XS
+   5. [danskin] Danskin Women’s Sports Bra Size M‎ 8-10
+   6. [chanel] CHANEL Black Pearl Authentic Upcycled Heart Charm Bow Bag Charm Keychain
+   7. [meet the posher] Meet your Posher, Liz
+   8. [levi's] Levis 514 Jeans Mens 36x32 Black Stretch Straight Leg Denim Low Rise 5 Pocket
+   9. [coach] Authentic Coach Floral Cosmetic Bag
+  10. [meet the posher] Meet your Posher, T
+
+--- Placement 3 Sample Products ---
+   1. [None] Black long sleeve for girls
+   2. [calvin klein] Calvin Klein Lavender Sneakers
+   3. [None] Vintage 1980's Shiny Gold Tone Braided Necklace Flat Chain Wide Elegant Mesh 23"
+   4. [flag & anthem] Classic Navy Striped Button-Down Shirt
+   5. [flax] Flax V neck pullover 100% linen
+   6. [None] Lace bathing suit coverup off white M
+   7. [thursday boot co.] Thursday Boot Co Mens Brown Executive Handcrafted Leather Dress Shoes
+   8. [kayali] Kayali Eden Juicy Apple Eau de Parfum 10 ml Sealed
+   9. [michael kors] Michael Kors Brown Heels with Gold Accents
+  10. [alpine design] Alpine Design Women's Blaze Chelsea Boots Ivory Color AD23WCW006-IVY - NEW - 9
+
+--- Placement 5 Sample Products ---
+   1. [motf] MOTF FLORAL FLOCKING Velvet Long Sleeve Dress in Deep Burgundy  M
+   2. [juicy couture] Juicy Couture Brown Velour Tracksuit
+   3. [giorgio armani] Giorgio Armani Italy Black Sleeveless Maxi Sheath Dress Size 46 US 8/10
+   4. [eleven by venus williams] NWT SIZE XS/L/XL EleVen by Venus Williams White Sleeveless Relaxed Tank
+   5. [ag adriano goldschmied] AG Adriano Goldschmied The Stevie Slim Straight Jeans Distressed 29R 7.75” rise
+   6. [universal thread] Universal Thread - Women's Mid-Rise 80's Slim Straight Ankle Jeans -  Light Wash
+   7. [unbranded] Unbranded Skirt Women 24W Plus Black A-Line Midi Zipper Mid Rise Classic Fit
+   8. [liztech] Signed Liztech Oak Leaf Brooch w Acorn
+   9. [susan lawrence] Susan Lawrence Red and Black Patterned Blouse
+  10. [wild fable] Wild Fable - Women's Pullover Sweater - Wild Fable Floral XS Blue
+
+================================================================================
+SECTION 10: WITHIN-AUCTION BRAND HOMOGENEITY
+================================================================================
+
+Key test: If P5 is Brand Page, auctions should show SAME brand.
+If P3 is Search, auctions should show DIVERSE brands.
+
+Distribution of unique brands per auction:
+
+| Placement | 0 brands | 1 brand | 2-5 brands | 6-10 brands | >10 brands |
+|-----------|----------|---------|------------|-------------|------------|
+| P1        |    0.1%  |  52.9%  |      4.4%   |       6.1%   |     36.5%   |
+| P2        |    0.1%  |  99.2%  |      0.7%   |       0.0%   |      0.0%   |
+| P3        |    0.0%  |   8.2%  |     18.1%   |      10.7%   |     63.0%   |
+| P5        |    0.0%  |   0.9%  |      0.4%   |       0.2%   |     98.6%   |
+
+================================================================================
+SECTION 11: INTERPRETATION & VALIDATION
+================================================================================
+
+EXPECTED vs OBSERVED:
+
+P3 (Search Results) - Expected: HIGH diversity
+  Observed: 18.14 brands/auction, 8.2% single-brand
+  VALIDATION: UNEXPECTED - P3 does NOT have highest diversity
+
+P5 (Brand Page) - Expected: LOW brand diversity / HIGH single-brand rate
+  Observed: 45.53 brands/auction, 0.9% single-brand
+  VALIDATION: UNEXPECTED - P5 does NOT show brand homogeneity
+
+P2 (PDP Ad Section) - Expected: MODERATE diversity (related products)
+  Observed: 1.01 brands/auction, 99.2% single-brand
+  (PDP shows related items which may cross brands)
+
+P1 (Homepage/Feed) - Expected: MODERATE diversity (personalized mix)
+  Observed: 11.37 brands/auction, 52.9% single-brand
+
+BRAND DIVERSITY RANKING (most diverse first):
+  1. P5: 45.53 brands/auction
+  2. P3: 18.14 brands/auction
+  3. P1: 11.37 brands/auction
+  4. P2: 1.01 brands/auction
+
+SINGLE-BRAND RATE RANKING (most homogeneous first):
+  1. P2: 99.2% single-brand auctions
+  2. P1: 52.9% single-brand auctions
+  3. P3: 8.2% single-brand auctions
+  4. P5: 0.9% single-brand auctions
+
+================================================================================
+SECTION 12: REVISED INTERPRETATION
+================================================================================
+
+CRITICAL INSIGHT:
+
+The original hypothesis (P5 = Brand Page, P2 = PDP) is INCONSISTENT
+with the product diversity data.
+
+OBSERVED PATTERNS:
+
+  P2: 99.2% single-brand auctions, 1.01 brands/auction
+      -> EXTREME brand homogeneity
+      -> Products in auction are almost always from SAME BRAND
+      -> This is the pattern expected for BRAND PAGE, not PDP!
+
+  P5: 0.9% single-brand auctions, 45.53 brands/auction
+      -> HIGHEST brand diversity
+      -> Products in auction from MANY different brands
+      -> This is NOT the pattern for Brand Page
+
+  P3: 8.2% single-brand auctions, 18.14 brands/auction
+      -> Moderate-high diversity
+      -> Consistent with Search (users search for various items)
+
+  P1: 52.9% single-brand auctions, 11.37 brands/auction
+      -> Mixed pattern (some single-brand, some diverse)
+      -> Could be personalized feed with occasional brand-specific views
+
+REVISED MAPPING HYPOTHESIS:
+
+Based on PRODUCT DIVERSITY (this analysis):
+
+  P2 = BRAND PAGE (or Brand-Specific Recommendations)
+       Evidence: 99.2% single-brand auctions
+       All products competing in auction are from same brand
+       Top brand: 'meet the posher' (27.3%) - closet/seller pages?
+
+  P5 = CATEGORY/BROWSE PAGE (not Brand Page)
+       Evidence: Highest brand diversity (45.53 brands/auction)
+       Only 0.9% single-brand auctions
+       99% department 000e8975d97b4e80ef00a955 (single category)
+       Users browsing a CATEGORY see products from many brands
+
+  P3 = SEARCH RESULTS
+       Evidence: Moderate diversity (18.14 brands/auction)
+       Many unique brands (52,993 total)
+       Consistent with broad search queries
+
+  P1 = HOMEPAGE/FEED (mixed)
+       Evidence: Bimodal pattern (52.9% single-brand, 36.5% >10 brands)
+       Suggests mixture of brand-specific and diverse recommendations
+
+RECONCILIATION WITH CO-FIRING ANALYSIS:
+
+Co-firing analysis (14_cross_placement_cofiring.txt) found:
+  - P2 <-> P5: 3% co-firing (highest pair)
+  - This suggests P2 and P5 are tightly coupled (same user journey)
+
+NEW INTERPRETATION:
+  User flow: Category Page (P5) -> click product -> PDP loads
+             But P2 fires when viewing seller/brand closet
+
+  The high P2<->P5 co-firing may represent:
+  - User browses category (P5 - diverse)
+  - User clicks into seller's closet or brand page (P2 - homogeneous)
+  - The 'meet the posher' brand (27.3% of P2) confirms seller closet view
+
+IMPORTANT NOTE ON 'MEET THE POSHER':
+
+P2's top 'brand' is 'meet the posher' at 27.3%
+This is NOT a clothing brand - it's the Poshmark seller introduction listing
+'Meet your Posher' listings are placeholder profiles sellers create
+
+This strongly suggests P2 = SELLER CLOSET PAGE VIEW
+When users view a seller's closet, they see:
+  - The seller's 'Meet the Posher' intro (if created)
+  - Other items from SAME SELLER (hence single-brand pattern)
+
+================================================================================
+FINAL REVISED MAPPING
+================================================================================
+
+| Placement | Revised Page Type              | Key Evidence                    |
+|-----------|--------------------------------|---------------------------------|
+| P2        | Seller Closet / Brand Page     | 99.2% single-brand, 'meet the posher' |
+| P3        | Search Results                 | 18 brands/auction, diverse products |
+| P5        | Category/Browse Page           | 45 brands/auction, single department |
+| P1        | Homepage/Feed                  | Mixed (52.9% single, 36.5% diverse) |
+
+This mapping better fits the observed product diversity patterns.
+P2's extreme brand homogeneity indicates seller-level or brand-level browsing,
+not generic PDP recommendations which would show related but diverse products.
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/eda/placement/results/15_placement_product_diversity.txt

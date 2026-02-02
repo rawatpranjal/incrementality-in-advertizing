@@ -1,0 +1,259 @@
+================================================================================
+USER BROWSING MODEL (UBM) CLICK MODEL
+================================================================================
+
+MATHEMATICAL FRAMEWORK:
+  P(C_r = 1 | last_click = r') = α_u × γ_{r,r'}
+
+  α_u = attractiveness of product u
+  γ_{r,r'} = P(examine rank r | last click at r')
+  γ_{r,0} = P(examine rank r | no prior click)
+
+KEY DIFFERENCE FROM PBM:
+  - UBM: examination depends on DISTANCE to last click
+  - PBM: examination depends only on absolute position
+
+KEY DIFFERENCE FROM DBN:
+  - UBM: explicit γ_{r,r'} for any prior click position
+  - DBN: binary satisfaction/continuation model
+
+================================================================================
+SECTION 1: DATA LOADING
+----------------------------------------
+
+Loaded session_items: 222,890 rows
+Loaded sessions: 31,501 rows
+
+Session click distribution:
+  0 clicks: 27,268 (86.6%)
+  1 clicks: 3,081 (9.8%)
+  2 clicks: 713 (2.3%)
+  3 clicks: 235 (0.7%)
+  4 clicks: 103 (0.3%)
+  5 clicks: 46 (0.1%)
+
+Multi-click sessions: 1,152 (3.7%)
+  (UBM explicitly models examination after clicks)
+
+================================================================================
+SECTION 2: UBM ESTIMATION VIA EM
+----------------------------------------
+
+Fitting UBM via EM...
+
+EM convergence:
+  Initial LL: -1194.02
+  Final LL: -1046.45
+  Iterations: 50
+  LL improvement: 147.57
+
+Item attractiveness (α_u) statistics:
+  N items: 2,660
+  Mean: 0.0277
+  Std: 0.0782
+  Min: 0.0010
+  Max: 0.6450
+  Median: 0.0010
+
+================================================================================
+SECTION 3: POSITION EFFECTS (NO PRIOR CLICK)
+----------------------------------------
+
+γ_{r,0}: Examination probability with no prior click
+  (Comparable to PBM θ_k)
+
+Position effects comparison:
+  Position   γ_{r,0} (UBM)   θ (Simple)   Diff       Raw CTR   
+  ---------- --------------- ------------ ---------- ----------
+  1          1.0000          1.000        0.000      2.88      
+  2          0.9647          0.949        0.016      2.73      
+  3          0.9178          0.978        -0.061     2.82      
+  4          0.8908          1.037        -0.146     2.99      
+  5          0.8504          1.062        -0.212     3.06      
+  6          0.8500          0.975        -0.125     2.81      
+  7          0.7684          0.994        -0.226     2.87      
+  8          0.8214          0.935        -0.113     2.69      
+  9          0.7670          1.137        -0.370     3.28      
+  10         0.7266          1.040        -0.314     3.00      
+  11         0.6475          0.967        -0.319     2.79      
+  12         0.7357          1.033        -0.297     2.98      
+  13         0.6270          1.005        -0.378     2.90      
+  14         0.6302          0.985        -0.355     2.84      
+  15         0.5147          0.888        -0.374     2.56      
+  16         0.6410          1.000        -0.358     2.88      
+  17         0.6928          0.987        -0.294     2.85      
+  18         0.8775          0.790        0.088      2.28      
+  19         0.6988          0.926        -0.227     2.67      
+  20         0.6841          1.085        -0.401     3.13      
+
+Monotonicity: 13/19 positions (68.4%)
+
+================================================================================
+SECTION 4: EXAMINATION AFTER CLICK (DISTANCE EFFECT)
+----------------------------------------
+
+γ_{r,r'}: Examination probability given last click at r'
+  UBM's key innovation: models 'restart' behavior after clicking
+
+Examination at position 5 given different last clicks:
+  Last click at position 0 (none): γ_(5, 0) = 0.8504
+  Last click at position 1: γ_{5,1} = 0.0848
+  Last click at position 2: γ_{5,2} = 0.4654
+  Last click at position 3: γ_{5,3} = 0.9998
+  Last click at position 4: γ_{5,4} = 0.7615
+
+Examination at position 10 given different last clicks:
+  Last click at position 0 (none): γ_{10,0} = 0.7266
+  Last click at position 1: γ_{10,1} = 0.5500
+  Last click at position 5: γ_{10,5} = 0.0571
+  Last click at position 9: γ_{10,9} = 1.0000
+
+Distance effect: γ_{r, r-d} for position r=10, varying distance d:
+  Distance   γ value     
+  ---------- ------------
+  1          1.0000
+  2          0.3365
+  3          0.0100
+  5          0.0571
+  7          0.6364
+  9          0.5500
+
+================================================================================
+SECTION 5: GAMMA MATRIX SUMMARY
+----------------------------------------
+
+γ_{r,r'} matrix (first 10 positions, r' = 0..5):
+  r'=0 is no prior click, r'=1..5 means last click at position 1..5
+
+  r\r'  0         1         2         3         4         5         
+  ------------------------------------------------------------------
+  1     1.0000    0.1000    0.1000    0.1000    0.1000    0.1000    
+  2     0.9647    1.0000    0.1000    0.1000    0.1000    0.1000    
+  3     0.9178    0.6327    0.9998    0.1000    0.1000    0.1000    
+  4     0.8908    0.9836    0.9997    1.0000    0.1000    0.1000    
+  5     0.8504    0.0848    0.4654    0.9998    0.7615    0.1000    
+  6     0.8500    0.9983    1.0000    1.0000    1.0000    0.3726    
+  7     0.7684    1.0000    0.9996    1.0000    0.5804    0.0146    
+  8     0.8214    0.0252    0.6874    0.7388    0.6706    1.0000    
+  9     0.7670    0.1333    0.4852    0.0100    0.7388    0.0459    
+  10    0.7266    0.5500    1.0000    0.6364    1.0000    0.0571    
+
+================================================================================
+SECTION 6: PREDICTION QUALITY
+----------------------------------------
+
+Prediction metrics (item-level, no context):
+  Metric               Simple          UBM            
+  -------------------- --------------- ---------------
+  Log Loss             0.1299          0.1263         
+  Brier Score          0.0278          0.0275         
+  AUC                  0.5147          0.5680         
+
+Log loss improvement over simple: 2.77%
+
+================================================================================
+SECTION 7: SESSION-LEVEL EVALUATION
+----------------------------------------
+
+Evaluating UBM with proper click context...
+
+Session-level (with click context) metrics:
+  UBM avg negative LL: 0.1298
+  Simple avg negative LL: 0.1299
+  Improvement: 0.09%
+
+================================================================================
+SECTION 8: MULTI-CLICK SESSION ANALYSIS
+----------------------------------------
+
+N multi-click sessions: 1,152
+
+Examination probability at second click position:
+  Mean: 0.6962
+  By distance from first click:
+    Distance 1: γ = 0.8710 (n=259)
+    Distance 2: γ = 0.7677 (n=181)
+    Distance 3: γ = 0.6958 (n=117)
+    Distance 4: γ = 0.5795 (n=97)
+    Distance 5: γ = 0.7500 (n=62)
+    Distance 6: γ = 0.5631 (n=52)
+    Distance 7: γ = 0.5157 (n=37)
+    Distance 8: γ = 0.6095 (n=46)
+    Distance 9: γ = 0.5502 (n=35)
+    Distance 10: γ = 0.6617 (n=18)
+    Distance 11: γ = 0.4714 (n=24)
+    Distance 13: γ = 0.3128 (n=12)
+    Distance 14: γ = 0.2435 (n=12)
+
+================================================================================
+SECTION 9: STRATIFIED ANALYSIS BY PLACEMENT
+----------------------------------------
+
+PLACEMENT 1:
+  Sessions: 14,019
+  Multi-click rate: 3.7%
+  γ_{1,0}: 1.000
+  γ_{5,0}: 0.869
+  Mean α: 0.0259
+
+PLACEMENT 2:
+  Sessions: 5,781
+  Multi-click rate: 7.8%
+  γ_{1,0}: 1.000
+  γ_{5,0}: 0.872
+  Mean α: 0.0298
+
+PLACEMENT 3:
+  Sessions: 11,134
+  Multi-click rate: 1.5%
+  γ_{1,0}: 1.000
+  γ_{5,0}: 0.883
+  Mean α: 0.0326
+
+PLACEMENT 5:
+  Sessions: 567
+  Multi-click rate: 2.3%
+  γ_{1,0}: 1.000
+  γ_{5,0}: 0.876
+  Mean α: 0.0034
+
+================================================================================
+SECTION 10: SUMMARY
+================================================================================
+
+UBM PARAMETERS:
+  Mean α (attractiveness): 0.0277
+  γ_{1,0} (examine position 1, no prior click): 1.0000
+  γ_{5,0} (examine position 5, no prior click): 0.8504
+  γ_{10,0} (examine position 10, no prior click): 0.7266
+
+POSITION EFFECTS (γ_{r,0}):
+  Position 1: 1.0000 (normalized)
+  Position 5: 0.8504 (85.0% of position 1)
+  Position 10: 0.7266 (72.7% of position 1)
+  Position 20: 0.6841 (68.4% of position 1)
+
+DISTANCE EFFECT (γ_{{10,r'}} for position 10):
+  No prior click (r'=0): 0.7266
+  Last click at 5 (r'=5): 0.0571
+  Last click at 9 (r'=9): 1.0000
+
+MODEL FIT:
+  Item-level Log loss: 0.1263
+  Item-level AUC: 0.5680
+  Session-level avg neg LL: 0.1298
+
+KEY FINDINGS:
+  1. UBM captures distance-to-last-click effect
+  2. Multi-click rate (3.7%) justifies modeling click context
+  3. UBM outperforms simple baseline on session-level LL
+
+COMPARISON WITH OTHER MODELS:
+  - PBM: position-only examination (no click context)
+  - DBN: satisfaction/continuation (partial click context)
+  - UBM: full click context via γ_{r,r'} matrix
+
+================================================================================
+UBM ESTIMATION COMPLETE
+Output saved to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/click_models/results/12_ubm_estimation.txt
+================================================================================

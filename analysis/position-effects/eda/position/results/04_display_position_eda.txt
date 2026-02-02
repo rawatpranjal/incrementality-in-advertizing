@@ -1,0 +1,520 @@
+================================================================================
+POSITION EFFECTS EDA ROUND 3: DISPLAY POSITION ANALYSIS
+================================================================================
+
+CONTEXT:
+  Building on 03_hypothesis_tests.py findings:
+  - QUALITY × BID achieves 85.75% exact rank match within auctions
+  - Only 6.26% of winners get impressions
+  - CTR is NOT monotonic by rank for impression-receivers
+  - Rank 4 shows anomalous higher CTR than ranks 3 and 5
+
+OBJECTIVE:
+  Explore distinction between bid rank and display position.
+  Assess feasibility of causal inference methods (RDD, PBM).
+
+================================================================================
+
+================================================================================
+SECTION 1: DATA LOADING
+----------------------------------------
+
+Loading data files...
+  auctions_results: 3,748,381 rows
+  auctions_users: 78,318 rows
+  impressions: 192,307 rows
+  clicks: 6,090 rows
+  catalog: 1,039,783 rows
+
+Merged PLACEMENT and USER_ID into auctions_results
+  Rows with PLACEMENT: 3,748,381
+  Rows with USER_ID: 3,748,381
+
+Winners (IS_WINNER=True): 2,993,977
+
+================================================================================
+SECTION 2: IMPRESSION SELECTION MECHANISM (EDA 1)
+----------------------------------------
+
+HYPOTHESIS: Impressions go to top-N winners by rank
+TEST: P(impression | rank=k, winner) should decrease monotonically
+
+Matching winners with impressions...
+  Winners: 2,993,977
+  Winners with impressions: 186,555 (6.23%)
+
+P(impression | rank, winner) by rank:
+Rank     N Winners       N Impressed     Imp Rate %  
+-------- --------------- --------------- ------------
+1        77,957          20,334          26.08       
+2        77,235          20,119          26.05       
+3        76,671          11,320          14.76       
+4        76,223          10,964          14.38       
+5        75,857          8,247           10.87       
+6        75,519          8,043           10.65       
+7        75,169          7,240           9.63        
+8        74,866          7,148           9.55        
+9        74,563          5,683           7.62        
+10       74,291          5,769           7.77        
+11       74,018          5,299           7.16        
+12       73,783          5,346           7.25        
+13       73,570          4,962           6.74        
+14       73,352          4,906           6.69        
+15       73,168          4,587           6.27        
+16       72,960          4,434           6.08        
+17       72,807          4,037           5.54        
+18       72,607          3,847           5.30        
+19       72,453          3,397           4.69        
+20       72,298          3,150           4.36        
+21       70,555          2,544           3.61        
+22       70,427          2,353           3.34        
+23       70,293          2,148           3.06        
+24       70,170          2,092           2.98        
+25       69,980          1,822           2.60        
+
+Monotonicity: VIOLATED at 2 points
+  Rank 9 (7.62%) < Rank 10 (7.77%)
+  Rank 11 (7.16%) < Rank 12 (7.25%)
+
+Testing top-N selection hypothesis:
+  Rank 8 captures 50% of impressions
+  Rank 18 captures 75% of impressions
+  Rank 30 captures 90% of impressions
+  Rank 38 captures 95% of impressions
+  Rank 51 captures 99% of impressions
+
+Shape analysis:
+  Rate at Rank 1: 26.08%
+  Rate at Rank 10: 7.77%
+  Decay factor (R10/R1): 0.2977
+  Pattern: Gradual decline
+
+================================================================================
+SECTION 3: DISPLAY POSITION VS BID RANK (EDA 2)
+----------------------------------------
+
+HYPOTHESIS: RANKING (bid rank) may differ from display position (UI order)
+TEST: Use impression timestamps to infer display order
+
+Computing display positions from impression timestamps...
+  Impressions with display position: 192,307
+  Unique auctions: 27,045
+
+Distribution of display positions:
+  Position 1: 27,045 (14.1%)
+  Position 2: 26,100 (13.6%)
+  Position 3: 16,253 (8.5%)
+  Position 4: 15,851 (8.2%)
+  Position 5: 11,075 (5.8%)
+  Position 6: 10,863 (5.6%)
+  Position 7: 8,705 (4.5%)
+  Position 8: 8,525 (4.4%)
+  Position 9: 6,155 (3.2%)
+  Position 10: 5,972 (3.1%)
+
+Merging with bid ranking...
+  Matched impressions with bid rank: 187,544 / 192,307 (97.5%)
+
+Correlation(display_position, RANKING): 0.8689
+
+Exact match rate (display_position == RANKING): 26.28%
+
+Mean absolute difference: 3.66 positions
+
+Cross-tabulation (Display Position rows × Bid Rank columns):
+  Showing counts for positions/ranks 1-10
+
+  Disp\Rank      1      2      3      4      5      6      7      8      9     10
+  -------------------------------------------------------------------------------
+          1   9762   9328   1561   1279    505    475    364    399    304   2354
+          2   9017   9175   1494   1307    473    480    406    364    309   2388
+          3    813    879   4138   4046    990    787    446    456    274   2958
+          4    835    804   3848   4036    902    877    478    414    258   2945
+          5     87     87    104    119   2496   2476    931    914    364   3144
+          6     72     80    113    123   2399   2419    990    842    336   3143
+          7     34     46     36     40    255    245   1860   1825    636   3468
+          8     42     36     53     39    201    266   1719   1884    544   3493
+          9      7      7      2      5      7      9     14     21   1292   4620
+         10     49     52     31     29     28     20     41     36   1370  59015
+
+Discrepancy analysis:
+  Position difference (display - bid rank):
+    Mean: -3.19
+    Median: -1
+    Std: 5.92
+    P10: -11
+    P90: 1
+
+  Cases where display != bid rank: 138,250 (73.72%)
+
+Timestamp granularity check:
+  Time gaps between consecutive impressions (same auction):
+    Mean: 8.4048 seconds
+    Median: 0.0000 seconds
+    Min: 0.000000 seconds
+    Max: 17241.00 seconds
+    % with gap = 0: 60.56%
+
+  WARNING: Many zero-gap timestamps suggest batch logging, not sequential display
+  Display position inference may be unreliable
+
+================================================================================
+SECTION 4: CLICK POSITION ANALYSIS (EDA 3)
+----------------------------------------
+
+HYPOTHESIS: Clicks happen at display position, not bid rank
+TEST: Compare CTR by display_position vs CTR by RANKING
+
+Matched impressions: 187,544
+Clicked impressions: 5,257 (2.80%)
+
+CTR by Display Position:
+Disp Pos   Impressions     Clicks     CTR %     
+---------- --------------- ---------- ----------
+1          26,331          761        2.8901    
+2          25,413          688        2.7073    
+3          15,787          427        2.7048    
+4          15,397          451        2.9291    
+5          10,722          307        2.8633    
+6          10,517          321        3.0522    
+7          8,445           247        2.9248    
+8          8,277           234        2.8271    
+9          5,984           214        3.5762    
+10         5,804           171        2.9462    
+11         4,381           148        3.3782    
+12         4,266           113        2.6489    
+13         3,494           103        2.9479    
+14         3,383           88         2.6012    
+15         3,024           81         2.6786    
+
+CTR by Bid Ranking (among impressed):
+Bid Rank   Impressions     Clicks     CTR %     
+---------- --------------- ---------- ----------
+1          20,718          605        2.9202    
+2          20,494          550        2.6837    
+3          11,380          310        2.7241    
+4          11,023          347        3.1480    
+5          8,256           248        3.0039    
+6          8,054           221        2.7440    
+7          7,249           196        2.7038    
+8          7,155           208        2.9071    
+9          5,687           161        2.8310    
+10         5,773           174        3.0140    
+11         5,303           175        3.3000    
+12         5,350           144        2.6916    
+13         4,964           166        3.3441    
+14         4,907           128        2.6085    
+15         4,590           138        3.0065    
+
+Monotonicity check (top 10 with N>=100):
+  CTR decreasing by display position: False
+  CTR decreasing by bid ranking: False
+
+Variance explained (R-squared of CTR):
+  R² using display position: 0.000485
+  R² using bid ranking: 0.000420
+  Display position explains clicks better
+
+================================================================================
+SECTION 5: RANK 4 ANOMALY DEEP DIVE (EDA 4)
+----------------------------------------
+
+HYPOTHESIS: Rank 4 shows anomalous CTR - may be a special UI slot
+TEST: Compare characteristics across placements
+
+Product/bid characteristics at ranks 3, 4, 5 (all winners):
+
+Rank 3 (N=76,671):
+  QUALITY:    mean=0.036287, std=0.060890
+  FINAL_BID:  mean=12.2378, std=12.5888
+  PRICE:      mean=10.89, median=7.00
+  PACING:     mean=0.9244, std=0.2073
+  Imp Rate:   14.76%
+
+Rank 4 (N=76,223):
+  QUALITY:    mean=0.033801, std=0.058990
+  FINAL_BID:  mean=11.5446, std=11.3671
+  PRICE:      mean=10.59, median=7.00
+  PACING:     mean=0.9272, std=0.2035
+  Imp Rate:   14.38%
+
+Rank 5 (N=75,857):
+  QUALITY:    mean=0.032026, std=0.056577
+  FINAL_BID:  mean=11.1365, std=10.9867
+  PRICE:      mean=10.43, median=7.00
+  PACING:     mean=0.9277, std=0.2012
+  Imp Rate:   10.87%
+
+CTR by Rank x Placement:
+Top 5 placements: ['3', '1', '5', '2']
+
+Placement: 3
+  Rank     N            Clicks     CTR %     
+  -------- ------------ ---------- ----------
+  1        5,216        150        2.8758    
+  2        5,382        131        2.4340    
+  3        2,630        70         2.6616    
+  4        2,449        63         2.5725    
+  5        1,862        54         2.9001    
+  6        1,804        57         3.1596    
+  7        1,797        51         2.8381    
+  8        1,790        53         2.9609    
+  9        1,307        37         2.8309    
+  10       1,473        52         3.5302    
+  Rank 4 anomaly NOT present
+
+Placement: 1
+  Rank     N            Clicks     CTR %     
+  -------- ------------ ---------- ----------
+  1        10,534       314        2.9808    
+  2        10,228       283        2.7669    
+  3        5,989        148        2.4712    
+  4        5,861        180        3.0711    
+  5        4,354        120        2.7561    
+  6        4,236        96         2.2663    
+  7        3,680        98         2.6630    
+  8        3,609        85         2.3552    
+  9        2,840        72         2.5352    
+  10       2,774        68         2.4513    
+  Rank 4 anomaly PRESENT: CTR4 (3.07%) > CTR3 (2.47%) and CTR5 (2.76%)
+
+Placement: 5
+  Rank     N            Clicks     CTR %     
+  -------- ------------ ---------- ----------
+  1        377          6          1.5915    
+  2        382          6          1.5707    
+  3        263          3          1.1407    
+  4        260          4          1.5385    
+  5        135          4          2.9630    
+  6        140          2          1.4286    
+  7        132          4          3.0303    
+  8        128          3          2.3438    
+  9        105          1          0.9524    
+  10       101          2          1.9802    
+  Rank 4 anomaly NOT present
+
+Placement: 2
+  Rank     N            Clicks     CTR %     
+  -------- ------------ ---------- ----------
+  1        4,207        130        3.0901    
+  2        4,127        126        3.0531    
+  3        2,438        86         3.5275    
+  4        2,394        99         4.1353    
+  5        1,896        70         3.6920    
+  6        1,863        65         3.4890    
+  7        1,631        43         2.6364    
+  8        1,621        67         4.1333    
+  9        1,431        51         3.5639    
+  10       1,421        52         3.6594    
+  Rank 4 anomaly PRESENT: CTR4 (4.14%) > CTR3 (3.53%) and CTR5 (3.69%)
+
+Impression Rate by Rank x Placement (winners):
+Placement: 3
+  Rank     N Winners    N Impressed  Imp Rate %  
+  -------- ------------ ------------ ------------
+  1        46,838       5,216        11.14       
+  2        46,838       5,382        11.49       
+  3        46,838       2,630        5.62        
+  4        46,838       2,449        5.23        
+  5        46,838       1,862        3.98        
+  6        46,838       1,804        3.85        
+  7        46,838       1,797        3.84        
+  8        46,838       1,790        3.82        
+  9        46,838       1,307        2.79        
+  10       46,838       1,473        3.14        
+
+Placement: 1
+  Rank     N Winners    N Impressed  Imp Rate %  
+  -------- ------------ ------------ ------------
+  1        14,279       10,534       73.77       
+  2        13,786       10,228       74.19       
+  3        13,373       5,989        44.78       
+  4        13,042       5,861        44.94       
+  5        12,794       4,354        34.03       
+  6        12,550       4,236        33.75       
+  7        12,297       3,680        29.93       
+  8        12,070       3,609        29.90       
+  9        11,831       2,840        24.00       
+  10       11,633       2,774        23.85       
+
+Placement: 5
+  Rank     N Winners    N Impressed  Imp Rate %  
+  -------- ------------ ------------ ------------
+  1        8,601        377          4.38        
+  2        8,588        382          4.45        
+  3        8,581        263          3.06        
+  4        8,575        260          3.03        
+  5        8,573        135          1.57        
+  6        8,569        140          1.63        
+  7        8,569        132          1.54        
+  8        8,563        128          1.49        
+  9        8,560        105          1.23        
+  10       8,560        101          1.18        
+
+================================================================================
+SECTION 6: RDD SETUP AT WINNER BOUNDARY (EDA 5)
+----------------------------------------
+
+HYPOTHESIS: Sharp discontinuity at winner/loser boundary
+TEST: Compare last winner vs first loser outcomes
+
+Bids with valid scores (QUALITY x FINAL_BID): 3,748,381
+
+Identifying winner/loser boundary...
+Auctions with identifiable boundary: 77,346
+
+Score gap at boundary (last winner - first loser):
+  Mean: 0.006831
+  Median: 0.000447
+  Std: 0.029434
+  Min: -0.413950
+  Max: 1.827353
+
+Score gap percentiles:
+  P1: -0.036063
+  P5: 0.000000
+  P10: 0.000011
+  P25: 0.000098
+  P50: 0.000447
+  P75: 0.002190
+  P90: 0.029632
+  P95: 0.043692
+  P99: 0.096976
+
+Negative gaps (loser score > winner score): 3745 (4.84%)
+
+Tiny gaps (|gap| < 0.001): 46415 (60.01%)
+Small gaps (|gap| < 0.01): 61566 (79.60%)
+
+Rank gap at boundary (first loser rank - last winner rank):
+  Gap      Count        %         
+  -------- ------------ ----------
+  1.0      77,346       100.00    
+
+McCrary-style density analysis:
+  Testing for manipulation at boundary (bunching)
+  Score gap bins (window: |gap| < 0.1, N=76,458):
+    (-0.0982, -0.0881]: 29
+    (-0.0881, -0.0782]: 17
+    (-0.0782, -0.0683]: 41
+    (-0.0683, -0.0584]: 117
+    (-0.0584, -0.0485]: 142
+    (-0.0485, -0.0386]: 223
+    (-0.0386, -0.0287]: 374
+    (-0.0287, -0.0188]: 626
+    (-0.0188, -0.0089]: 1011
+    (-0.0089, 0.001]: 47343
+    (0.001, 0.0109]: 14266
+    (0.0109, 0.0208]: 4098
+    (0.0208, 0.0307]: 1286
+    (0.0307, 0.0406]: 1870
+    (0.0406, 0.0505]: 2994
+    (0.0505, 0.0604]: 951
+    (0.0604, 0.0703]: 422
+    (0.0703, 0.0802]: 317
+    (0.0802, 0.0901]: 200
+    (0.0901, 0.1]: 131
+
+  Observations with gap < 0: 3596
+  Observations with gap >= 0: 72862
+  Ratio (above/below): 20.26
+
+RDD FEASIBILITY ASSESSMENT:
+  FEASIBLE: Sufficient observations near boundary
+  Median score gap: 0.000447
+  % with gap < 0.01: 79.60%
+
+================================================================================
+SECTION 7: MULTI-AUCTION USER JOURNEYS (EDA 6)
+----------------------------------------
+
+HYPOTHESIS: Same user sees same products at different positions over time
+TEST: Track product exposure across user sessions
+
+User activity statistics:
+  Unique users: 7,236
+  Auctions per user:
+    Mean: 10.81
+    Median: 4
+    P90: 22
+    Max: 4961
+
+  Unique products per user:
+    Mean: 226.84
+    Median: 112
+    P90: 520
+
+Multi-exposure analysis (same user, same product, different auctions):
+  User-product pairs with 2+ auction exposures: 847,371
+  Number of auctions per user-product pair:
+    Mean: 3.49
+    Median: 2
+    Max: 1652
+
+  Rank variation for repeated exposures:
+    Rank range (max - min):
+      Mean: 8.57
+      Median: 4
+      P90: 25
+
+    Same rank across auctions: 112417 (13.3%)
+    Different ranks across auctions: 734954 (86.7%)
+
+    Rank std (within user-product):
+      Mean: 4.70
+      Median: 2.16
+
+PBM (Position-Based Model) FEASIBILITY ASSESSMENT:
+  FEASIBLE: Sufficient rank variation for identification
+  % with rank variation: 86.7%
+  Mean rank range: 8.57
+
+================================================================================
+SECTION 8: SUMMARY OF FINDINGS
+================================================================================
+
+EDA 1 - IMPRESSION SELECTION:
+  Impression rate has 2 monotonicity violations
+  Overall winner impression rate: 6.23%
+
+EDA 2 - DISPLAY POSITION VS BID RANK:
+  Correlation(display_position, RANKING): 0.8689
+  Exact match rate: 26.28%
+  Mean absolute difference: 3.66 positions
+
+EDA 3 - CLICK POSITION:
+  CTR monotonic by display position: False
+  CTR monotonic by bid ranking: False
+  R² (display position): 0.000485
+  R² (bid ranking): 0.000420
+
+EDA 4 - RANK 4 ANOMALY:
+  See placement-specific CTR tables above
+  Anomaly appears to be placement-specific
+
+EDA 5 - RDD FEASIBILITY:
+  Auctions with boundary: 77,346
+  Median score gap: 0.000447
+  % with tiny gap (<0.01): 79.60%
+
+EDA 6 - PBM FEASIBILITY:
+  User-product pairs with 2+ exposures: 847,371
+  % with rank variation: 86.7%
+  Mean rank range: 8.57
+
+IMPLICATIONS FOR CAUSAL INFERENCE:
+  1. Display position may differ from bid rank - need to verify
+  2. Impression selection is systematic (rank-based), not random
+  3. RDD at winner boundary may have limited power (median gap not tiny)
+  4. PBM requires sufficient within-user position variation
+  5. Rank 4 anomaly suggests UI-specific effects worth investigating
+
+RECOMMENDED NEXT STEPS:
+  1. Validate timestamp-based display position inference
+  2. Investigate UI layout for rank 4 anomaly
+  3. Consider IV approach using score discontinuities
+  4. Explore placement-specific position effects
+
+================================================================================
+DISPLAY POSITION EDA COMPLETE
+================================================================================

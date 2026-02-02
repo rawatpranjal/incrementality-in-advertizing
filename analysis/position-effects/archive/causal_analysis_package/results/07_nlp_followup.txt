@@ -1,0 +1,548 @@
+================================================================================
+NLP FOLLOW-UP: INVESTIGATING PERPLEXING POSITION EFFECTS
+================================================================================
+
+CONTEXT FROM 06_nlp_position_models.py:
+  - Position coefficients are POSITIVE for later positions
+  - Position 9 shows +0.23 (p=0.004) - more clicks at later positions?
+  - Embedding controls change position coefficients by only 0.2%
+  - Cluster position effects range from -0.03 to +0.13
+  - Matching sample is tiny: only 602 neighbor impressions
+  - TF-IDF explains only 14.6% variance in 50 components
+
+OBJECTIVE: Investigate all 24 questions to explain anomalies
+
+================================================================================
+
+================================================================================
+DATA LOADING
+----------------------------------------
+
+Loading data files...
+  catalog: 1,039,783 rows
+  auctions_results: 3,748,381 rows
+  auctions_users: 78,318 rows
+  impressions: 192,307 rows
+  clicks: 6,090 rows
+
+Loading precomputed embeddings...
+  Embeddings shape: (1039783, 50)
+  Product IDs: 1,039,783
+
+Preparing catalog data...
+
+Merged PLACEMENT and USER_ID into auctions_results
+
+Winners (IS_WINNER=True): 2,993,977
+  Winners with impressions: 186,555
+  Clicked impressions: 5,257
+
+================================================================================
+SECTION 1: BID RANK VS DISPLAY POSITION COMPARISON (Q16, Q24)
+----------------------------------------
+
+PURPOSE: Determine if timestamp-inferred display position is the problem
+
+Analysis sample: 105,050 impressions
+
+Model 1A: CTR ~ display_position (timestamp-inferred)
+----------------------------------------
+  N: 105,050
+  Pseudo R-squared: 0.0004
+
+  Position coefficients (display_position):
+    Position 2: -0.0646 (SE=0.0553, p=0.2430) 
+    Position 3: -0.0421 (SE=0.0652, p=0.5179) 
+    Position 4: -0.0208 (SE=0.0654, p=0.7508) 
+    Position 5: -0.0035 (SE=0.0770, p=0.9637) 
+    Position 6: +0.0453 (SE=0.0764, p=0.5531) 
+    Position 7: -0.0568 (SE=0.0909, p=0.5322) 
+    Position 8: -0.0519 (SE=0.0917, p=0.5712) 
+    Position 9: +0.2908 (SE=0.1094, p=0.0078) *
+    Position 10: -0.0598 (SE=0.1287, p=0.6425) 
+
+Model 1B: CTR ~ RANKING (bid rank)
+----------------------------------------
+  N: 105,050
+  Pseudo R-squared: 0.0004
+
+  Position coefficients (RANKING):
+    Rank 2: -0.0885 (SE=0.0598, p=0.1389) 
+    Rank 3: -0.0743 (SE=0.0709, p=0.2950) 
+    Rank 4: +0.0778 (SE=0.0684, p=0.2555) 
+    Rank 5: +0.0292 (SE=0.0766, p=0.7028) 
+    Rank 6: -0.0687 (SE=0.0799, p=0.3896) 
+    Rank 7: -0.0774 (SE=0.0833, p=0.3530) 
+    Rank 8: -0.0089 (SE=0.0817, p=0.9133) 
+    Rank 9: +0.0023 (SE=0.0902, p=0.9795) 
+    Rank 10: +0.0774 (SE=0.0876, p=0.3767) 
+
+SIDE-BY-SIDE COEFFICIENT COMPARISON:
+------------------------------------------------------------
+Pos/Rank   display_position     RANKING (bid)       
+---------- -------------------- --------------------
+2          -0.0646              -0.0885             
+3          -0.0421              -0.0743             
+4          -0.0208              +0.0778             
+5          -0.0035              +0.0292             
+6          +0.0453              -0.0687             
+7          -0.0568              -0.0774             
+8          -0.0519              -0.0089             
+9          +0.2908              +0.0023             
+10         -0.0598              +0.0774             
+
+TIMESTAMP QUALITY ANALYSIS:
+----------------------------------------
+Computing timestamp quality per auction...
+  Auctions analyzed: 27,045
+
+Timestamp gap statistics:
+  Median gap (seconds):
+    Mean: 0.9825
+    Median: 0.0000
+    Std: 41.2443
+
+  Coefficient of Variation (CV) of gaps:
+    Mean: 0.9521
+    Median: 1.2714
+
+  Percent zero gaps per auction:
+    Mean: 76.8%
+    Median: 71.4%
+
+Timestamp quality tiers:
+  Good (median_gap > 0.5s, CV > 0.3): 2,139 auctions
+  Poor (median_gap <= 0.5s or pct_zero > 50%): 23,762 auctions
+
+Position effects by timestamp quality tier:
+----------------------------------------
+  GOOD timestamp auctions (n=11,624):
+    Position coefficient: -0.0247 (SE=0.0180, p=0.1711)
+
+  POOR timestamp auctions (n=92,376):
+    Position coefficient: +0.0075 (SE=0.0083, p=0.3659)
+
+
+================================================================================
+SECTION 2: EMBEDDING-POSITION ORTHOGONALITY CHECK (Q17, Q23)
+----------------------------------------
+
+PURPOSE: Understand why embedding controls change nothing
+
+Extracting embeddings for analysis sample...
+  Analysis sample with embeddings: 104,899
+
+Correlation: Embedding PCs vs display_position:
+----------------------------------------
+  PC1 vs display_position: r = -0.0021
+  PC2 vs display_position: r = -0.0136
+  PC3 vs display_position: r = 0.0024
+  PC4 vs display_position: r = -0.0105
+  PC5 vs display_position: r = 0.0095
+  PC6 vs display_position: r = 0.0051
+  PC7 vs display_position: r = -0.0111
+  PC8 vs display_position: r = -0.0222
+  PC9 vs display_position: r = -0.0090
+  PC10 vs display_position: r = 0.0024
+
+  Max |correlation|: 0.0222
+
+Predicting display_position from embeddings:
+----------------------------------------
+  R² (embeddings -> display_position): 0.0013
+  Interpretation: Embeddings explain 0.13% of position variance
+
+Predicting QUALITY from embeddings:
+----------------------------------------
+  R² (embeddings -> QUALITY): 0.0027
+  Interpretation: Embeddings explain 0.27% of QUALITY variance
+
+Predicting clicks from embeddings only:
+----------------------------------------
+  Pseudo R² (embeddings -> click): 0.0018
+
+  Significant embedding coefficients:
+    PC1: +1.6685 (p=0.0000) *
+    PC2: -0.5126 (p=0.0283) *
+    PC3: -0.4634 (p=0.0401) *
+    PC4: +0.9303 (p=0.0001) *
+    PC7: -0.8321 (p=0.0023) *
+
+MEDIATION ANALYSIS: PC1 -> Position -> Click:
+----------------------------------------
+  Path a (PC1 -> Position):
+    Correlation: -0.0021
+  Path b (Position -> Click, controlling PC1):
+    Position coef: +0.0081 (p=0.2780)
+    PC1 coef: +1.2792 (p=0.0005)
+
+  INTERPRETATION:
+    If PC1 has low correlation with position, it cannot mediate.
+    Embeddings capture product content, not auction dynamics.
+
+================================================================================
+SECTION 3: CLUSTER DEEP DIVE (Q18, Q22)
+----------------------------------------
+
+PURPOSE: Interpret what each cluster represents
+
+Fitting K-means (k=10) on embeddings...
+  Products with cluster assignments: 1,039,783
+
+Fitting TF-IDF for cluster term analysis...
+  TF-IDF vocabulary: 5,000 terms
+
+CLUSTER 0 ANALYSIS:
+----------------------------------------
+  N products: 423,102
+
+  Top 20 distinctive terms:
+    size: 0.0271
+    black: 0.0268
+    new: 0.0245
+    condition: 0.0209
+    perfect: 0.0189
+    white: 0.0176
+    blue: 0.0172
+    pink: 0.0165
+    skirt: 0.0155
+    free: 0.0152
+    set: 0.0149
+    shorts: 0.0148
+    nwt: 0.0137
+    design: 0.0129
+    vintage: 0.0128
+    women: 0.0127
+    stylish: 0.0126
+    floral: 0.0125
+    wear: 0.0117
+    red: 0.0116
+
+  Top 10 brands:
+    lululemon athletica: 9,840
+    nike: 8,647
+    free people: 5,116
+    disney: 4,667
+    victoria's secret: 4,069
+    zara: 3,182
+    athleta: 3,059
+    adidas: 3,001
+    j. crew: 2,852
+    anthropologie: 2,549
+
+  Price distribution:
+    Mean: $21404931076.69
+    Median: $27.00
+    IQR: $18.00 - $49.00
+
+  Description length:
+    Mean: 268 chars
+    Median: 158 chars
+
+  Sample product names (10):
+    1. Luxe Brown Sequin Blazer...
+    2. BaByliss PRO Titanium Xtreme Hair Blow Dryer Black GFCI Plug Nozzle Co...
+    3. DONATING CLOSET 3/1!...
+    4. *BRAND NEW* LONGCHAMP US EXCLUSIVE
+LE FOULONNÉ PASSPORT COVER...
+    5. Elegant Faux Floral Wreath 
+NEW, Handcrafted Original Design...
+    6. Red and White One-Shoulder Sundress for Resort Wear...
+    7. Anthropologie Charmed Cardigan sweater...
+    8. Supreme Dark Blue Logo Beanie...
+    9. NWT rag & bone Flavia Off-The Shoulder Lace Size XS...
+    10. Flat Brim Fedora Hat - Black...
+
+  Top categories:
+    00188975d97b4e80ef00a955: 65,932
+    002a8975d97b4e80ef00a955: 28,716
+    001c8975d97b4e80ef00a955: 27,826
+    00208975d97b4e80ef00a955: 19,737
+    00248975d97b4e80ef00a955: 19,590
+
+CLUSTER 1 ANALYSIS:
+----------------------------------------
+  N products: 47,644
+
+  Top 20 distinctive terms:
+    jeans: 0.2432
+    rise: 0.0997
+    denim: 0.0921
+    blue: 0.0722
+    straight: 0.0669
+    leg: 0.0647
+    skinny: 0.0643
+    high: 0.0507
+    wash: 0.0502
+    distressed: 0.0491
+    size: 0.0473
+    inseam: 0.0437
+    dark: 0.0394
+    waist: 0.0378
+    fit: 0.0371
+    levi: 0.0332
+    women: 0.0306
+    classic: 0.0294
+    stretch: 0.0290
+    light: 0.0283
+
+  Top 10 brands:
+    levi's: 4,374
+    american eagle outfitters: 1,631
+    madewell: 1,522
+    abercrombie & fitch: 1,218
+    mother: 1,019
+    old navy: 910
+    7 for all mankind: 845
+    paige: 830
+    agolde: 826
+    wrangler: 808
+
+  Price distribution:
+    Mean: $41.94
+    Median: $30.00
+    IQR: $21.00 - $49.00
+
+  Description length:
+    Mean: 298 chars
+    Median: 193 chars
+
+  Sample product names (10):
+    1. Calypso Light Blue Denim Jumpsuit - Originally Retailed at 100.00...
+    2. American Eagle Super High Rise Wide Leg Classic Blue Women's Jeans...
+    3. Hudson Jeans Size 29...
+    4. Good American Good Petite Skinny Jeans...
+    5. Diamanté Women’s Plus Size 24 Dark Wash Stretch Jeans Straight Skinny...
+    6. NWT $228 Joe’s Jeans 
+Size 29
+THE WILDER
+RELAXED BARREL...
+    7. Universal Thread Skinny No-Fade Black Denim Jeans...
+    8. Universal Thread Women’s Olive Barrel Wide Leg Jeans Size 16...
+    9. American Eagle Classic High Rise Skinny Jeans Size 10 Long...
+    10. DG2  Jeans-Closet Clear Out!...
+
+  Top categories:
+    001a8975d97b4e80ef00a955: 35,010
+    05008c10d97b4e1245005764: 6,510
+    001e8975d97b4e80ef00a955: 2,258
+    001c8975d97b4e80ef00a955: 1,920
+    24002b34d97b4efb71005784: 1,137
+
+CLUSTER 5 ANALYSIS:
+----------------------------------------
+  N products: 11,490
+
+  Top 20 distinctive terms:
+    leave: 0.2622
+    comment: 0.2583
+    questions: 0.1958
+    reposhing: 0.1493
+    rotate: 0.1362
+    purchased: 0.1303
+    loved: 0.1167
+    ready: 0.1070
+    item: 0.0942
+    new: 0.0693
+    size: 0.0265
+    dress: 0.0240
+    nwt: 0.0161
+    black: 0.0158
+    leather: 0.0117
+    women: 0.0115
+    small: 0.0108
+    bag: 0.0102
+    jacket: 0.0098
+    blue: 0.0096
+
+  Top 10 brands:
+    j. crew: 321
+    free people: 284
+    lululemon athletica: 273
+    anthropologie: 267
+    zara: 189
+    nike: 170
+    coach: 139
+    kate spade: 109
+    gucci: 92
+    madewell: 89
+
+  Price distribution:
+    Mean: $78.60
+    Median: $36.00
+    IQR: $23.00 - $65.00
+
+  Description length:
+    Mean: 105 chars
+    Median: 129 chars
+
+  Sample product names (10):
+    1. Alo Yoga Vapor Snakeskin Leggings Size XXS / 2XS High Waisted Full Len...
+    2. NWOT Womens Mustard heels, size 9.5...
+    3. Hudson Collin Mid-Rise Flap Skinny Jeans...
+    4. Tuckernuck Olive Emerson Popover Pullover...
+    5. Louis Vuitton Monogram Wallet (MI1913)...
+    6. Everlane the Day Glove in Black Suede, Size 8.5...
+    7. Bronx & Banco Off the shoulder mini dress...
+    8. Chicos Blue the Ultimate Tee Long Sleeves, Buttons on the Sleeves...
+    9. We the Free Waffle Cowl Neck long sleeve top Oversized  black XS NWOT...
+    10. Love J Jumpsuit...
+
+  Top categories:
+    00268975d97b4e80ef00a955: 1,551
+    00108975d97b4e80ef00a955: 1,542
+    00188975d97b4e80ef00a955: 1,224
+    00248975d97b4e80ef00a955: 1,088
+    001c8975d97b4e80ef00a955: 725
+
+CLUSTER 6 ANALYSIS:
+----------------------------------------
+  N products: 43,668
+
+  Top 20 distinctive terms:
+    pants: 0.2495
+    leg: 0.0840
+    wide: 0.0528
+    waist: 0.0488
+    size: 0.0434
+    rise: 0.0402
+    black: 0.0377
+    inseam: 0.0370
+    pockets: 0.0354
+    cargo: 0.0318
+    fit: 0.0309
+    straight: 0.0283
+    women: 0.0252
+    elastic: 0.0245
+    casual: 0.0243
+    condition: 0.0242
+    stretch: 0.0227
+    perfect: 0.0217
+    comfortable: 0.0213
+    high: 0.0211
+
+  Top 10 brands:
+    zara: 1,134
+    lululemon athletica: 1,042
+    athleta: 1,011
+    banana republic: 692
+    figs: 690
+    nike: 655
+    old navy: 550
+    anthropologie: 547
+    talbots: 528
+    free people: 525
+
+  Price distribution:
+    Mean: $41.22
+    Median: $30.00
+    IQR: $20.00 - $45.00
+
+  Description length:
+    Mean: 339 chars
+    Median: 224 chars
+
+  Sample product names (10):
+    1. Marine Layer Flora High Waisted wide leg Trouser Pants, henna, size 2,...
+    2. Alp N Rock Women Pants XS NWT Geneva Skinny Stretch Faux Leather Vegan...
+    3. Women's SPANX Black Sleeveless V-Neck Jumpsuit XL...
+    4. Flax Light Blue 100% Linen Wide Leg Pants L...
+    5. Figs Surgical Green Scrubs (3 Piece)...
+    6. NWT Athleta Brooklyn Size 12T Tall Blue/Gray Mid-rise Ankle Pants...
+    7. C&C California 100% Linen Floral Leaf Print Pull On Crop Wide Leg Pant...
+    8. Gap Men's Trousers...
+    9. FIGS Women’s Black Kade Pants Shirt Scrubs Set XXL...
+    10. FIGS Women’s Black Kade Pants Shirt Scrubs Set XXL...
+
+  Top categories:
+    001c8975d97b4e80ef00a955: 30,397
+    06008c10d97b4e1245005764: 8,550
+    24002b34d97b4efb71005784: 1,056
+    001a8975d97b4e80ef00a955: 834
+    00208975d97b4e80ef00a955: 646
+
+================================================================================
+SECTION 4: POSITION 9 INVESTIGATION (Q16, Q24)
+----------------------------------------
+
+PURPOSE: Why is Position 9 special (+0.23, p=0.004)?
+
+Auctions with Position 9 impressions: 2,562
+
+Is Position 9 typically the last position in auction?
+----------------------------------------
+  Of 50 sampled auctions with Position 9:
+    Position 9 is last position: 2 (4.0%)
+    Max position distribution:
+      Max position 9: 2 auctions
+      Max position 10: 9 auctions
+      Max position 12: 5 auctions
+      Max position 14: 1 auctions
+      Max position 16: 7 auctions
+      Max position 17: 1 auctions
+      Max position 18: 3 auctions
+      Max position 20: 1 auctions
+      Max position 22: 2 auctions
+      Max position 25: 1 auctions
+      Max position 26: 4 auctions
+      Max position 32: 2 auctions
+      Max position 33: 1 auctions
+      Max position 36: 2 auctions
+      Max position 40: 2 auctions
+      Max position 42: 1 auctions
+      Max position 48: 3 auctions
+      Max position 52: 1 auctions
+      Max position 54: 2 auctions
+
+Position 9 CTR analysis:
+----------------------------------------
+  Position   Impressions     Clicks     CTR %     
+  ---------- --------------- ---------- ----------
+  1          24,335          710        2.92      
+  2          23,356          640        2.74      
+  3          13,140          368        2.80      
+  4          12,765          365        2.86      
+  5          7,910           230        2.91      
+  6          7,708           235        3.05      
+  7          5,469           151        2.76      
+  8          5,335           148        2.77      
+  9          2,562           99         3.86      
+  10         2,470           68         2.75      
+
+Product QUALITY: Position 9 vs Position 1:
+----------------------------------------
+  Position 1 QUALITY: mean=0.040044, median=0.027017
+  Position 9 QUALITY: mean=0.035844, median=0.021621
+
+Timestamp gap before Position 9:
+----------------------------------------
+  N gaps measured: 50
+  Mean gap before position 9: 20.4800 seconds
+  Median gap before position 9: 7.5000 seconds
+  Max gap: 256.0000 seconds
+
+POSITION 9 HYPOTHESES:
+  1. Position 9 may be first on second page (pagination)
+  2. Users who scroll to position 9 are highly engaged (selection bias)
+  3. Position 9 products may have different characteristics
+  4. Timestamp ordering may be unreliable at position 9
+
+================================================================================
+SECTION 5: TIMESTAMP QUALITY STRATIFICATION (Q24)
+----------------------------------------
+
+PURPOSE: Identify reliable vs unreliable timestamp auctions
+
+Timestamp quality tier details:
+----------------------------------------
+  GOOD timestamp tier:
+    N auctions: 2,139
+    Median gap mean: 7.1536s
+    CV mean: 1.4652
+
+  POOR timestamp tier:
+    N auctions: 23,762
+    Median gap mean: 0.0020s
+    Pct zero gaps mean: 80.7%
+
+Position effect models by timestamp quality:

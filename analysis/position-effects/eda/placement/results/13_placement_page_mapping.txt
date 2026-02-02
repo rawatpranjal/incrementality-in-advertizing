@@ -1,0 +1,255 @@
+================================================================================
+PLACEMENT TO PAGE TYPE MAPPING (REVISED WITH PRODUCT DIVERSITY)
+================================================================================
+Generated: 2026-02-02 06:31:47
+
+================================================================================
+OFFICIAL POSHMARK AD PLACEMENTS
+================================================================================
+
+Source: poshmark.com/promoted-closet/learn
+
+Poshmark's Promoted Closet documentation lists ONLY TWO placement surfaces:
+
+  1. SEARCH RESULTS
+     'Your eligible listings can be surfaced in high-visibility spots
+     when shoppers search'
+
+  2. BRAND PAGES
+     'Your listings can also appear on Brand pages (where shoppers
+     browse a specific brand)'
+
+NOT official placements:
+  - Home feed: not listed as official placement
+  - Category pages: filtered browsing counts as 'Search results'
+
+================================================================================
+EVIDENCE SOURCES
+================================================================================
+
+This mapping synthesizes THREE independent analyses:
+
+  1. BEHAVIORAL PATTERNS (10_placement_verification.txt)
+     - Self-transition rates, session starts, CTR
+     - Multi-slot clustering
+
+  2. CO-FIRING ANALYSIS (14_cross_placement_cofiring.txt)
+     - Which placements fire within <1s of each other
+     - Indicates same-page vs different-page
+
+  3. PRODUCT DIVERSITY (15_placement_product_diversity.txt) **NEW**
+     - Brand diversity within auctions
+     - Single-brand vs multi-brand auction rates
+
+================================================================================
+KEY PRODUCT DIVERSITY FINDINGS
+================================================================================
+
+From 15_placement_product_diversity.txt:
+
+| Placement | Brands/Auction | Single-Brand% | Interpretation              |
+|-----------|----------------|---------------|------------------------------|
+| P1        | 11.37          | 52.9%         | Mixed (bimodal)              |
+| P2        | 1.01           | 99.2%         | EXTREME homogeneity          |
+| P3        | 18.14          | 8.2%          | Moderate diversity           |
+| P5        | 45.53          | 0.9%          | HIGHEST diversity            |
+
+CRITICAL INSIGHT:
+  P2's 99.2% single-brand rate is INCONSISTENT with 'PDP recommendations'
+  which would show related products from multiple brands.
+
+  P2's pattern matches SELLER CLOSET or BRAND PAGE viewing:
+  - User views seller's closet -> sees items from SAME seller (single brand)
+  - Top 'brand' in P2: 'meet the posher' (27.3%) = seller intro listings
+
+  P5's pattern (45 brands/auction) is INCONSISTENT with 'Brand Page'
+  which would show products from ONE brand.
+
+  P5's pattern matches CATEGORY BROWSE:
+  - User browses a category -> sees items from MANY brands
+  - 99% single department (category-specific)
+
+================================================================================
+FINAL MAPPING (RECONCILED)
+================================================================================
+
+| Placement | Page Type                  | Confidence | Key Evidence                |
+|-----------|----------------------------|------------|------------------------------|
+| P3        | Search Results             | High       | 88% self-trans, 18 brands/auc |
+| P2        | Seller Closet / Brand Page | High       | 99.2% single-brand auctions   |
+| P5        | Category Browse            | Medium     | 45 brands/auc, single dept    |
+| P1        | Homepage/Feed              | Medium     | 31% session starts, mixed div |
+
+================================================================================
+EVIDENCE BY PLACEMENT
+================================================================================
+
+--------------------------------------------------------------------------------
+P3 = SEARCH RESULTS - HIGH CONFIDENCE
+--------------------------------------------------------------------------------
+
+Behavioral Evidence:
+  - 88% self-transition: Users paginate through search repeatedly
+  - 77.5% multi-slot clusters: 2 ad slots fire per page load
+  - Mean 1.78 auctions/cluster: ~2 promoted listings per search page
+  - 60% of all auctions: Search is primary discovery method
+  - 54.2% session starts: Highest entry point
+
+Product Diversity Evidence:
+  - 18.14 brands/auction: Moderate diversity
+  - 8.2% single-brand auctions: Users search for varied products
+  - 52,993 unique brands across all P3 auctions
+
+Matches official Poshmark docs: 'high-visibility spots when shoppers search'
+
+--------------------------------------------------------------------------------
+P2 = SELLER CLOSET / BRAND PAGE - HIGH CONFIDENCE
+--------------------------------------------------------------------------------
+
+Behavioral Evidence:
+  - 40% self-transition: LOWEST - users view then leave
+  - 21s median gap: Time to browse seller's items
+  - 4.00% CTR: HIGHEST - engaged users viewing seller's closet
+  - 3% co-firing with P5: Users navigate between category and seller
+
+Product Diversity Evidence (DECISIVE):
+  - 1.01 brands/auction: EXTREME homogeneity
+  - 99.2% single-brand auctions: Almost always same seller/brand
+  - Top 'brand': 'meet the posher' (27.3%) = seller introduction listings
+
+INTERPRETATION:
+  P2 fires when users view a SELLER'S CLOSET:
+  - All items from same seller (hence single brand/seller pattern)
+  - 'Meet the Posher' listings are seller introductions
+  - High CTR because users are engaged with specific seller
+
+  This matches official Poshmark 'Brand Pages' placement:
+  'Brand pages (where shoppers browse a specific brand)'
+
+NOTE: 'Brand' in Poshmark context often means SELLER not product brand
+
+--------------------------------------------------------------------------------
+P5 = CATEGORY BROWSE PAGE - MEDIUM CONFIDENCE
+--------------------------------------------------------------------------------
+
+Behavioral Evidence:
+  - 69.4% self-transition: Users browse within category
+  - 47 winners/auction: Largest grid (many products per page)
+  - 0.8% session starts: Users navigate TO category pages
+  - Strong P2<->P5 loop: Browse category -> view seller -> return
+
+Product Diversity Evidence (DECISIVE):
+  - 45.53 brands/auction: HIGHEST diversity
+  - 0.9% single-brand auctions: Products from many brands
+  - 99% department '000e8975d97b4e80ef00a955': Single category focus
+  - 12.02 unique categories per auction
+
+INTERPRETATION:
+  P5 fires when users browse a CATEGORY (e.g., 'Women's Jeans'):
+  - Category view shows products from MANY different sellers/brands
+  - High brand diversity because category aggregates across sellers
+  - Single department = users filtering by one category
+
+  This is NOT the official 'Brand Page' placement (which would be P2).
+  P5 may count as 'Search results' in Poshmark's docs when filtered.
+
+--------------------------------------------------------------------------------
+P1 = HOMEPAGE/FEED - MEDIUM CONFIDENCE
+--------------------------------------------------------------------------------
+
+Behavioral Evidence:
+  - 65.8% self-transition: Moderate browsing behavior
+  - 43s median gap: Longer dwell time (reading feed)
+  - 31.6% session starts: Second-highest entry point
+  - 80.8% delivery: High delivery rate (premium placement)
+  - <0.1% co-firing with all: Separate page
+
+Product Diversity Evidence:
+  - 11.37 brands/auction: Moderate diversity
+  - 52.9% single-brand, 36.5% >10 brands: BIMODAL pattern
+
+INTERPRETATION:
+  P1's bimodal diversity suggests PERSONALIZED FEED:
+  - Sometimes shows brand-specific recommendations (single-brand)
+  - Sometimes shows diverse recommendations (multi-brand)
+  - Mix of 'items from your favorite sellers' and 'you might like'
+
+  Not an official Poshmark placement (undocumented).
+
+================================================================================
+CO-FIRING PATTERN RECONCILIATION
+================================================================================
+
+P2 <-> P5 Co-Firing (3% rate, highest pair):
+
+  ORIGINAL interpretation: P2=PDP, P5=Brand -> user views product from brand
+  REVISED interpretation:  P2=Seller, P5=Category -> user clicks seller from category
+
+  User flow (revised):
+    Category Browse (P5) -> sees products from many sellers
+    User clicks on interesting seller -> Seller Closet (P2)
+    User browses seller's items (all same brand/seller)
+    User returns to category -> Category Browse (P5)
+
+  This explains the P2<->P5 loop and diversity patterns.
+
+================================================================================
+MAPPING COMPARISON
+================================================================================
+
+ORIGINAL MAPPING (behavioral only):
+  P3 = Search Results
+  P5 = Brand Page         <- INCORRECT based on diversity
+  P2 = PDP Ad Section     <- INCORRECT based on diversity
+  P1 = Homepage/Feed
+
+REVISED MAPPING (behavioral + diversity):
+  P3 = Search Results     <- CONFIRMED
+  P2 = Seller Closet      <- Product diversity decisive (99% single-brand)
+  P5 = Category Browse    <- Product diversity decisive (45 brands/auction)
+  P1 = Homepage/Feed      <- CONFIRMED
+
+================================================================================
+RECONCILIATION WITH OFFICIAL DOCS
+================================================================================
+
+Official Poshmark placements: Search Results, Brand Pages
+
+Our 4 placements map as:
+  P3 = Search Results (official)
+  P2 = 'Brand Pages' (official) - but 'brand' = seller, not product brand
+  P5 = Search Results variant (category filter = search)
+  P1 = Undocumented (homepage/feed)
+
+NOTE: Poshmark's 'Brand Pages' likely refers to SELLER CLOSETS,
+not product brand pages. This aligns with P2's characteristics.
+
+================================================================================
+SUMMARY
+================================================================================
+
+FINAL PLACEMENT MAPPING:
+
+  P3 = Search Results
+       - Users search for items, see diverse results
+       - 2 promoted slots per page (multi-slot clusters)
+
+  P2 = Seller Closet / Brand Page
+       - Users view seller's closet (all items from same seller)
+       - 99.2% single-brand auctions confirms homogeneity
+       - Maps to official 'Brand Pages' placement
+
+  P5 = Category Browse
+       - Users browse a category (e.g., 'Women's Jeans')
+       - 45 brands/auction shows high diversity
+       - May map to official 'Search Results' (filtered)
+
+  P1 = Homepage/Feed
+       - Personalized recommendations on homepage
+       - Mixed diversity (some brand-specific, some varied)
+       - Not an official placement (undocumented)
+
+KEY INSIGHT:
+  Product diversity analysis was DECISIVE in correcting P2/P5 mapping.
+  Behavioral signals alone were insufficient to distinguish seller closet
+  from PDP recommendations.

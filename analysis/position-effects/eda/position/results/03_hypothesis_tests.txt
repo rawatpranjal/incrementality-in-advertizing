@@ -1,0 +1,604 @@
+================================================================================
+POSITION EFFECTS EDA ROUND 2: HYPOTHESIS TESTING
+================================================================================
+
+CONTEXT:
+  First EDA revealed contradictions:
+  - QUALITY × FINAL_BID explains only 1% of RANKING variance (R² = 0.01)
+  - This contradicts claimed ranking mechanics
+
+OBJECTIVE:
+  Test specific hypotheses about ranking formula, funnel logic,
+  quality score meaning, and pacing mechanism.
+
+================================================================================
+
+================================================================================
+SECTION 1: DATA LOADING
+----------------------------------------
+
+Loading data files...
+  auctions_results: 3,748,381 rows
+  auctions_users: 78,318 rows
+  impressions: 192,307 rows
+  clicks: 6,090 rows
+
+Merged PLACEMENT into auctions_results: 3,748,381 have PLACEMENT
+
+Rows with complete scoring features: 3,748,381 / 3,748,381 (100.0%)
+
+================================================================================
+SECTION 2: RANKING FORMULA TESTS (A1, A2, D5, D6)
+----------------------------------------
+
+TEST A1: WITHIN-AUCTION EXACT RANK MATCH
+  Question: If we sort by QUALITY × FINAL_BID desc, do we recover RANKING?
+
+  Computing predicted ranks within each auction...
+  Using score = QUALITY × FINAL_BID:
+    Exact rank match rate: 85.75%
+    Mean absolute error: 0.46 ranks
+
+  Using score = QUALITY × FINAL_BID × PACING:
+    Exact rank match rate: 25.89%
+    Mean absolute error: 3.79 ranks
+
+  INTERPRETATION:
+    50-90% exact match: Ranking partially determined by score
+
+TEST A2: DOES RANK-1 HAVE MAX SCORE IN ITS AUCTION?
+  Question: Is the highest-ranked bid always the highest score?
+
+  Using score = QUALITY × FINAL_BID:
+    Rank-1 has max score: 99.02% of auctions
+
+  Using score = QUALITY × FINAL_BID × PACING:
+    Rank-1 has max score: 87.59% of auctions
+
+TEST D5: DOES ADDING PACING IMPROVE R²?
+  Question: Does QUALITY × FINAL_BID × PACING explain more variance?
+
+  Within-auction R² (score vs RANKING):
+  Sample: 19,869 auctions
+
+  score_v1 = QUALITY × FINAL_BID:
+    Mean R²: 0.5704
+    Median R²: 0.5924
+    P25: 0.4350
+    P75: 0.7156
+
+  score_v2 = QUALITY × FINAL_BID × PACING:
+    Mean R²: 0.4961
+    Median R²: 0.5020
+    P25: 0.3742
+    P75: 0.6218
+
+  R² improvement from adding PACING: -0.0743
+
+TEST D6: IS PACING ALREADY BAKED INTO FINAL_BID?
+  Question: Is CORR(FINAL_BID, FINAL_BID × PACING) ≈ 1?
+
+  CORR(FINAL_BID, FINAL_BID × PACING): 0.937418
+  CORR(FINAL_BID, PACING): 0.053590
+
+  INTERPRETATION: PACING adds information beyond FINAL_BID
+
+================================================================================
+SECTION 3: FUNNEL VERIFICATION (F2, F3)
+----------------------------------------
+
+TEST F2: WINNERS PER AUCTION
+  Question: How many bids win (IS_WINNER=True) per auction?
+
+  N auctions with winners: 77,957
+  Winners per auction:
+    Mean: 38.41
+    Median: 40
+    P25: 40
+    P75: 48
+    Max: 64
+
+  Distribution of winner counts:
+    1 winners: 722 auctions (0.9%)
+    2 winners: 564 auctions (0.7%)
+    3 winners: 448 auctions (0.6%)
+    4 winners: 366 auctions (0.5%)
+    5 winners: 338 auctions (0.4%)
+    6 winners: 350 auctions (0.4%)
+    7 winners: 303 auctions (0.4%)
+    8 winners: 303 auctions (0.4%)
+    9 winners: 272 auctions (0.3%)
+    10 winners: 273 auctions (0.4%)
+    11 winners: 235 auctions (0.3%)
+    12 winners: 213 auctions (0.3%)
+    13 winners: 218 auctions (0.3%)
+    14 winners: 184 auctions (0.2%)
+    15 winners: 208 auctions (0.3%)
+    16 winners: 153 auctions (0.2%)
+    17 winners: 200 auctions (0.3%)
+    18 winners: 154 auctions (0.2%)
+    19 winners: 155 auctions (0.2%)
+    20 winners: 1,743 auctions (2.2%)
+
+TEST F3: IMPRESSIONS PER AUCTION
+  Question: How many impressions per auction?
+
+  N auctions with impressions: 27,045
+  Impressions per auction:
+    Mean: 7.11
+    Median: 4
+    P25: 2
+    P75: 8
+    Max: 68
+
+  Distribution of impression counts:
+    1 impressions: 945 auctions (3.5%)
+    2 impressions: 9,847 auctions (36.4%)
+    3 impressions: 402 auctions (1.5%)
+    4 impressions: 4,776 auctions (17.7%)
+    5 impressions: 212 auctions (0.8%)
+    6 impressions: 2,158 auctions (8.0%)
+    7 impressions: 180 auctions (0.7%)
+    8 impressions: 2,370 auctions (8.8%)
+    9 impressions: 183 auctions (0.7%)
+    10 impressions: 1,512 auctions (5.6%)
+    11 impressions: 118 auctions (0.4%)
+    12 impressions: 791 auctions (2.9%)
+    13 impressions: 112 auctions (0.4%)
+    14 impressions: 364 auctions (1.3%)
+    15 impressions: 80 auctions (0.3%)
+    16 impressions: 396 auctions (1.5%)
+    17 impressions: 77 auctions (0.3%)
+    18 impressions: 265 auctions (1.0%)
+    19 impressions: 71 auctions (0.3%)
+    20 impressions: 290 auctions (1.1%)
+
+  COMPARISON: Winners vs Impressions per auction
+    N auctions with both: 26,331
+    CORR(winners, impressions): 0.2305
+    Mean winners: 35.65
+    Mean impressions: 7.12
+    Ratio (imp/winners): 0.20
+
+================================================================================
+SECTION 4: QUALITY SCORE VALIDATION (B2, B3)
+----------------------------------------
+
+  Winners: 2,993,977
+  Clicked: 5,451 (0.18%)
+
+TEST B2: IS QUALITY A GOOD PCTR PREDICTOR?
+  Question: Does QUALITY predict clicks (AUC)?
+
+  Winners with QUALITY: 2,993,977
+  AUC of QUALITY predicting click: 0.6813
+
+  INTERPRETATION: QUALITY has weak predictive power (0.55 < AUC < 0.7)
+
+TEST B3: IS QUALITY CALIBRATED?
+  Question: Does QUALITY match actual CTR across deciles?
+
+  Calibration table:
+  Decile     Mean QUALITY    N            Clicks     Actual CTR  
+  ---------- --------------- ------------ ---------- ------------
+  0          0.000853        299,398      100        0.0334      %
+  1          0.002790        299,398      144        0.0481      %
+  2          0.004942        299,397      212        0.0708      %
+  3          0.007513        299,398      313        0.1045      %
+  4          0.010720        299,398      440        0.1470      %
+  5          0.014839        299,397      528        0.1764      %
+  6          0.021132        299,398      724        0.2418      %
+  7          0.032281        299,429      961        0.3209      %
+  8          0.048340        299,447      941        0.3142      %
+  9          0.118457        299,317      1,088      0.3635      %
+
+  CTR monotonically increasing with QUALITY: False
+  Correlation(mean_quality, actual_ctr): 0.8091
+
+================================================================================
+SECTION 5: BID FORMULA TEST (C3)
+----------------------------------------
+
+TEST C3: DOES FINAL_BID ≈ CONVERSION_RATE × PRICE?
+  Question: Is FINAL_BID derived from pCVR × Price?
+
+  Rows with FINAL_BID, CONVERSION_RATE, PRICE: 2,993,977
+  R² of FINAL_BID ~ CONVERSION_RATE × PRICE: -1.0639
+  Correlation: 0.7324
+
+  Summary of FINAL_BID / (CONVERSION_RATE × PRICE):
+    Mean: 202.4656
+    Median: 123.8252
+    Std: 447.9948
+    P10: 57.7463
+    P90: 376.7662
+
+  INTERPRETATION: Moderate relationship (corr > 0.5)
+
+================================================================================
+SECTION 6: PACING MECHANISM (D2)
+----------------------------------------
+
+TEST D2: IS PACING CAMPAIGN-LEVEL?
+  Question: Does PACING vary within or between campaigns?
+
+  Rows with CAMPAIGN_ID, PACING: 3,748,381
+  Unique campaigns: 37,579
+
+  Variance decomposition:
+    Overall variance: 0.047051
+    Between-campaign variance: 0.023300
+    Within-campaign variance: 0.023430
+    ICC (intraclass correlation): 0.4986
+
+  INTERPRETATION: PACING varies mostly within campaigns (not campaign-level)
+
+  Sample campaigns (top 10 by count):
+  Campaign                                 N          Mean PACING     Std PACING     
+  ---------------------------------------- ---------- --------------- ---------------
+  019bfffb2e7676219c0ae363b915b672         23178      0.9942          0.0386         
+  019c101d201b7e92b2c126547e5aa63e         16716      1.0000          0.0000         
+  019c002bc9767ca39693ceecfdfd8e95         16635      0.9698          0.0788         
+  019bf7606f4d7b808241eb3edd71c0f3         8512       0.9965          0.0579         
+  019c127fd5377352a8f186820b5c842b         7839       0.9873          0.0658         
+  019c0daa01dd75b1a9ad4ad348009950         6963       0.9964          0.0463         
+  019c0a670b907582b6b5e48f255e47a1         6765       0.9014          0.2784         
+  019c033327f87a638b1103b9326b858e         6482       0.9800          0.0941         
+  019bff2d479b76b3a8118a26425a14e9         6194       0.9915          0.0538         
+  019c0f98ac807c40a9a963501d258cae         5597       0.9861          0.0453         
+
+================================================================================
+SECTION 7: CTR BY PLACEMENT × RANK
+----------------------------------------
+
+Question: Does CTR by rank differ across placements?
+
+  Winners with PLACEMENT: 2,993,977
+  Unique placements: 4
+
+  Top placements by volume:
+    3: 1,848,744 (61.7%)
+    1: 417,661 (14.0%)
+    5: 408,132 (13.6%)
+    2: 319,440 (10.7%)
+
+  CTR by Rank for top 5 placements:
+
+  Placement: 3
+    Rank     N            Clicks     CTR %     
+    -------- ------------ ---------- ----------
+    1        46,838       151        0.322     
+    2        46,838       133        0.284     
+    3        46,838       72         0.154     
+    4        46,838       64         0.137     
+    5        46,838       55         0.117     
+    6        46,838       57         0.122     
+    7        46,838       51         0.109     
+    8        46,838       53         0.113     
+    9        46,838       37         0.079     
+    10       46,838       52         0.111     
+    Monotonic (top 5): False
+
+  Placement: 1
+    Rank     N            Clicks     CTR %     
+    -------- ------------ ---------- ----------
+    1        14,279       318        2.227     
+    2        13,786       288        2.089     
+    3        13,373       149        1.114     
+    4        13,042       180        1.380     
+    5        12,794       122        0.954     
+    6        12,550       96         0.765     
+    7        12,297       98         0.797     
+    8        12,070       87         0.721     
+    9        11,831       73         0.617     
+    10       11,633       70         0.602     
+    Monotonic (top 5): False
+
+  Placement: 5
+    Rank     N            Clicks     CTR %     
+    -------- ------------ ---------- ----------
+    1        8,601        9          0.105     
+    2        8,588        9          0.105     
+    3        8,581        4          0.047     
+    4        8,575        6          0.070     
+    5        8,573        4          0.047     
+    6        8,569        2          0.023     
+    7        8,569        4          0.047     
+    8        8,563        4          0.047     
+    9        8,560        1          0.012     
+    10       8,560        3          0.035     
+    Monotonic (top 5): False
+
+  Placement: 2
+    Rank     N            Clicks     CTR %     
+    -------- ------------ ---------- ----------
+    1        8,239        143        1.736     
+    2        8,023        139        1.733     
+    3        7,879        93         1.180     
+    4        7,768        109        1.403     
+    5        7,652        73         0.954     
+    6        7,562        71         0.939     
+    7        7,465        47         0.630     
+    8        7,395        70         0.947     
+    9        7,334        52         0.709     
+    10       7,260        57         0.785     
+    Monotonic (top 5): False
+
+
+================================================================================
+SECTION 8: MULTI-CLICK INVESTIGATION
+----------------------------------------
+
+Question: What's happening in auctions with 2+ clicks?
+
+  Total auctions with clicks: 3,764
+  Auctions with 2+ clicks: 1,230 (32.7%)
+
+  Distribution of clicks per auction:
+    1 clicks: 2,534 (67.3%)
+    2 clicks: 722 (19.2%)
+    3 clicks: 273 (7.3%)
+    4 clicks: 111 (2.9%)
+    5 clicks: 49 (1.3%)
+    6 clicks: 23 (0.6%)
+    7 clicks: 25 (0.7%)
+    8 clicks: 9 (0.2%)
+    9 clicks: 8 (0.2%)
+    10 clicks: 2 (0.1%)
+
+  Time gap analysis in multi-click auctions:
+    Min gap between clicks:
+      Mean: 46.52 seconds
+      Median: 18.00 seconds
+      P10: 4.00 seconds
+      P90: 86.10 seconds
+
+    Potential duplicate clicks (gap < 1 sec): 13 (1.1%)
+
+  Same product vs different products:
+    Same product clicked multiple times: 194 (15.8%)
+    Different products clicked: 1036 (84.2%)
+
+  Ranks of products in multi-click auctions:
+    Rank 1: 284 clicks
+    Rank 2: 257 clicks
+    Rank 3: 186 clicks
+    Rank 4: 201 clicks
+    Rank 5: 150 clicks
+    Rank 6: 132 clicks
+    Rank 7: 128 clicks
+    Rank 8: 145 clicks
+    Rank 9: 118 clicks
+    Rank 10: 128 clicks
+
+================================================================================
+SECTION 9: PACING DISTRIBUTION
+----------------------------------------
+
+  N rows with PACING: 3,748,381
+
+  PACING range:
+    Min: 0.006738
+    Max: 1.000000
+    Mean: 0.919041
+    Median: 1.000000
+    Std: 0.216912
+
+  Fraction in [0, 1]: 100.00%
+
+  PACING percentiles:
+    P1: 0.036509
+    P5: 0.326736
+    P10: 0.621815
+    P25: 1.000000
+    P50: 1.000000
+    P75: 1.000000
+    P90: 1.000000
+    P95: 1.000000
+    P99: 1.000000
+
+  PACING by campaign (top 10 campaigns by N):
+  Campaign                                 N          Mean       Std        Min        Max       
+  ---------------------------------------- ---------- ---------- ---------- ---------- ----------
+  019bfffb2e7676219c0ae363b915b672         23178      0.9942     0.0386     0.6578     1.0000    
+  019c101d201b7e92b2c126547e5aa63e         16716      1.0000     0.0000     1.0000     1.0000    
+  019c002bc9767ca39693ceecfdfd8e95         16635      0.9698     0.0788     0.3560     1.0000    
+  019bf7606f4d7b808241eb3edd71c0f3         8512       0.9965     0.0579     0.0069     1.0000    
+  019c127fd5377352a8f186820b5c842b         7839       0.9873     0.0658     0.5413     1.0000    
+  019c0daa01dd75b1a9ad4ad348009950         6963       0.9964     0.0463     0.2917     1.0000    
+  019c0a670b907582b6b5e48f255e47a1         6765       0.9014     0.2784     0.0402     1.0000    
+  019c033327f87a638b1103b9326b858e         6482       0.9800     0.0941     0.3277     1.0000    
+  019bff2d479b76b3a8118a26425a14e9         6194       0.9915     0.0538     0.5066     1.0000    
+  019c0f98ac807c40a9a963501d258cae         5597       0.9861     0.0453     0.7232     1.0000    
+
+================================================================================
+SECTION 10: WINNER → IMPRESSION SELECTION (H3)
+----------------------------------------
+
+Question: Among IS_WINNER=True, who gets impressions?
+  Is it top-N by rank? Random? Something else?
+
+  Winners: 2,993,977
+  Winners with impressions: 187,544 (6.26%)
+
+  P(impression | rank) for winners:
+  Rank     N Winners       N Impressed     Imp Rate %  
+  -------- --------------- --------------- ------------
+  1        78,341          20,718          26.45       
+  2        77,610          20,494          26.41       
+  3        76,731          11,380          14.83       
+  4        76,282          11,023          14.45       
+  5        75,866          8,256           10.88       
+  6        75,530          8,054           10.66       
+  7        75,178          7,249           9.64        
+  8        74,873          7,155           9.56        
+  9        74,567          5,687           7.63        
+  10       74,295          5,773           7.77        
+  11       74,022          5,303           7.16        
+  12       73,787          5,350           7.25        
+  13       73,572          4,964           6.75        
+  14       73,353          4,907           6.69        
+  15       73,171          4,590           6.27        
+  16       72,964          4,438           6.08        
+  17       72,809          4,039           5.55        
+  18       72,610          3,850           5.30        
+  19       72,456          3,400           4.69        
+  20       72,299          3,151           4.36        
+
+  Impression rate monotonically decreasing (top 10): False
+
+  Testing top-N selection hypothesis:
+  Up to Rank   Cum Winners     Cum Impressed   Cum Rate %  
+  ------------ --------------- --------------- ------------
+  1            78,341          20,718          26.45       
+  2            155,951         41,212          26.43       
+  3            232,682         52,592          22.60       
+  4            308,964         63,615          20.59       
+  5            384,830         71,871          18.68       
+  6            460,360         79,925          17.36       
+  7            535,538         87,174          16.28       
+  8            610,411         94,329          15.45       
+  9            684,978         100,016         14.60       
+  10           759,273         105,789         13.93       
+  11           833,295         111,092         13.33       
+  12           907,082         116,442         12.84       
+  13           980,654         121,406         12.38       
+  14           1,054,007       126,313         11.98       
+  15           1,127,178       130,903         11.61       
+
+  Rank 30 captures 90% of impressions
+  Rank 51 captures 99% of impressions
+
+================================================================================
+SECTION 11: RANK 4 ANOMALY INVESTIGATION (H7)
+----------------------------------------
+
+Question: Is Rank 4 a special slot? Different characteristics?
+
+  Rank 3 characteristics (N=76,671):
+    QUALITY:    mean=0.036287, median=0.022220, std=0.060890
+    FINAL_BID:  mean=12.2378, median=8.0000, std=12.5888
+    PRICE:      mean=10.89, median=7.00, std=10.82
+    PACING:     mean=0.9244, median=1.0000, std=0.2073
+    CTR:        0.4148% (318 clicks)
+    Imp Rate:   14.83%
+
+  Rank 4 characteristics (N=76,223):
+    QUALITY:    mean=0.033801, median=0.020042, std=0.058990
+    FINAL_BID:  mean=11.5446, median=8.0000, std=11.3671
+    PRICE:      mean=10.59, median=7.00, std=10.03
+    PACING:     mean=0.9272, median=1.0000, std=0.2035
+    CTR:        0.4710% (359 clicks)
+    Imp Rate:   14.45%
+
+  Rank 5 characteristics (N=75,857):
+    QUALITY:    mean=0.032026, median=0.018478, std=0.056577
+    FINAL_BID:  mean=11.1365, median=8.0000, std=10.9867
+    PRICE:      mean=10.43, median=7.00, std=9.95
+    PACING:     mean=0.9277, median=1.0000, std=0.2012
+    CTR:        0.3348% (254 clicks)
+    Imp Rate:   10.88%
+
+  Comparing Rank 3 vs Rank 4:
+    QUALITY diff (R4-R3): -0.002486
+    QUALITY ratio (R4/R3): 0.9315
+    FINAL_BID diff (R4-R3): -0.6932
+    FINAL_BID ratio (R4/R3): 0.9434
+    CTR diff (R4-R3): 0.0562pp
+    CTR ratio (R4/R3): 1.1356
+
+  Variance comparison (coefficient of variation):
+    Rank 3: CV(QUALITY)=1.6780, CV(BID)=1.0287
+    Rank 4: CV(QUALITY)=1.7452, CV(BID)=0.9846
+    Rank 5: CV(QUALITY)=1.7666, CV(BID)=0.9865
+
+================================================================================
+SECTION 12: POSITION EFFECTS WITHIN IMPRESSION-RECEIVERS (H4)
+----------------------------------------
+
+Question: Among products that got impressions, is CTR monotonic in rank?
+
+  Winners with impressions: 187,544
+
+  CTR by Rank (impression-receivers only):
+  Rank     Impressions     Clicks       CTR %     
+  -------- --------------- ------------ ----------
+  1        20,718          605          2.9202    
+  2        20,494          550          2.6837    
+  3        11,380          310          2.7241    
+  4        11,023          347          3.1480    
+  5        8,256           248          3.0039    
+  6        8,054           221          2.7440    
+  7        7,249           196          2.7038    
+  8        7,155           208          2.9071    
+  9        5,687           161          2.8310    
+  10       5,773           174          3.0140    
+  11       5,303           175          3.3000    
+  12       5,350           144          2.6916    
+  13       4,964           166          3.3441    
+  14       4,907           128          2.6085    
+  15       4,590           138          3.0065    
+  16       4,438           135          3.0419    
+  17       4,039           86           2.1292    
+  18       3,850           109          2.8312    
+  19       3,400           81           2.3824    
+  20       3,151           81           2.5706    
+
+  CTR monotonically decreasing (top 10 with N>=100): False
+
+  Comparison: CTR by Rank (all winners vs impression-receivers):
+  Rank     All Winners CTR %    Impressed CTR %      Ratio     
+  -------- -------------------- -------------------- ----------
+  1        0.7966               2.9202               3.67      
+  2        0.7367               2.6837               3.64      
+  3        0.4148               2.7241               6.57      
+  4        0.4710               3.1480               6.68      
+  5        0.3348               3.0039               8.97      
+  6        0.2993               2.7440               9.17      
+  7        0.2661               2.7038               10.16     
+  8        0.2858               2.9071               10.17     
+  9        0.2186               2.8310               12.95     
+  10       0.2450               3.0140               12.30     
+
+  Position effect magnitude (relative to Rank 1):
+  Rank     CTR %           Relative to R1  Decay     
+  -------- --------------- --------------- ----------
+  1        2.9202          1.0000          0.0000    
+  2        2.6837          0.9190          0.0810    
+  3        2.7241          0.9329          0.0671    
+  4        3.1480          1.0780          -0.0780   
+  5        3.0039          1.0287          -0.0287   
+  6        2.7440          0.9397          0.0603    
+  7        2.7038          0.9259          0.0741    
+  8        2.9071          0.9955          0.0045    
+  9        2.8310          0.9695          0.0305    
+  10       3.0140          1.0321          -0.0321   
+
+================================================================================
+SECTION 13: SUMMARY OF FINDINGS
+================================================================================
+
+RANKING FORMULA TESTS:
+  A1: Exact rank match rate (QUALITY × BID): 85.75%
+  A2: Rank-1 has max score: 99.02%
+  D5: R² improvement from PACING: -0.0743
+  D6: CORR(BID, BID×PACING): 0.9374
+
+FUNNEL VERIFICATION:
+  F2: Mean winners per auction: 38.41
+  F3: Mean impressions per auction: 7.11
+
+QUALITY SCORE:
+  B2: AUC for click prediction: 0.6813
+
+WINNER → IMPRESSION SELECTION (H3):
+  Overall impression rate for winners: 6.26%
+  Impression rate monotonic in rank: False
+
+POSITION EFFECTS (H4 - Impressed Only):
+  CTR monotonic for impression-receivers: False
+  Rank 1 CTR (impressed): 2.9202%
+
+================================================================================
+HYPOTHESIS TESTING COMPLETE
+================================================================================

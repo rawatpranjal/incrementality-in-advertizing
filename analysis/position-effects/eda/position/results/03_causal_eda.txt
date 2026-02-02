@@ -1,0 +1,642 @@
+================================================================================
+CAUSAL INFERENCE VIABILITY EDA - ROUND 2 DATA
+================================================================================
+
+================================================================================
+SECTION 0: DATA LOADING
+----------------------------------------
+
+Loading data files...
+  auctions_results: 4,337,598 rows, 12 columns
+  auctions_users: 91,802 rows, 4 columns
+  impressions: 226,939 rows, 7 columns
+  clicks: 7,151 rows, 7 columns
+  purchases: 882 rows, 7 columns
+  catalog: 159,888 rows, 7 columns
+
+AUCTIONS_RESULTS columns:
+  AUCTION_ID: dtype=object, null=0, unique=91,641
+  VENDOR_ID: dtype=object, null=0, unique=37,656
+  CAMPAIGN_ID: dtype=object, null=0, unique=38,086
+  PRODUCT_ID: dtype=object, null=0, unique=1,160,499
+  RANKING: dtype=int64, null=0, min=1.0000, max=74.0000
+  IS_WINNER: dtype=bool, null=0, unique=2
+  FINAL_BID: dtype=int64, null=0, min=0.0000, max=100.0000
+  QUALITY: dtype=float64, null=0, min=0.0000, max=0.9998
+  CONVERSION_RATE: dtype=float64, null=0, min=0.0000, max=0.0565
+  PACING: dtype=float64, null=0, min=0.0067, max=1.0000
+  PRICE: dtype=float64, null=871,405, min=1.0000, max=101.0000
+  CREATED_AT: dtype=datetime64[ns], null=0, unique=91,155
+
+Date ranges:
+  auctions_results: 2026-02-01 19:19:26.106000 to 2026-02-02 04:15:29.762000
+  auctions_users: 2026-02-01 19:19:21.250000 to 2026-02-02 04:15:29.755000
+  impressions: 2026-02-01 19:24:16 to 2026-02-02 04:18:17
+  clicks: 2026-02-01 19:24:47 to 2026-02-02 04:17:59
+  purchases: 2026-02-01 19:25:57 to 2026-02-02 04:19:43
+
+Basic counts:
+  Unique auctions (AR): 91,641
+  Unique auctions (AU): 91,802
+  Unique vendors: 37,656
+  Unique products (AR): 1,160,499
+  Unique products (catalog): 159,888
+  Unique users (AU): 7,709
+  Unique users (purchases): 593
+
+Join validation (auction_id overlaps):
+  AR ∩ AU: 100.0%
+  IMP ∩ AR: 98.5%
+  CLICK ∩ AR: 98.7%
+
+Creating merged analysis dataframe...
+  Merged impressions: 226,939 rows
+  With RANKING: 224,009 (98.7%)
+  With PLACEMENT: 224,009 (98.7%)
+  Total clicks matched: 6,351
+
+================================================================================
+SECTION 1: SELECTION INTO IMPRESSION
+----------------------------------------
+
+OBJECTIVE: Understand what determines whether a bid gets an impression.
+
+Overall impression rate:
+  Total bids: 4,337,598
+  Bids with impression: 222,890 (5.14%)
+  Winners: 3,466,193 (79.91%)
+
+Impression rate by IS_WINNER:
+  IS_WINNER=True: 6.43% (N=3,466,193)
+  IS_WINNER=False: 0.00% (N=871,405)
+
+Impression rate by RANKING (top 64):
+  Rank     N Bids          Imp Rate %   Winner Rate %  
+  -------- --------------- ------------ ---------------
+  1        91,641          26.42        99.56          
+  2        91,132          26.16        98.99          
+  3        90,760          14.87        98.53          
+  4        90,469          14.41        98.13          
+  5        90,225          10.73        97.82          
+  6        90,007          10.44        97.50          
+  7        89,857          9.52         97.17          
+  8        89,701          9.40         96.90          
+  9        89,534          7.54         96.68          
+  10       89,369          7.67         96.46          
+  11       89,066          7.22         96.40          
+  12       88,597          7.33         96.61          
+  13       88,182          6.81         96.76          
+  14       87,737          6.79         96.92          
+  15       87,396          6.37         97.03          
+  16       86,990          6.25         97.21          
+  17       86,506          5.70         97.38          
+  18       86,144          5.48         97.54          
+  19       85,845          4.84         97.66          
+  20       85,470          4.55         97.75          
+  21       85,150          3.66         95.58          
+  22       84,912          3.36         95.63          
+  23       84,544          3.13         95.71          
+  24       84,278          3.02         95.82          
+  25       84,047          2.59         95.77          
+  26       83,832          2.58         95.83          
+  27       83,646          2.48         95.90          
+  28       83,391          2.42         95.95          
+  29       83,212          2.20         95.94          
+  30       83,033          2.16         95.91          
+  31       80,900          2.09         98.12          
+  32       80,671          2.06         97.93          
+  33       80,489          1.81         87.64          
+  34       80,344          1.77         87.27          
+  35       80,123          1.67         86.85          
+  36       79,999          1.68         86.36          
+  37       79,793          1.55         86.11          
+  38       79,654          1.57         86.11          
+  39       79,318          1.51         86.35          
+  40       78,577          1.49         87.07          
+  41       77,784          0.87         29.92          
+  42       77,105          0.88         30.14          
+  43       68,939          0.85         33.65          
+  44       68,838          0.84         33.64          
+  45       68,742          0.84         33.65          
+  46       68,656          0.82         33.65          
+  47       68,569          0.81         33.64          
+  48       68,494          0.83         33.65          
+  49       68,406          0.64         6.03           
+  50       68,327          0.61         6.00           
+  51       23,190          1.71         17.56          
+  52       23,165          1.74         17.50          
+  53       23,132          1.69         17.46          
+  54       23,101          1.71         17.43          
+  55       23,080          1.64         17.38          
+  56       23,052          1.68         17.36          
+  57       23,022          0.06         1.28           
+  58       23,001          0.06         1.28           
+  59       4,080           0.39         7.21           
+  60       4,057           0.39         7.22           
+  61       4,035           0.30         7.26           
+  62       4,013           0.30         7.25           
+  63       4,003           0.32         7.27           
+  64       3,989           0.33         7.30           
+
+Impression rate by QUALITY decile:
+  Decile     N            Imp Rate %      Win Rate %     
+  ---------- ------------ --------------- ---------------
+  0          433,760      1.06            69.18          
+  1          433,760      1.77            73.05          
+  2          433,760      2.51            75.88          
+  3          433,759      3.39            78.21          
+  4          433,760      4.57            80.84          
+  5          433,760      5.62            84.95          
+  6          433,761      7.94            86.75          
+  7          433,896      9.76            84.86          
+  8          433,622      7.65            81.10          
+  9          433,760      7.11            84.27          
+
+Impression rate by FINAL_BID decile:
+  Decile     N            Imp Rate %      Win Rate %     
+  ---------- ------------ --------------- ---------------
+  0          500,559      2.85            69.81          
+  1          773,262      4.64            78.71          
+  2          623,658      5.25            79.30          
+  3          407,378      5.31            79.59          
+  4          524,636      5.03            80.44          
+  5          355,200      5.19            81.84          
+  6          364,910      5.51            82.00          
+  7          354,612      6.04            83.55          
+  8          433,383      7.40            87.93          
+
+Impression rate by auction size (num bidders):
+  Size Bin     N               Imp Rate %      Win Rate %     
+  ------------ --------------- --------------- ---------------
+  1-10         12,035          32.23           57.23          
+  11-20        59,593          18.97           47.18          
+  21-30        116,045         13.77           67.70          
+  31-40        115,508         9.20            80.55          
+  41-50        2,655,720       3.93            79.54          
+  51-60        1,110,280       2.55            82.78          
+  60+          268,417         18.04           84.99          
+
+Impression rate by PACING decile:
+  Decile     N            Imp Rate %      Win Rate %     
+  ---------- ------------ --------------- ---------------
+  0          433,770      4.77            69.42          
+  1          3,903,828    5.18            81.08          
+
+Logistic regression: P(impression) ~ features
+
+  Logistic regression coefficients (standardized):
+    RANKING: -1.1724
+    QUALITY: 0.1000
+    FINAL_BID: 0.0486
+    PACING: 0.0493
+    n_bidders: -0.0327
+  Intercept: -3.4762
+
+  McFadden's pseudo-R2: 0.1188
+
+================================================================================
+SECTION 2: RDD FEASIBILITY
+----------------------------------------
+
+OBJECTIVE: Assess feasibility of regression discontinuity design.
+
+Score distribution (QUALITY * FINAL_BID):
+  count: 4337598.0000
+  mean: 0.1801
+  std: 0.4361
+  min: 0.0000
+  25%: 0.0203
+  50%: 0.0542
+  75%: 0.1600
+  max: 47.2133
+
+Within-auction score gaps between adjacent ranks:
+  Total gap observations: 4,245,957
+
+Gap distribution:
+  Mean: 0.011278
+  Median: 0.000721
+  Std: 0.125435
+  P25: 0.000136
+  P75: 0.003621
+  P95: 0.046087
+
+Gap concentration:
+  |gap| < 0.1: 97.59%
+  |gap| < 0.01: 81.42%
+  |gap| < 0.001: 50.83%
+  |gap| < 0.0001: 16.76%
+
+Sample size at rank boundaries within bandwidths:
+  Rank 1, |gap| < 0.01: N = 13,085
+  Rank 2, |gap| < 0.01: N = 27,647
+  Rank 3, |gap| < 0.01: N = 38,363
+  Rank 4, |gap| < 0.01: N = 48,054
+  Rank 5, |gap| < 0.01: N = 54,103
+  Rank 1, |gap| < 0.001: N = 1,941
+  Rank 2, |gap| < 0.001: N = 5,037
+  Rank 3, |gap| < 0.001: N = 7,566
+  Rank 4, |gap| < 0.001: N = 10,857
+  Rank 5, |gap| < 0.001: N = 13,338
+  Rank 1, |gap| < 0.0001: N = 514
+  Rank 2, |gap| < 0.0001: N = 1,070
+  Rank 3, |gap| < 0.0001: N = 1,721
+  Rank 4, |gap| < 0.0001: N = 2,232
+  Rank 5, |gap| < 0.0001: N = 2,933
+
+McCrary density test proxy:
+  Left of 0 density (mean count): 688.57
+  Right of 0 density (mean count): 33882.01
+  Ratio (left/right): 0.020
+
+Covariate balance at winner/loser cutoff:
+  Marginal winners (rank = max winner rank): 91,240
+  Marginal losers (rank = max winner rank + 1): 88,961
+
+  QUALITY: winner=0.0171, loser=0.0194, diff=-0.0024, std_diff=-0.083
+  FINAL_BID: winner=6.8340, loser=6.5049, diff=0.3291, std_diff=0.048
+  PACING: winner=0.9576, loser=0.8850, diff=0.0726, std_diff=0.324
+  CONVERSION_RATE: winner=0.0093, loser=0.0096, diff=-0.0002, std_diff=-0.039
+
+================================================================================
+SECTION 3: DISPLAY POSITION VS BID RANK
+----------------------------------------
+
+OBJECTIVE: Assess if RANKING corresponds to display order.
+
+Timestamp analysis of impressions:
+  Total auctions with impressions: 31,996
+  Auctions with unique timestamps per impression: 1,567
+  Mean time span (seconds): 50.8335
+  Auctions with time span > 1s: 16,839
+
+  'Good timestamp' auctions (unique times, span > 1s): 322
+
+  Correlation (display_position vs RANKING): 0.2057
+  Mean |display - RANKING|: 13.15
+  Median |display - RANKING|: 10.00
+  % exact match: 21.2%
+
+CTR comparison by timestamp quality:
+  Good timestamp = True: CTR = 4.069% (N = 1,106)
+  Good timestamp = False: CTR = 2.792% (N = 225,833)
+
+================================================================================
+SECTION 4: CTR BY RANK
+----------------------------------------
+
+OBJECTIVE: Measure click-through rate by ranking position.
+
+CTR by RANKING (positions 1-20):
+  Rank     Impressions     Clicks       CTR %     
+  -------- --------------- ------------ ----------
+  1        24,660          723          2.932     
+  2        24,270          649          2.674     
+  3        13,548          385          2.842     
+  4        13,092          412          3.147     
+  5        9,693           317          3.270     
+  6        9,406           263          2.796     
+  7        8,562           239          2.791     
+  8        8,442           233          2.760     
+  9        6,753           199          2.947     
+  10       6,857           185          2.698     
+  11       6,440           182          2.826     
+  12       6,506           200          3.074     
+  13       6,006           195          3.247     
+  14       5,957           167          2.803     
+  15       5,573           146          2.620     
+  16       5,441           155          2.849     
+  17       4,931           123          2.494     
+  18       4,723           126          2.668     
+  19       4,156           106          2.551     
+  20       3,888           95           2.443     
+
+CTR by RANKING stratified by PLACEMENT:
+
+  PLACEMENT = 1:
+    Rank     Impressions     Clicks     CTR %   
+    -------- --------------- ---------- --------
+    1        12,936          360        2.783   
+    2        12,419          326        2.625   
+    3        7,198           183        2.542   
+    4        6,997           217        3.101   
+    5        5,180           159        3.069   
+    6        5,022           125        2.489   
+    7        4,368           116        2.656   
+    8        4,249           100        2.353   
+    9        3,415           92         2.694   
+    10       3,331           73         2.192   
+
+  PLACEMENT = 2:
+    Rank     Impressions     Clicks     CTR %   
+    -------- --------------- ---------- --------
+    1        4,914           164        3.337   
+    2        4,854           155        3.193   
+    3        2,893           110        3.802   
+    4        2,823           110        3.897   
+    5        2,157           85         3.941   
+    6        2,121           71         3.347   
+    7        1,906           52         2.728   
+    8        1,908           71         3.721   
+    9        1,665           63         3.784   
+    10       1,646           51         3.098   
+
+  PLACEMENT = 3:
+    Rank     Impressions     Clicks     CTR %   
+    -------- --------------- ---------- --------
+    1        6,314           192        3.041   
+    2        6,504           162        2.491   
+    3        3,103           89         2.868   
+    4        2,923           81         2.771   
+    5        2,177           68         3.124   
+    6        2,084           64         3.071   
+    7        2,117           68         3.212   
+    8        2,113           59         2.792   
+    9        1,543           42         2.722   
+    10       1,754           59         3.364   
+
+  PLACEMENT = 5:
+    Rank     Impressions     Clicks     CTR %   
+    -------- --------------- ---------- --------
+    1        496             7          1.411   
+    2        493             6          1.217   
+    3        354             3          0.847   
+    4        349             4          1.146   
+    5        179             5          2.793   
+    6        179             3          1.676   
+    7        171             3          1.754   
+    8        172             3          1.744   
+    9        130             2          1.538   
+    10       126             2          1.587   
+
+Rank 4 anomaly check:
+  Rank 3 CTR: 2.842%
+  Rank 4 CTR: 3.147%
+  Rank 5 CTR: 3.270%
+  Expected Rank 4 (linear interp): 3.056%
+  Anomaly: 0.091pp
+
+CTR by rank conditional on auction size:
+  Auction size 1-10 bidders:
+    Rank 1: CTR = 4.184% (N = 1,434)
+    Rank 2: CTR = 3.535% (N = 990)
+    Rank 3: CTR = 2.791% (N = 430)
+    Rank 4: CTR = 2.614% (N = 306)
+    Rank 5: CTR = 2.424% (N = 165)
+  Auction size 10-50 bidders:
+    Rank 1: CTR = 3.313% (N = 8,512)
+    Rank 2: CTR = 3.135% (N = 8,325)
+    Rank 3: CTR = 2.865% (N = 5,445)
+    Rank 4: CTR = 3.233% (N = 5,290)
+    Rank 5: CTR = 3.468% (N = 4,210)
+  Auction size 50-200 bidders:
+    Rank 1: CTR = 2.589% (N = 14,714)
+    Rank 2: CTR = 2.360% (N = 14,955)
+    Rank 3: CTR = 2.828% (N = 7,673)
+    Rank 4: CTR = 3.108% (N = 7,496)
+    Rank 5: CTR = 3.140% (N = 5,318)
+
+================================================================================
+SECTION 5: WITHIN-PRODUCT POSITION VARIATION
+----------------------------------------
+
+OBJECTIVE: Identify products appearing at multiple positions.
+
+Product position variation summary:
+  Total products with impressions: 160,381
+  Products with 2+ positions: 30,908
+  Products with 5+ auctions: 3,299
+  Products with range > 3: 20,740
+
+Products with 5+ auctions AND range > 3: 2,686
+
+CTR comparison for high-variation products:
+  CTR at ranks 1-5: 1.992% (N = 7,881)
+  CTR at ranks 6-10: 2.345% (N = 3,198)
+  Difference: -0.353pp
+
+User-product pairs with position variation:
+  Total user-product pairs: 186,829
+  Pairs with 2+ positions: 18,511
+  Pairs with range > 3: 9,568
+
+================================================================================
+SECTION 6: PLACEMENT DEEP DIVE
+----------------------------------------
+
+OBJECTIVE: Understand placement-level behavior.
+
+Placement summary:
+  Placement    Auctions     Impressions     CTR %      Avg Rank  
+  ------------ ------------ --------------- ---------- ----------
+  1            14,019       108,848         2.529      11.21     
+  2            5,781        61,693          3.454      17.76     
+  3            11,134       48,456          2.739      8.31      
+  5            567          5,012           1.556      13.71     
+
+Impressions per auction by placement:
+  Placement    Mean       Median     Max       
+  ------------ ---------- ---------- ----------
+  1            7.76       4          60        
+  2            10.67      4          68        
+  3            4.35       4          18        
+  5            8.84       4          48        
+
+Average RANKING of impressed items by placement:
+  Placement 1: avg RANKING = 11.21
+  Placement 2: avg RANKING = 17.76
+  Placement 3: avg RANKING = 8.31
+  Placement 5: avg RANKING = 13.71
+
+Multi-click rate by placement:
+  Placement 1: 3.72%
+  Placement 2: 7.85%
+  Placement 3: 1.53%
+  Placement 5: 2.29%
+
+================================================================================
+SECTION 7: MULTI-CLICK PATTERNS
+----------------------------------------
+
+OBJECTIVE: Understand click behavior within auctions.
+
+Clicks per auction distribution:
+  0 clicks: 27,711 (86.6%)
+  1 clicks: 3,117 (9.7%)
+  2 clicks: 728 (2.3%)
+  3 clicks: 234 (0.7%)
+  4 clicks: 104 (0.3%)
+  2+ clicks: 1,168 (3.7%)
+
+Multi-click auctions: 1,168
+
+Rank of first vs second click:
+  First click avg rank: 7.75
+  Second click avg rank: 15.02
+
+Rank difference (second - first):
+  Mean: 7.27
+  % sequential (diff = 1): 13.7%
+  % jumping (|diff| > 1): 79.1%
+  % backwards (diff < 0): 7.7%
+
+Time between clicks:
+  Mean: 62.12 seconds
+  Median: 31.00 seconds
+  P95: 172.75 seconds
+
+================================================================================
+SECTION 8: PURCHASE FUNNEL
+----------------------------------------
+
+OBJECTIVE: Connect impressions/clicks to purchases.
+
+Purchase data summary:
+  Total purchases: 882
+  Unique users: 593
+  Unique products: 861
+
+Matching purchases to impressions:
+  Purchases with prior impression: 22 (2.5%)
+  Purchases with prior click: 19 (2.2%)
+  Purchases with click but no impression: 1
+
+Conversion rate by click rank:
+  Rank     Clicks       Conversions     Conv Rate % 
+  -------- ------------ --------------- ------------
+  1        777          5               0.64        
+  2        692          0               0.00        
+  3        412          3               0.73        
+  4        441          1               0.23        
+  5        336          1               0.30        
+  6        279          0               0.00        
+  7        255          3               1.18        
+  8        258          0               0.00        
+  9        218          2               0.92        
+  10       205          0               0.00        
+
+Conversion rate: clicked vs non-clicked impressions:
+  Clicked impressions: conversion rate = 0.283%
+  Non-clicked impressions: conversion rate = 0.007%
+
+================================================================================
+SECTION 9: SCORE MECHANICS VALIDATION
+----------------------------------------
+
+OBJECTIVE: Validate that RANKING = f(QUALITY, FINAL_BID).
+
+Computing expected rank from QUALITY * FINAL_BID...
+  % exact match: 85.90%
+  Correlation: 0.992553
+  MAE: 0.5103
+
+Testing if QUALITY alone determines rank:
+  % exact match (QUALITY only): 5.02%
+  Correlation (QUALITY only): 0.478115
+
+Mismatches (expected != actual): 611,630 (14.10%)
+
+Mismatch analysis:
+  Mean rank error in mismatches: 3.62
+  Max rank error: 46
+
+Checking for tied scores within mismatched auctions:
+  Auctions with tied scores (sample of 100): 58 (58.0%)
+
+================================================================================
+SECTION 10: COMPETITION AS INSTRUMENT
+----------------------------------------
+
+OBJECTIVE: Assess viability of auction competition as instrument.
+
+Distribution of bidders per auction:
+  Mean: 47.3
+  Median: 50
+  P25: 45
+  P75: 58
+  P95: 58
+  Max: 74
+
+Effect of competition on RANKING for same product:
+  Within-product correlation (n_bidders vs RANKING):
+    Mean: 0.1950
+    Median: 0.2485
+    % positive (more competition -> lower rank): 67.5%
+
+First stage regression: RANKING ~ num_bidders + quality + bid
+  Coefficients:
+    n_bidders: 0.3295
+    QUALITY: -24.2743
+    FINAL_BID: -0.2463
+  Intercept: -0.3664
+  R2: 0.1954
+
+  F-statistic for num_bidders: 44140.17
+  Threshold for strong instrument: F > 10
+  Status: STRONG instrument
+
+Exclusion restriction discussion:
+  For num_bidders to be valid instrument:
+  1. Relevance: num_bidders affects RANKING (tested above)
+  2. Exclusion: num_bidders affects CTR only through RANKING
+  Potential violations:
+    - More bidders may indicate more popular products (selection)
+    - More bidders may occur in busier sessions (user engagement)
+    - Auction size correlates with placement type
+
+Direct effect of num_bidders on CTR:
+  Correlation (num_bidders vs CTR): -0.3723
+
+================================================================================
+SECTION 11: SUMMARY TABLES
+================================================================================
+
+KEY NUMBERS COMPILATION
+----------------------------------------
+
+Data Volume:
+  Auctions: 91,641
+  Bids: 4,337,598
+  Impressions: 226,939
+  Clicks: 7,151
+  Purchases: 882
+  Users: 7,709
+
+Rates:
+  CTR (overall): 2.799%
+  Conversion rate (click->purchase): 0.283%
+  Winner rate: 79.91%
+  Impression rate (for winners): 6.43%
+
+Position Variation:
+  Products with 5+ auctions AND range > 3: 2,686
+  % of impressed products: 1.7%
+
+Score Mechanics:
+  QUALITY*BID predicts RANKING: 85.9% exact match
+  QUALITY alone predicts RANKING: 5.0% exact match
+
+RDD Feasibility:
+  Score gaps < 0.001: 50.8%
+  Marginal winners: 91,240
+  Marginal losers: 88,961
+
+Instrument Strength:
+  F-statistic for num_bidders: 44140.17
+  Status: STRONG
+
+================================================================================
+METHOD VIABILITY ASSESSMENT
+================================================================================
+
+Method                         Key Metric                Value           Viability      
+------------------------------ ------------------------- --------------- ---------------
+1. PBM (within-product)        Products w/ variation     1.7%         LIMITED        
+2. RDD at winner cutoff        Marginal sample           180,201      YES            
+3. Score-based RDD             Gaps < 0.001              50.8%         YES            
+4. IV (competition)            F-statistic               44140.2         YES            
+5. Selection model             Pseudo-R2                 0.119          YES            
+
+================================================================================
+CAUSAL EDA COMPLETE
+================================================================================

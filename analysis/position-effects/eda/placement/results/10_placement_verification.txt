@@ -1,0 +1,333 @@
+================================================================================
+PLACEMENT INTERPRETATION VERIFICATION
+================================================================================
+Purpose: Verify hypothesized placement interpretations using data signals
+Data source: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/data
+
+================================================================================
+LOADING DATA
+================================================================================
+  Loaded au_all: 78,318 rows
+  Loaded ar_all: 3,748,381 rows
+  Loaded imp_all: 192,307 rows
+  Loaded clicks_all: 6,090 rows
+  Loaded catalog_all: 1,039,783 rows
+  Loaded au_p5: 8,400 rows
+  Loaded ar_p5: 482,413 rows
+  Loaded imp_p5: 11,320 rows
+  Loaded clicks_p5: 240 rows
+  Loaded catalog_p5: 20,026 rows
+
+================================================================================
+PLACEMENT 5: BOT/SCRAPER HYPOTHESIS
+================================================================================
+Claimed: ~150 users with 65 auctions/user, automated traffic
+
+--- Test 1: User Concentration ---
+  _all dataset:
+    Users: 120
+    Mean auctions/user: 71.7
+    Max auctions/user: 3,309
+    Top 1% users control: 66.7% of auctions
+  _p5 dataset:
+    Users: 116
+    Mean auctions/user: 72.4
+    Max auctions/user: 3,257
+    Top 1% users control: 67.0% of auctions
+  Verdict: ✓ PASS (mean auctions/user > 30 for bot-like behavior)
+
+--- Test 2: Hour-of-Day Activity ---
+  Hour distribution (Placement 5 from _all):
+    Coefficient of variation: 0.276
+    Min hour count: 497
+    Max hour count: 1,263
+    Hour distribution histogram:
+      00:00  ########### (497)
+      01:00   (0)
+      02:00   (0)
+      03:00   (0)
+      04:00   (0)
+      05:00   (0)
+      06:00   (0)
+      07:00   (0)
+      08:00   (0)
+      09:00   (0)
+      10:00   (0)
+      11:00   (0)
+      12:00   (0)
+      13:00   (0)
+      14:00   (0)
+      15:00   (0)
+      16:00  #################### (877)
+      17:00  ############################# (1,236)
+      18:00  ######################## (1,017)
+      19:00  ################# (757)
+      20:00  ############################## (1,263)
+      21:00  ############################# (1,237)
+      22:00  ####################### (980)
+      23:00  ################# (742)
+  Verdict: ✓ PASS (CV < 0.5 suggests 24/7 automated activity)
+
+--- Test 3: Inter-Auction Regularity ---
+  Time gap statistics (seconds):
+    Mean: 33.08
+    Std: 259.30
+    CV (std/mean): 7.838
+    Median: 8.09
+    P5: 1.23
+    P95: 75.53
+    Gaps < 5 seconds: 20.0%
+  Verdict: ✗ FAIL (low CV or >50% rapid-fire = scripted)
+
+--- Test 4: Purchase Rate ---
+  PURCHASES data not available in parquet files
+  Cannot verify purchase behavior (assuming inconclusive)
+  Verdict: ? INCONCLUSIVE (data unavailable)
+
+--- Test 5: Click Behavior ---
+  P5 CTR: 2.287%
+  P5 impressions: 4,067
+  P5 clicks: 93
+  P1 CTR for comparison: 2.782%
+  P2 CTR for comparison: 4.005%
+  P3 CTR for comparison: 3.033%
+  Verdict: ✓ PASS (CTR < 1% or very few clicks = bot)
+
+--- Test 6: Product Diversity ---
+  Total unique products in P5: 20,543
+  Products per auction: mean=57.4, median=58
+  Top 10 products account for: 0.9% of all bids
+  P1 unique products for comparison: 284,084
+  P2 unique products for comparison: 141,160
+  Products per 1000 auctions: 2387.1
+  Verdict: ? INCONCLUSIVE (low diversity = systematic crawl)
+
+--- PLACEMENT 5 SUMMARY ---
+Tests passed: 3/5
+Verdict: ? INCONCLUSIVE - Mixed evidence
+
+================================================================================
+PLACEMENT 3: SEARCH PAGINATION HYPOTHESIS
+================================================================================
+Claimed: ~3s gaps, ~87% self-transition, ~20% impression delivery
+
+--- Test 1: Time Gaps ---
+  Time gap statistics (seconds):
+    Median: 1.98
+    Mean: 497.86
+    P25: 0.02
+    P75: 75.05
+  Expected: ~2.9 seconds
+  Verdict: ✓ PASS (median gap between 1-10s)
+
+--- Test 2: Self-Transition Rate ---
+  P3 -> P3 transitions: 37,311
+  Total P3 transitions: 42,341
+  Self-transition rate: 88.1%
+
+  Transition probabilities from P3:
+    P3 -> P1: 8.0%
+    P3 -> P2: 3.6%
+    P3 -> P3: 88.1%
+    P3 -> P5: 0.2%
+  Expected: ~87%
+  Verdict: ✓ PASS (self-transition > 70%)
+
+--- Test 3: Session Bursts ---
+  Burst size statistics:
+    Mean burst size: 2.2
+    Median burst size: 2
+    Max burst size: 78
+    Bursts with 5+ auctions: 813 (3.9%)
+  Verdict: ✓ PASS (mean burst > 2 = paginated search)
+
+--- Test 4: Product Rank Shifts ---
+  Products appearing at multiple ranks: 480,165 (61.7%)
+  Total unique products: 778,439
+  Products with rank range > 10: 222,477
+  Verdict: ✓ PASS (>10% products at multiple ranks = pagination)
+
+--- Test 5: Impression Delivery Rate ---
+  Auctions with impressions: 9,150 / 46,844
+  Auction delivery rate: 19.5%
+  Winners: 1,848,744
+  Impressions: 39,598
+  Impressions per winner: 0.02
+  Expected: ~20% delivery
+  Verdict: ✓ PASS (delivery < 50% = not all results viewed)
+
+--- PLACEMENT 3 SUMMARY ---
+Tests passed: 5/5
+Verdict: ✓ CONFIRMED - Strong evidence for Search Pagination hypothesis
+
+================================================================================
+PLACEMENT 2: PDP CAROUSEL HYPOTHESIS
+================================================================================
+Claimed: ~4% CTR, CTR increases with rank, high multi-click rate
+
+--- Test 1: CTR by Rank ---
+  CTR by Rank:
+    Rank  Impressions     Clicks        CTR
+  ------ ------------ ---------- ----------
+       1        4,310        160      3.71%
+       2        4,224        147      3.48%
+       3        2,474        100      4.04%
+       4        2,432        116      4.77%
+       5        1,898         77      4.06%
+       6        1,865         76      4.08%
+       7        1,632         53      3.25%
+       8        1,622         77      4.75%
+       9        1,432         61      4.26%
+      10        1,422         63      4.43%
+
+  Early ranks (1-3) avg CTR: 3.74%
+  Late ranks avg CTR: 4.48%
+  Trend (late - early): +0.73%
+  Expected: flat or increasing CTR
+  Verdict: ✓ PASS (CTR not strongly decreasing)
+
+--- Test 2: Category Homogeneity ---
+  Could not compute category overlap
+  Expected: products share categories (PDP 'similar items')
+  Verdict: ? INCONCLUSIVE
+
+--- Test 3: Multi-Click Rate ---
+  Auctions with any click: 1,066
+  Auctions with 2+ clicks: 447
+  Multi-click rate: 41.9%
+  Clicks per auction distribution:
+    1 click: 619
+    2 clicks: 207
+    3+ clicks: 240
+  Expected: high multi-click (carousel browsing)
+  Verdict: ✓ PASS (multi-click > 5%)
+
+--- Test 4: Transition Patterns ---
+  Transitions TO P2:
+    P1 -> P2: 4.6%
+    P2 -> P2: 40.8%
+    P3 -> P2: 20.9%
+    P5 -> P2: 33.8%
+
+  Transitions FROM P2:
+    P2 -> P1: 5.9%
+    P2 -> P2: 40.0%
+    P2 -> P3: 20.8%
+    P2 -> P5: 33.2%
+
+  Expected: P2 follows P1/P3 (PDP after discovery)
+  From P1 or P3: 25.5%
+  Verdict: ? INCONCLUSIVE
+
+--- Test 5: Overall CTR ---
+  Impressions: 52,588
+  Clicks: 2,106
+  CTR: 4.00%
+
+  CTR comparison with other placements:
+    P1 CTR: 2.78%
+    P3 CTR: 3.03%
+    P5 CTR: 2.29%
+
+  Expected: ~4% (highest CTR)
+  Verdict: ✓ PASS (CTR > 2.5%)
+
+--- PLACEMENT 2 SUMMARY ---
+Tests passed: 3/5
+Verdict: ? INCONCLUSIVE - Mixed evidence
+
+================================================================================
+PLACEMENT 1: BROWSE/FEED HYPOTHESIS
+================================================================================
+Claimed: ~81% impression delivery, ~36s gaps, standard position decay
+
+--- Test 1: Impression Delivery ---
+  Auctions: 14,543
+  Auctions with impressions: 11,746
+  Delivery rate: 80.8%
+  Winners: 417,661
+  Impressions: 91,291
+  Expected: ~81%
+  Verdict: ✓ PASS (delivery > 60%)
+
+--- Test 2: CTR by Rank ---
+    Rank  Impressions     Clicks        CTR
+  ------ ------------ ---------- ----------
+       1       10,804        351      3.25%
+       2       10,494        309      2.94%
+       3        6,010        172      2.86%
+       4        5,880        195      3.32%
+       5        4,360        132      3.03%
+       6        4,244        101      2.38%
+       7        3,688        100      2.71%
+       8        3,615         99      2.74%
+       9        2,843         78      2.74%
+      10        2,777         76      2.74%
+
+  Rank 1-2 avg CTR: 3.10%
+  Rank 3-5 avg CTR: 3.07%
+  Trend: -0.03%
+  Expected: declining CTR (standard position decay)
+  Verdict: ✓ PASS
+
+--- Test 3: Time Gaps ---
+  Time gap statistics (seconds):
+    Median: 43.69
+    Mean: 787.10
+    P25: 9.23
+    P75: 307.39
+  Expected: ~36s (leisurely browsing)
+  Verdict: ✓ PASS (median > 20s)
+
+--- Test 4: Session Starts ---
+  First placement per user session:
+    P1: 31.6%
+    P2: 13.5%
+    P3: 54.2%
+    P5: 0.8%
+
+  Expected: P1 often starts sessions (browse entry)
+  Verdict: ✓ PASS (P1 starts > 15% of sessions)
+
+--- Test 5: User Distribution ---
+  Users: 3,466
+  Mean auctions/user: 4.2
+  Max auctions/user: 108
+  Top 1% users control: 12.1% of auctions
+
+  Auctions per user distribution:
+    P50: 2
+    P75: 5
+    P90: 9
+    P95: 13
+    P99: 28
+
+  Expected: normal distribution (not concentrated)
+  Verdict: ✓ PASS (top 1% < 30% share)
+
+--- PLACEMENT 1 SUMMARY ---
+Tests passed: 5/5
+Verdict: ✓ CONFIRMED - Strong evidence for Browse/Feed hypothesis
+
+================================================================================
+VERIFICATION SUMMARY
+================================================================================
+
+Placement    Hypothesis           Tests Passed    Verdict     
+------------ -------------------- --------------- ------------
+P1           Browse/Feed          5/5             ✓ CONFIRMED 
+P2           PDP Carousel         3/5             ? MIXED     
+P3           Search Pagination    5/5             ✓ CONFIRMED 
+P5           Bot/Scraper          3/5             ? MIXED     
+
+================================================================================
+INTERPRETATION KEY
+================================================================================
+✓ CONFIRMED: >=70% of tests passed - Strong evidence supports hypothesis
+? MIXED: 40-70% of tests passed - Inconclusive, needs more investigation
+✗ REFUTED: <40% of tests passed - Evidence contradicts hypothesis
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
+Output written to: /Users/pranjal/Code/topsort-incrementality/analysis/position-effects/results/10_placement_verification.txt

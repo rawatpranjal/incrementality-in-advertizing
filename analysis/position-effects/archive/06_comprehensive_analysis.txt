@@ -1,0 +1,99 @@
+Loading data...
+Prepping Analysis DataFrame...
+
+=== METHOD 1: PBM VIA EM ALGORITHM ===
+Items: 77041, Ranks: 10, Obs: 104867
+Iter 0: Diff 0.1946
+Iter 5: Diff 0.1464
+Iter 10: Diff 0.1217
+Iter 15: Diff 0.1028
+
+Estimated Examination Probabilities (Gamma):
+Rank | Gamma (PBM)
+-----|------------
+   1 | 1.0000
+   2 | 0.6429
+   3 | 0.5447
+   4 | 0.5273
+   5 | 0.5036
+   6 | 0.4596
+   7 | 0.4479
+   8 | 0.4596
+   9 | 0.4532
+  10 | 0.4707
+
+=== METHOD 2: IV REGRESSION (COMPETITOR COUNT) ===
+Stage 1 (Rank ~ Instrument):
+=================================================================================
+                    coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+Intercept        -0.7730      0.092     -8.441      0.000      -0.953      -0.594
+num_bidders       0.3410      0.002    189.481      0.000       0.338       0.345
+quality_score   -24.6730      0.436    -56.635      0.000     -25.527     -23.819
+bid              -0.2566      0.002   -110.826      0.000      -0.261      -0.252
+=================================================================================
+Stage 1 F-Stat: 14595.56
+
+Stage 2 (Click ~ Rank_Hat):
+=================================================================================
+                    coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+Intercept         0.0368      0.001     27.214      0.000       0.034       0.039
+rank_hat         -0.0004   8.13e-05     -4.399      0.000      -0.001      -0.000
+quality_score     0.0453      0.007      6.901      0.000       0.032       0.058
+bid              -0.0005   3.91e-05    -13.834      0.000      -0.001      -0.000
+=================================================================================
+
+IV Estimate of Rank Position Effect (Linear): -0.00036 (p=0.000)
+Interpretation: Change in CTR for 1 unit increase in Rank (worse position).
+
+=== METHOD 3: WITHIN-AUCTION FIXED EFFECTS ===
+                             OLS Regression Results                            
+===============================================================================
+Dep. Variable:     is_clicked_demeaned   R-squared:                       0.002
+Model:                             OLS   Adj. R-squared:                  0.002
+Method:                  Least Squares   F-statistic:                     14.68
+Date:                 Sun, 01 Feb 2026   Prob (F-statistic):           1.81e-26
+Time:                         23:25:20   Log-Likelihood:                 51676.
+No. Observations:               104041   AIC:                        -1.033e+05
+Df Residuals:                   104030   BIC:                        -1.032e+05
+Df Model:                           10                                         
+Covariance Type:                   HC1                                         
+====================================================================================
+                       coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------
+const                0.0010      0.000      2.186      0.029       0.000       0.002
+rank_2              -0.0009      0.001     -0.683      0.495      -0.004       0.002
+rank_3              -0.0057      0.002     -2.951      0.003      -0.009      -0.002
+rank_4              -0.0005      0.002     -0.227      0.820      -0.004       0.003
+rank_5              -0.0056      0.002     -2.429      0.015      -0.010      -0.001
+rank_6              -0.0086      0.002     -3.778      0.000      -0.013      -0.004
+rank_7              -0.0104      0.002     -4.395      0.000      -0.015      -0.006
+rank_8              -0.0076      0.002     -3.185      0.001      -0.012      -0.003
+rank_9              -0.0095      0.003     -3.536      0.000      -0.015      -0.004
+rank_10             -0.0077      0.003     -2.823      0.005      -0.013      -0.002
+quality_demeaned     0.1859      0.019      9.549      0.000       0.148       0.224
+==============================================================================
+Omnibus:                    90808.845   Durbin-Watson:                   2.250
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):          2861933.217
+Skew:                           4.218   Prob(JB):                         0.00
+Kurtosis:                      27.270   Cond. No.                         34.5
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity robust (HC1)
+
+=== METHOD 4: MULTI-CLICK ANALYSIS ===
+Multi-click auctions: 962
+Top Co-Click Pairs (Rank A, Rank B):
+  Ranks (1, 2): 64 times
+  Ranks (2, 4): 36 times
+  Ranks (3, 4): 34 times
+  Ranks (1, 3): 28 times
+  Ranks (1, 4): 28 times
+  Ranks (4, 5): 26 times
+  Ranks (2, 3): 23 times
+  Ranks (2, 5): 23 times
+  Ranks (5, 7): 22 times
+  Ranks (2, 8): 21 times
+Avg Rank Distance in Co-Clicks: 11.65
