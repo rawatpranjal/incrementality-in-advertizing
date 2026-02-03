@@ -1,0 +1,8 @@
+- writing guidelines.
+- no em dash, textbf, bullets, informal language. 
+- graphs used sparingly. 
+- tables are fine (tables of results i mean)
+- paragarphs equally sized
+- move technical details to footnotes
+- keep narrative flowing, dont give summaries, or conclusions. 
+- state probelm, state approach, define notation carefully, state assumptions, state results, state interpretation and move on. 

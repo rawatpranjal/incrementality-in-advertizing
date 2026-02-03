@@ -1,0 +1,59 @@
+\section{Near-Tie Identification of Fold Effects}
+
+This section studies how rank affects visibility and clicks on sponsored listings. Rank determines which ads appear in the initial viewport and when additional ads are revealed through scrolling. The economic question is whether moving an otherwise similar ad just above a fold boundary changes its chance of being seen and, conditional on being seen, its chance of being clicked. The identification problem is that better ads are mechanically ranked higher by the platform’s scoring rule, so naïve comparisons confound exposure, ad appeal, and competitive context.
+
+The empirical approach exploits within-auction near ties around fixed rank boundaries. Let $a$ index auctions and $i$ index ads. Let $s_{ai}$ denote the platform score that determines rank, with $s_{ai} = q_{ai} \times b_{ai}$, where $q_{ai}$ is a platform quality predictor for clicks and $b_{ai}$ is the final bid. Ads are ranked in descending order of $s_{ai}$. For a given boundary $b \in \{2, 4, 6\}$, form pairs that are second versus third by score for $b=2$, fourth versus fifth for $b=4$, and sixth versus seventh for $b=6$ within the same auction. Define a near tie by requiring the relative gap $(s_b - s_{b+1})/s_b$ to lie below a small bandwidth $\tau$. Within each pair, denote by $\text{lucky}$ the ad with the better provided rank and by $\text{unlucky}$ the other ad. The primary outcomes are an exposure indicator that the ad received at least one impression in the auction and a click indicator that the ad received at least one click.
+
+Identification rests on local randomization in a small neighborhood of the cutoff. Conditional on the auction, ads with nearly equal scores are assumed to have similar potential outcomes absent the discrete change in rank. This implies continuity in potential outcomes with respect to score at the boundary and no strategic bunching exactly at the cutoff. Two empirical diagnostics support these conditions. First, covariates are balanced between $\text{lucky}$ and $\text{unlucky}$ within near ties, using the platform quality predictor and the final bid. Second, the empirical density of the running variable around the cutoff shows no left and right asymmetry in small symmetric windows. Rank-score alignment is also reported to verify that the provided ordering follows the score rule in the relevant surface.\footnote{In category pages the provided rank is less tightly aligned with $q \times b$, which weakens identification on that surface.}
+
+The analysis proceeds in two stages. The first stage examines the extensive margin by comparing exposure rates for $\text{lucky}$ and $\text{unlucky}$ items in near ties at each boundary. This isolates the fold effect on visibility in a narrow score neighborhood. The second stage conditions on both items being exposed and compares their click indicators. This separates the visibility channel from within-exposure differences in clicking. Timing statistics complement these contrasts by comparing time to first impression and dwell times relative to the auction’s first rendered impression. Heterogeneity is assessed across placements and across boundaries, and a placebo boundary below the fold is included as a falsification check.\footnote{Impressions and clicks are mapped to candidate ads by the composite key of auction, product, and vendor. This ensures that exposure and clicks are attributed to the paired ads within the same auction context.}
+
+The results indicate a large exposure advantage at the fold in search and brand placements. Around the two versus three boundary in search, raising an ad just above the fold increases its probability of receiving any impression by about 0.21 at $\tau = 0.02$, with a similar magnitude in the earlier round. Conditional on both items being exposed, the difference in click propensity between $\text{lucky}$ and $\text{unlucky}$ at the fold is close to zero. At deeper boundaries such as four versus five, exposure differences shrink and small positive differences in within-exposure click propensity sometimes appear, consistent with position decay taking effect once users scroll further. The exposure effect is concentrated in mobile-like sessions, where the estimated increase at the fold is about 0.27 versus about 0.03 on desktop-like sessions. On product pages, exposure effects are small and both-impressed pairs are sparse, while in category pages rank-score alignment is weaker and exposure effects at the fold are negligible.\footnote{Bandwidths are defined by $\tau$ in \{0.5 percent, 1 percent, 2 percent, 5 percent\}. The main inferences rely on $\tau$ between 1 percent and 2 percent, where covariate balance is strongest and sample sizes remain adequate. Balance checks pass in all reported windows except one very tight case at the fold; a McCrary-style bin-count histogram over the running variable shows smooth mass without bunching.}
+
+\begin{table}[htbp]
+\centering
+\caption{Exposure and click decomposition by rank boundary at $\tau = 0.02$}
+\label{tab:rdd_main}
+\begin{tabular}{lcccc}
+\toprule
+Boundary & $\Delta_{\text{exp}}$ & $\Delta_{\text{ctr}}$ & $N$ pairs & $N$ both exposed \\
+\midrule
+2 vs 3 (fold) & 0.21 & 0.00 & 1686 & 709 \\
+4 vs 5 & 0.07 & 0.01 & 2843 & 768 \\
+6 vs 7 & 0.03 & $-$0.01 & 3932 & 968 \\
+7 vs 8 (placebo) & 0.00 & 0.00 & 4404 & 1231 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Bandwidth sensitivity at the fold boundary (2 vs 3)}
+\label{tab:rdd_bandwidth}
+\begin{tabular}{lccc}
+\toprule
+Bandwidth $\tau$ & $\Delta_{\text{exp}}$ & $N$ pairs & Balance \\
+\midrule
+0.005 & 0.17 & 479 & Fail \\
+0.010 & 0.19 & 899 & Pass \\
+0.020 & 0.21 & 1686 & Pass \\
+0.050 & 0.22 & 3933 & Pass \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Device heterogeneity at the fold boundary ($\tau = 0.02$)}
+\label{tab:rdd_device}
+\begin{tabular}{lcccc}
+\toprule
+Device & $\Delta_{\text{exp}}$ & $\Delta_{\text{ctr}}$ & $N$ pairs \\
+\midrule
+Mobile & 0.27 & 0.00 & 1265 \\
+Desktop & 0.03 & $-$0.02 & 149 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The interpretation is that position primarily operates through visibility at the fold rather than through a change in click likelihood among ads that are actually seen. This pattern is strongest where the interface presents a tight viewport and where ranking reliably follows the platform’s scoring rule. It is weaker on surfaces where the viewport is large or where the mapping from score to provided rank is noisier. The evidence is evaluated across multiple bandwidths, time slices, and a placebo boundary, and it is accompanied by diagnostics for balance, density, and alignment.\footnote{An optional model summary uses pair-clustered linear probability specifications with local score trends and, in robustness, conditional logit with pair fixed effects. Inference is clustered at the pair level, and these models confirm the near-zero within-exposure effect at the fold.}

@@ -1,0 +1,15 @@
+\section{Literature Review}
+\label{sec:literature}
+
+This paper addresses two related questions in digital advertising: whether winning ad auctions generates incremental sales for vendors, and how ad position affects visibility and engagement within auctions.
+
+Measuring the causal effect of advertising presents a fundamental identification challenge: advertisers target consumers they expect to convert, creating selection bias that inflates naive estimates. Randomized controlled trials provide the cleanest identification. \citet{blake2015consumer} establish two foundational results from eBay experiments: brand-keyword advertising is largely ineffective for well-known brands due to substitution from organic results, while non-brand advertising works primarily on new and infrequent users. \citet{lewis2014online} show that display advertising effects occur largely offline and among users who view but do not click ads; their work also validates a difference-in-differences specification against RCT benchmarks, bridging experimental and observational approaches.
+
+When randomization is infeasible, researchers rely on panel data with rich fixed effects. \citet{shapiro2021tv} analyze 288 consumer packaged goods brands and find TV advertising elasticities so small that over 80 percent of brands have negative marginal ROI, suggesting widespread over-investment. However, \citet{gordon2023comparison} provide a crucial note of caution by directly comparing observational methods against hundreds of Facebook RCTs. They find that even state-of-the-art machine learning models produce severely upward-biased estimates, diagnosing this as a fundamental data problem rather than a modeling limitation. This tension motivates our use of staggered adoption designs with explicit parallel trends validation.
+
+A separate literature studies how ad position affects user behavior in sponsored listings. Quality-weighted bidding rules produce deterministic rank orderings where visibility depends on rank \citep{varian2007position}. \citet{narayanankalyanam2015} apply a regression discontinuity design to search advertising and find that causal position effects are much smaller than naive comparisons suggest, with effects concentrated among smaller advertisers and unfamiliar keywords.
+
+Regression discontinuity designs provide a template for credible local comparisons at thresholds where a continuous running variable induces discrete treatment assignment \citep{cattaneo2019rdd}. \citet{cohen2016uber} apply an analogous strategy to Uber surge pricing, where a continuous internal generator rounds to discrete price multipliers, creating local discontinuities in purchase rates that identify demand.
+
+Our contribution leverages granular auction data and two observational designs: a staggered adoption estimation at the vendor level, and a regression discontinuity design within auctions \citep{cohen2016uber}. This allows us to isolate position effects from user selection \citep{narayanankalyanam2015} while validating observational estimates against the experimental ground truth.
+

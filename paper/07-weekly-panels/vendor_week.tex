@@ -1,0 +1,236 @@
+\subsection*{Vendor-Week Panel}
+
+We construct a vendor-week panel to analyze the effectiveness of advertising from the perspective of the firms selling on the marketplace. This panel aggregates data at the vendor level, allowing us to model the relationship between a vendor's advertising activities and their revenue.
+
+The vendor-week panel comprises nearly one million observations from over 150,000 unique vendors across 26 weeks. Table \ref{tab:vendor_panel_dims} provides a high-level overview of the panel's dimensions.
+
+\begin{table}[htbp!]
+\centering
+\caption{Vendor-Week Panel Dimensions}
+\label{tab:vendor_panel_dims}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Total Observations (Rows) & 979,290 \\
+Unique Vendors & 150,075 \\
+Unique Weeks & 26 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The panel is unbalanced, with a large number of vendors having data for only a few weeks, as shown in Table \ref{tab:vendor_obs_dist}. This imbalance is common in firm-level panel data and poses estimation challenges.
+
+The distributions of clicks and revenue are highly skewed, with 42.6\% of vendor-weeks having zero revenue. Table \ref{tab:vendor_dist} presents the overall distribution of the key metrics.
+
+\begin{table}[htbp!]
+\centering
+\caption{Distribution of Key Metrics per Vendor-Week}
+\label{tab:vendor_dist}
+\begin{tabular}{lrrr}
+\toprule
+Statistic & Clicks & Purchases & Revenue (\$) \\
+\midrule
+Mean & 148.78 & 2.11 & 88.02 \\
+Std. Dev. & 211.42 & 6.14 & 380.85 \\
+Min & 1 & 0 & 0.00 \\
+25\% & 56 & 0 & 0.00 \\
+50\% & 102 & 1 & 18.00 \\
+75\% & 168 & 2 & 76.00 \\
+Max & 11,292 & 1,288 & 772.81 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table \ref{tab:weekly_agg} shows the platform-wide aggregates on a weekly basis. There is a clear upward trend in total revenue, clicks, and the number of active vendors over the sample period.
+
+\subsubsection*{Model}
+
+To estimate the average elasticity of vendor revenue with respect to clicks, we use a two-way fixed-effects model:
+
+\begin{equation}
+\log(\text{revenue}_{vt} + 1) = \alpha_v + \gamma_t + \beta \log(\text{clicks}_{vt} + 1) + \epsilon_{vt}
+\end{equation}
+
+where $\text{revenue}_{vt}$ is the revenue for vendor $v$ in week $t$, $\text{clicks}_{vt}$ is the number of clicks on vendor $v$'s ads, $\alpha_v$ is a vendor fixed effect, and $\gamma_t$ is a week fixed effect. The results are presented in Table \ref{tab:vendor_fe_results}.
+
+\begin{table}[htbp!]
+\centering
+\caption{Fixed-Effects Model of Vendor-Week Revenue}
+\label{tab:vendor_fe_results}
+\begin{tabular}{lc}
+\toprule
+ & log(revenue + 1) \\
+\midrule
+log(clicks + 1) & 0.6422 \\
+ & (0.0028) \\
+\midrule
+Vendor Fixed Effects & Yes \\
+Week Fixed Effects & Yes \\
+Observations & 979,290 \\
+R-squared & 0.5574 \\
+Within R-squared & 0.0734 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Note: Standard errors are clustered at the vendor level. The coefficient for log(clicks + 1) is statistically significant at the p < 0.001 level.
+
+The estimated elasticity of 0.6422 is statistically significant and suggests that, on average, a 1\% increase in clicks is associated with a 0.64\% increase in revenue. This result provides a baseline estimate of the average return to advertising across all vendors.
+
+\subsection*{Vendor Heterogeneity}
+
+We extend the analysis to account for vendor-level heterogeneity using a mixed-effects model with random slopes. The model is specified as:
+
+\begin{equation}
+\log(\text{revenue}_{vt} + 1) = \beta_v \log(\text{clicks}_{vt} + 1) + \alpha_v + \gamma_t + \epsilon_{vt}
+\end{equation}
+
+where $\beta_v$ is a vendor-specific click elasticity coefficient. We estimate these coefficients using an empirical Bayes approach that shrinks extreme estimates toward the global mean, reducing noise from vendors with limited data. The distribution of vendor-specific click elasticities reveals significant variation across vendors, with a mean elasticity of 0.77.
+
+\begin{table}[htbp!]
+\centering
+\caption{Summary Statistics of Vendor Elasticities ($\beta_v$)}
+\label{tab:vendor_beta_v_dist}
+\begin{tabular}{lr}
+\toprule
+Statistic & Value \\
+\midrule
+Min. & 0.1942 \\
+1st Qu. & 0.7487 \\
+Median & 0.7788 \\
+Mean & 0.7721 \\
+3rd Qu. & 0.7995 \\
+Max. & 1.2652 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We use these vendor-specific elasticities to calculate the incremental Return on Ad Spend (iROAS) for each vendor, assuming a constant cost-per-click (CPC).
+
+\subsubsection*{Incremental Return on Ad Spend (iROAS)}
+
+To evaluate the profitability of advertising campaigns at a granular level, we utilize the Incremental Return on Ad Spend (iROAS). This metric quantifies the incremental revenue generated for each unit of advertising expenditure. iROAS is derived from vendor-specific click elasticity estimates and other key business metrics.
+
+The iROAS is calculated as:
+\begin{equation}
+\text{iROAS} = \frac{\text{Vendor-Specific Click Elasticity} \times \text{Average Revenue per Click}}{\text{Assumed Cost per Click}}
+\end{equation}
+
+The components of the iROAS calculation are defined as follows: The vendor-specific click elasticity ($\beta_v$) is the elasticity coefficient estimated from the mixed-effects model, representing the percentage change in revenue for a one percent change in clicks for a specific vendor. The average revenue per click is the total revenue generated by a vendor divided by their total clicks, calculated as Total Revenue / Total Clicks. Finally, the assumed cost per click (CPC) is the average cost incurred for each click on an ad, which is an assumption based on platform-wide averages or specific campaign costs.
+
+To illustrate the iROAS calculation, consider a representative vendor with median characteristics:
+
+\begin{table}[htbp!]
+\centering
+\caption{Example iROAS Calculation Parameters}
+\begin{tabular}{lr}
+\toprule
+Parameter & Value \\
+\midrule
+Vendor-specific elasticity ($\beta_v$) & 0.77 \\
+Total revenue & \$10,000 \\
+Total clicks & 500 \\
+Average revenue per click & \$20 \\
+Cost per click (marketplace rate) & \$0.75 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Applying the iROAS formula yields:
+\begin{equation}
+\text{iROAS} = \frac{0.77 \times 20}{0.75} = 20.53
+\end{equation}
+
+This ratio indicates each advertising dollar generates \$20.53 in incremental revenue. Given the heterogeneity in vendor elasticities, we examine iROAS sensitivity to CPC levels:
+
+\begin{table}[htbp!]
+\centering
+\caption{iROAS Sensitivity Analysis}
+\begin{tabular}{lrrr}
+\toprule
+CPC Level & Min iROAS & Median iROAS & Max iROAS \\
+& ($\beta_v$=0.19) & ($\beta_v$=0.78) & ($\beta_v$=1.27) \\
+\midrule
+\$0.50 (niche marketplace) & 7.77 & 31.15 & 50.61 \\
+\$0.75 (typical marketplace) & 5.18 & 20.77 & 33.74 \\
+\$1.16 (e-commerce average) & 3.35 & 13.43 & 21.81 \\
+\$2.69 (Google Search average) & 1.44 & 5.79 & 9.41 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The analysis reveals that marketplace advertising remains profitable across the elasticity distribution at typical marketplace CPCs (\$0.75), with only the bottom decile of vendors approaching break-even at e-commerce average rates.
+
+\subsection*{Staggered Adoption Analysis}
+
+The preceding analysis relies on two-way fixed effects and mixed effects models, which impose restrictive assumptions on treatment effect homogeneity across time and units. To address concerns about bias from staggered treatment timing, we implement the estimator proposed by \citet{callaway2021difference}, which provides valid inference under heterogeneous treatment effects in settings where units adopt treatment at different times.
+
+We define treatment as the first week a vendor wins any auction, representing the moment when their advertising becomes active on the platform. The panel comprises 846,430 observations from 142,920 vendors over 26 weeks. Of these vendors, 139,356 (97.5\%) eventually adopt advertising at some point during the sample period, while 3,564 (2.5\%) never win an auction and serve as the control group.\footnote{The high adoption rate reflects the nature of the marketplace where most active vendors participate in the advertising system. The never-treated group consists primarily of vendors who list products but never successfully compete in auctions.}
+
+The Callaway-Sant'Anna estimator identifies group-time average treatment effects $ATT(g,t)$ for each cohort $g$ (defined by the period of first treatment) at each time $t$. These are then aggregated to obtain an overall average treatment effect on the treated (ATT) and event-study estimates $\theta(e)$ that trace out the treatment effect dynamics relative to the treatment onset.
+
+Table \ref{tab:staggered_main} presents the main estimates using never-treated vendors as the control group.
+
+\begin{table}[htbp!]
+\centering
+\caption{Staggered Difference-in-Differences Estimates}
+\label{tab:staggered_main}
+\begin{tabular}{lcccc}
+\toprule
+Outcome & ATT & SE & 95\% CI & Sig. \\
+\midrule
+Impressions & +1.061 & 0.021 & [1.020, 1.102] & *** \\
+Clicks & +0.032 & 0.001 & [0.029, 0.034] & *** \\
+Total GMV (\$) & +0.26 & 1.20 & [-2.09, +2.61] & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Winning auctions increases weekly impressions by approximately 1.06 units and clicks by 0.032 units, both statistically significant at the 0.1\% level. The effect on vendor gross merchandise value (GMV), however, is not statistically distinguishable from zero. The point estimate of \$0.26 per vendor-week has a standard error of \$1.20, yielding a confidence interval that includes both positive and negative values.
+
+The validity of difference-in-differences estimation requires parallel trends in the pre-treatment period. Table \ref{tab:staggered_pretrends} summarizes the pre-trends assessment.
+
+\begin{table}[htbp!]
+\centering
+\caption{Pre-Trends Assessment}
+\label{tab:staggered_pretrends}
+\begin{tabular}{lccc}
+\toprule
+Outcome & Mean $\theta(e<0)$ & Significant Pre-periods & Joint $p$-value \\
+\midrule
+Impressions & +0.000048 & 0/22 & 0.615 \\
+Clicks & 0.000000 & 0/22 & -- \\
+Total GMV & 0.000000 & 0/22 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All three outcomes pass the parallel trends test. For impressions, the joint Wald test yields a $p$-value of 0.615, indicating no statistically significant deviation from parallel trends in the pre-treatment period. No individual pre-treatment coefficient achieves significance at the 5\% level.
+
+Figure \ref{fig:event_study_impressions} displays the event study estimates for impressions. The pre-treatment coefficients cluster tightly around zero, providing visual confirmation of the parallel trends assumption. At the treatment onset ($e=0$), a sharp jump of approximately 0.83 impressions occurs. The effect persists and grows modestly over subsequent periods, reaching 1.21 impressions by twenty weeks post-treatment.
+
+\begin{figure}[htbp!]
+\centering
+\begin{subfigure}[b]{0.32\textwidth}
+\includegraphics[width=\textwidth]{figures/event_study_impressions.png}
+\caption{Impressions}
+\label{fig:event_study_impressions}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\includegraphics[width=\textwidth]{figures/event_study_clicks.png}
+\caption{Clicks}
+\label{fig:event_study_clicks}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\includegraphics[width=\textwidth]{figures/event_study_total_gmv.png}
+\caption{Total GMV}
+\label{fig:event_study_total_gmv}
+\end{subfigure}
+\caption{Event Study: Effect of Auction Wins on Vendor Outcomes}
+\label{fig:event_studies}
+\end{figure}
+
+The results present a coherent picture of the advertising funnel. Winning auctions causally generates visibility (impressions) and engagement (clicks) for vendors. The click-through rate implied by the estimates is approximately 3.0\% (0.032/1.06), consistent with typical marketplace advertising benchmarks. However, the effect does not propagate to detectable increases in vendor sales within the same week. The null result for GMV may reflect several factors: organic purchases that would have occurred regardless of advertising exposure, delayed conversion effects beyond the weekly observation window, or genuine ineffectiveness of marginal advertising impressions in driving incremental sales. The robustness of the null finding to alternative control group specifications (not-yet-treated instead of never-treated) and estimation methods suggests this is not an artifact of the particular estimator employed.

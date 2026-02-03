@@ -1,0 +1,94 @@
+\section{Position Effects in Ad Auctions}
+\label{sec:position-effects}
+
+A central question in the economics of online advertising is to quantify the causal effect of an advertisement's position on its performance. A naive ordinary least squares regression of a performance metric, such as click-through rate, on ad rank typically reveals a strong negative correlation: ads at the top of the page receive significantly more clicks than ads at the bottom. However, this correlation is unlikely to represent a causal relationship due to the endogenous nature of ad rank.
+
+Figure~\ref{fig:naive-ctr-rank} displays the raw click-through rate by ad rank for two representative placements. Both surfaces exhibit declining CTR as rank increases, with the correlation appearing strongest in search results.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/naive_ctr_by_rank.png}
+\caption{Naive CTR by Rank}
+\label{fig:naive-ctr-rank}
+\end{figure}
+
+Ad auction systems are designed to award the most prominent positions to the ads that are most likely to be successful. Ad rank is a function of both the advertiser's bid and a quality score, which itself is often a prediction of the ad's relevance and click-through rate. Consequently, higher-quality, more appealing advertisements are systematically selected into higher ranks. This creates a selection problem: a simple regression cannot disentangle the causal effect of being in a better position from the fact that better ads are placed in those positions.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/illustrative_diagrams/03_activity_bias_dag.pdf}
+\caption{Activity bias in ad auctions. Unobserved user intent confounds rank and click outcomes.}
+\label{fig:activity-bias-dag}
+\end{figure}
+
+To address this challenge, we employ complementary empirical strategies that isolate the causal effect of position from confounding by ad appeal and context. We first estimate within-surface position gradients controlling for quality and fixed effects, and then implement a near-tie design that forms within-auction local comparisons around fold boundaries. The latter leverages the deterministic score-based ranking rule to construct as-if randomized contrasts at the margin where visibility changes discretely. Throughout, we report diagnostics for covariate balance, continuity, and rank-score alignment, and we separate the extensive margin of exposure from within-exposure click differences.
+
+This section estimates the marginal effect of ad position on click-through rates while controlling for the quality signal that determines rank.
+
+Let $i$ index impressions, $v$ index vendors, and $p$ index placements. The probability that impression $i$ receives a click is modeled as a logistic function of observable characteristics:
+\begin{equation}
+P(\text{click}_i = 1) = \Lambda\left(\beta_1 \cdot \text{quality}_i + \beta_2 \cdot \text{rank}_i + \beta_3 \cdot \text{price}_i + \beta_4 \cdot \text{cvr}_i + \alpha_v + \gamma_p\right)
+\label{eq:position-bias}
+\end{equation}
+where $\Lambda(\cdot)$ denotes the logistic function, $\alpha_v$ represents vendor fixed effects, and $\gamma_p$ represents placement fixed effects. The variable $\text{quality}_i$ is the platform's predicted click-through rate (pCTR), which serves as the quality score in auction ranking. The variable $\text{rank}_i$ is the ad position within the auction, where rank one indicates the highest position. The variable $\text{price}_i$ is the product price in cents, and $\text{cvr}_i$ is the platform's predicted conversion rate.\footnote{Standard errors are clustered at the auction level to account for correlation among impressions within the same auction.}
+
+The unit of analysis is the impression, defined as a winning bid that was rendered to the user. The sample includes 71,194 impressions observed during a 10-hour window, with an overall click-through rate of 3.03 percent. Estimation proceeds via conditional maximum likelihood, absorbing 4,742 vendor fixed effects and 4 placement fixed effects.
+
+Table~\ref{tab:position-bias-felogit} presents the coefficient estimates.
+
+\begin{table}[H]
+\centering
+\caption{Position Bias: Fixed-Effects Logit Results}
+\label{tab:position-bias-felogit}
+\begin{tabular}{lcccc}
+\toprule
+Variable & Estimate & Std.\ Error & $z$-value & Sig.\ \\
+\midrule
+Quality & 0.899 & 0.288 & 3.12 & ** \\
+Rank & $-$0.010 & 0.002 & $-$6.19 & *** \\
+Price & $-$0.016 & 0.004 & $-$4.05 & *** \\
+CVR & 3.453 & 3.841 & 0.90 & \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+$N = 71{,}194$ impressions. CTR = 3.03\%. Fixed effects: 4,742 vendors, 4 placements. Standard errors clustered by auction. Significance: *** $p < 0.001$, ** $p < 0.01$, * $p < 0.05$.
+\end{minipage}
+\end{table}
+
+The quality score is a positive predictor of clicks, consistent with its construction as a pCTR proxy. A one standard deviation increase in quality is associated with a 5.2 percent increase in click odds. Rank has a significant negative effect, where moving one position down reduces click odds by approximately 1 percent. The standardized effect of rank is larger: a one standard deviation increase in rank (moving to worse positions) corresponds to an 11.3 percent decrease in odds. Price exhibits a negative relationship with a standardized effect of 14.4 percent, suggesting users are less likely to click on higher-priced products conditional on position and quality. The predicted conversion rate is not statistically significant after conditioning on quality, likely due to collinearity between these variables, both of which are derived from predictive models using overlapping features.
+
+\subsection{Placement Fixed Effects}
+
+The placement fixed effects capture systematic differences in click propensity across page types, holding observable characteristics constant. Table~\ref{tab:placement-fe} reports these effects as odds multipliers relative to the baseline mean.
+
+\begin{table}[H]
+\centering
+\caption{Placement Fixed Effects (Odds Multipliers)}
+\label{tab:placement-fe}
+\begin{tabular}{cll}
+\toprule
+Placement & Interpretation & Odds Multiplier \\
+\midrule
+1 & Search & 1.112 \\
+2 & Brand & 1.448 \\
+3 & Product & 1.055 \\
+5 & Category & 0.588 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+Odds multipliers computed as $\exp(\hat{\gamma}_p - \bar{\gamma})$ relative to the mean placement effect.
+\end{minipage}
+\end{table}
+
+Brand pages (Placement 2) exhibit the highest click propensity, with odds 1.45 times the baseline. This pattern is consistent with the observation that users visiting brand pages have already expressed brand-specific interest through their navigation choice. Category pages (Placement 5) show substantially lower click propensity, with odds only 0.59 times the baseline. This heterogeneity across placements motivates the subsequent analyses, which examine additional factors that vary systematically by placement context.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/illustrative_diagrams/02_mobile_viewport.pdf}
+\caption{Mobile viewport with sponsored and organic slots. Ads below the fold require scrolling.}
+\label{fig:mobile-viewport}
+\end{figure}

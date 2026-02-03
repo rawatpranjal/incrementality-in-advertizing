@@ -1,0 +1,92 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+
+% Formatting
+\onehalfspacing
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=black
+}
+
+% Title and Author Information
+\title{Measuring Ad Effectiveness and Position Effects in an Online Marketplace}
+\author{
+    Pranjal Rawat\footnote{PhD candidates. Contact: pp712@georgetown.edu}\\
+    \textit{Georgetown University}
+    \and
+    Muyang Ye\footnotemark[1]\\
+    \textit{Georgetown University}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% Abstract removed for now
+% Introduction removed for now
+
+% Include sections
+\input{02-literature/literature.tex}
+% \input{02-literature/literature_optimization.tex}  % RETIRED: moved to archive
+\input{03-platform/marketplace.tex}
+\input{04-data/data.tex}
+% Position effects overview (moved into the position-effects chapter)
+% \input{09-position-effects/endogeneity_overview.tex}  % RETIRED: merged into position_bias.tex
+
+% weekly panels
+\input{07-weekly-panels/weekly_panel.tex}
+\input{07-weekly-panels/vendor_week.tex}
+% \input{07-weekly-panels/user_week.tex}  % RETIRED: moved to archive
+% \input{07-weekly-panels/user_vendor_week.tex}  % RETIRED: moved to archive
+
+% shopping sessions
+\input{05-sessions/funnel_analysis_v2.tex}
+
+% event sampling design
+% \input{06-event-sampling/event_sampling_design.tex}  % RETIRED: moved to archive
+
+% position effects
+\input{09-position-effects/position_bias.tex}
+\input{09-position-effects/latency_effects.tex}
+\input{09-position-effects/congestion_thresholds.tex}
+% \input{09-position-effects/viewport_fold.tex}  % RETIRED: subsumed by near_tie_identification
+\input{09-position-effects/near_tie_identification.tex}
+
+% user holdouts
+%\input{08-conclusion/holdouts.tex}
+%\input{08-conclusion/reconciliation.tex}
+%\input{08-conclusion/results.tex}
+%\input{08-conclusion/conclusion.tex}
+
+% Bibliography (commented out until .bib file is created)
+\bibliographystyle{apalike} % A common author-year style
+\bibliography{references} % Path to your .bib file based on the image
+
+% Appendix
+\appendix
+\input{appendix/supplementary_tables.tex}
+
+\end{document}
