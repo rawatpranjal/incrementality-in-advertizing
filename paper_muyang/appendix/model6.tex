@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\subsection*{Model 6: The Production-Ready Causal Machine Learning System}
+
+\subsubsection*{Objective}
+The objective is to create a production-ready system that overcomes the final limitations of the previous models, namely their assumptions of linearity and their separation of estimation from decision-making under uncertainty. The core problem is that standard "black-box" machine learning models are powerful predictors but are not causally valid, while the linear causal models are valid but may lack predictive accuracy. This final model integrates these two paradigms and introduces a formal mechanism for balancing exploration and exploitation.
+
+\subsubsection*{The Hybrid Framework: Combining Predictive Power with Causal Correction}
+This model abandons the purely linear structure in favor of a hybrid approach. It uses a powerful, non-linear machine learning model for its predictive accuracy and then applies a causal correction, derived from the instrumental variable, to de-bias its output. This is often framed as a "regression on the residual" or a "causal correction" model.
+
+\begin{table}[H]
+\centering
+\caption{The Two-Component Hybrid Causal ML Framework}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Component & Role and Implementation \\
+\midrule
+\textbf{1. The Predictive Model} & A standard, high-capacity machine learning model (e.g., Gradient Boosted Trees, Neural Network) is trained to predict the conversion outcome, $y_i(t)$, using all available features, including the endogenous ad stock, $x_{ik}(t)$. This model produces a highly accurate but biased prediction, $\hat{y}_{\text{corr}}(t)$. \\
+\addlinespace
+\textbf{2. The Causal Correction Model} & A second model is trained to predict the \textit{bias} or \textit{residual} of the first model. The target variable for this model is the prediction error: $e_i(t) = y_i(t) - \hat{y}_{\text{corr}}(t)$. This correction model is estimated using the instrumental variable (ghost ad stock, $z_{ik}(t)$) to ensure that its prediction, $\hat{e}_{\text{causal}}(t)$, is a causally valid estimate of the bias. \\
+\addlinespace
+\textbf{Final Causal Prediction} & The final, de-biased prediction is the sum of the correlational prediction and its causal correction:
+\[ \hat{y}_{\text{causal}}(t) = \hat{y}_{\text{corr}}(t) + \hat{e}_{\text{causal}}(t) \]
+This hybrid prediction is both highly accurate (leveraging the power of the ML model) and causally consistent (due to the IV-based correction). \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{From Estimation to Action: Decision-Making Under Uncertainty}
+The models above produce a point estimate of the causal effect. A production system must also account for the uncertainty in that estimate to make optimal decisions. This requires moving from a simple bidding rule to an adaptive learning framework that balances exploiting current knowledge with exploring to improve it.
+
+\begin{table}[H]
+\centering
+\caption{The Explore-Exploit Framework: Thompson Sampling}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Concept & Implementation and Rationale \\
+\midrule
+\textbf{The Problem} & The estimated causal effect coefficients, $\boldsymbol{\beta}_{\text{IV}}$, are not a single point but a probability distribution (e.g., a multivariate normal distribution with a mean and a covariance matrix). Always bidding based on the mean value is a pure "exploitation" strategy that prevents the model from learning and refining its own uncertainty. \\
+\addlinespace
+\textbf{The Solution} & Implement Thompson Sampling, an algorithm for principled exploration.
+\begin{enumerate}
+    \item Instead of storing a single point estimate for $\boldsymbol{\beta}_{\text{IV}}$, maintain its full posterior distribution, $P(\boldsymbol{\beta}_{\text{IV}} | \text{Data})$. This can be done via Bayesian methods or approximated using the bootstrap.
+    \item For each new ad opportunity, do not use the mean of the distribution. Instead, draw one random sample, $\boldsymbol{\beta}^*$, from the posterior: $\boldsymbol{\beta}^* \sim P(\boldsymbol{\beta}_{\text{IV}} | \text{Data})$.
+    \item Calculate the bid for this specific opportunity using the randomly drawn $\boldsymbol{\beta}^*$.
+\end{enumerate} \\
+\addlinespace
+\textbf{The Benefit} & This process naturally balances the trade-off. For coefficients with high certainty (low variance), the random draws will be close to the mean, leading to stable, exploitative bidding. For coefficients with high uncertainty (high variance), the draws will be widely dispersed, leading to occasional high or low bids that generate new data and reduce uncertainty over time. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{Implications of the Final System}
+Model 6 represents a complete, adaptive, and causally-aware decision engine.
+
+\begin{itemize}
+    \item It achieves high \textbf{predictive accuracy} by leveraging state-of-the-art machine learning models.
+    \item It ensures \textbf{causal validity} by using an instrumental variable to de-bias the predictions, making forecasts robust to changes in strategy.
+    \item It enables \textbf{adaptive learning} by using Thompson Sampling to manage the explore-exploit trade-off, allowing the system to continuously improve its own estimates and react to a changing environment.
+\end{itemize}
+
+This final framework moves beyond simple estimation to a holistic system that learns and acts optimally under the real-world conditions of endogeneity and uncertainty.
+
+\end{document}

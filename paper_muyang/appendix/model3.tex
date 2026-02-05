@@ -1,0 +1,178 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage[skip=8pt plus1pt, indent=0pt]{parskip}
+\usepackage{microtype}
+\raggedbottom
+
+\begin{document}
+
+\section*{Model 3: Attribution with Ad Stock}
+\vspace{-0.5em}
+This model serves as a bridge between the static Model 2 and a fully causal framework, introducing time dynamics to capture advertising's decaying influence—a critical feature absent from static models. While Model 2 counts impressions as if they have permanent, equal influence, Model 3 recognizes that advertising effects decay over time.
+
+The key innovation is reformulating the problem from discrete impression counts to continuous-time ad stock accumulation. The conversion rate at time $t$ depends on the accumulated, time-decayed influence of all past advertising exposures:
+
+\vspace{-0.5em}
+\[ y_i(t) = \alpha(t|W) + \sum_{k} \beta_k x_{ik}(t) + \varepsilon_i(t) \]
+\vspace{-0.5em}
+
+where the ad stock $x_{ik}(t)$ accumulates past impressions with decay:
+
+\vspace{-0.5em}
+\[ x_{ik}(t) = \sum_{j: t_j \leq t} f(t - t_j) \cdot \mathbb{1}[\text{impression } j \text{ has characteristic } k] \]
+\vspace{-0.5em}
+
+\begin{table}[htbp]
+\centering
+\caption{Ad Stock Components}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Component & Interpretation \\
+\midrule
+$x_{ik}(t)$ & Ad stock for characteristic $k$ at time $t$: the cumulative, time-decayed influence of all past impressions \\
+$t_j$ & Time when impression $j$ was shown \\
+$f(\Delta t)$ & Decay function determining how influence diminishes over time $\Delta t$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Decay Functions}
+\vspace{-0.5em}
+The decay function $f(\Delta t)$ is central to the model, encoding our assumptions about how advertising influence diminishes over time. Different functional forms represent competing theories of memory and attention decay. In practice, the choice of decay function has substantial implications for both attribution and bidding strategies.
+
+The decay function must satisfy several properties: (1) it should be a probability density function that integrates to 1 over the relevant time horizon, (2) it should monotonically decrease for most applications (except Gamma with shape parameter > 1), and (3) it should be computationally tractable for real-time bidding systems that require millisecond-level response times. The exponential distribution's memoryless property makes it particularly attractive for both analytical derivations and engineering complexity:
+
+\begin{table}[htbp]
+\centering
+\caption{Common Decay Functions for Ad Stock}
+\begin{tabular}{@{}lp{4.5cm}p{5cm}@{}}
+\toprule
+Kernel Name & Functional Form $f(\Delta t)$ & Key Properties and Interpretation \\
+\midrule
+Exponential & $e^{-\lambda \Delta t}$ & Constant decay rate, computationally convenient. Assumes maximum influence immediately after exposure. \\
+\addlinespace[0.5em]
+Gamma & $\Delta t^{k-1} e^{-\Delta t/\theta}$ (normalized) & Flexible shape allowing for initial build-up period when $k>1$. Exponential is special case when $k=1$. \\
+\addlinespace[0.5em]
+Weibull & $(\Delta t/\lambda)^{k-1} e^{-(\Delta t/\lambda)^k}$ (normalized) & Models increasing ($k>1$) or decreasing ($k<1$) decay rates over time. \\
+\addlinespace[0.5em]
+Uniform (Boxcar) & $\mathbb{1}[\Delta t \leq T]$ & Constant effect for fixed window $T$, then zero. Simple but unrealistic hard cutoff. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/decay_kernels.pdf}
+\caption{Ad stock decay functions showing different temporal dynamics. Exponential provides constant decay rate, while Gamma and Weibull allow flexible shapes. Uniform maintains constant effect over fixed window.}
+\label{fig:decay_kernels}
+\end{figure}
+
+\subsection*{Estimation Strategy}
+\vspace{-0.5em}
+Continuous-time modeling presents a practical challenge: we observe conversions at discrete moments but need to estimate the probability of conversion at any point in time. Since conversions are rare events (typically < 1\% of user-moments), we cannot feasibly evaluate the model at all possible time points. As Lewis (2018) notes, naive integration over continuous time would require infinite computational resources.
+
+We resolve this through choice-based sampling, a technique from discrete choice modeling that leverages the sparsity of positive outcomes. This approach is analogous to case-control sampling in epidemiology, where we oversample rare events (conversions) and undersample common events (non-conversions). The key insight is that we can recover consistent parameter estimates by appropriately weighting the observations:
+
+\begin{table}[htbp]
+\centering
+\caption{Constructing the Estimation Dataset}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Sample Type & Procedure \\
+\midrule
+Positives (+) & For each observed conversion at time $t_c$, create one row with $y=1$ and ad-stock vector $\mathbf{x}_i(t_c)$. \\
+\addlinespace[0.5em]
+Negatives (-) & Sample random user-moments $t_r$ from non-conversion periods with $y=0$ and ad-stock vector $\mathbf{x}_i(t_r)$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Over-sampling rare conversions requires weighted regression to correct bias:
+
+\begin{table}[htbp]
+\centering
+\caption{Weighted Estimation Procedure}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Step & Action and Rationale \\
+\midrule
+1. Assign Weights & Assign weights to restore the correct proportions. The weight for positives ($w^+$) is 1. The weight for negatives ($w^-$) is the ratio of total user-time to the number of negative samples drawn ($w^- = NT/N_{neg}$), scaling them up to be representative. In practice, sampling 10× more negatives than positives captures approximately 91\% of available statistical precision while dramatically reducing computational costs. \\
+\addlinespace[0.5em]
+2. Estimate Model & Estimate the parameters $\boldsymbol{\beta}$ by running a weighted regression (e.g., Weighted Least Squares, Weighted Logistic Regression, or Weighted Poisson Regression) on the sampled data. The weights ensure that the contribution of the negative samples is correctly scaled, leading to unbiased coefficient estimates despite the choice-based sampling. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/adstock_accumulation.pdf}
+\caption{Ad stock dynamics. Top: individual ad contributions and decay. Bottom: cumulative ad stock with conversion threshold. Multiple exposures create sustained elevation periods.}
+\label{fig:adstock_accumulation}
+\end{figure}
+
+\subsection*{Attribution Mechanism}
+\vspace{-0.5em}
+The model distributes conversion credit to past impressions proportionally to their remaining influence at conversion time. This creates a principled attribution framework where credit allocation emerges naturally from the estimated decay parameters and timing of exposures, rather than being imposed through arbitrary attribution windows or rules.
+
+For a conversion at time $t_c$, the incrementality share for impression $j$ is:
+\vspace{-0.5em}
+\[ s_{ijc} = \frac{\beta x_{ij}(t_c)}{\alpha(t_c) + \sum_k \beta_k x_{ik}(t_c)} \]
+\vspace{-0.5em}
+
+This formula captures three key insights:
+\begin{enumerate}
+\setlength\itemsep{0.3em}
+\item \textit{Recency matters}: More recent impressions have higher remaining ad stock $x_{ij}(t_c)$.
+\item \textit{Effectiveness varies}: Different ad characteristics have different coefficients $\beta_k$.
+\item \textit{Context dependence}: Attribution depends on the baseline conversion rate $\alpha(t_c)$.
+\end{enumerate}
+
+Importantly, this is \textit{model-based attribution}, not \textit{causal attribution}. The model tells us how to distribute credit given our assumptions about decay, but does not establish which impressions causally influenced the conversion. For causal attribution, we would need to address the endogeneity challenges discussed earlier through experimental or quasi-experimental methods.
+
+\subsection*{Numerical Example}
+\vspace{-0.5em}
+To illustrate the attribution mechanism, consider a realistic scenario from e-commerce advertising. A user is exposed to two ads before converting:
+- Ad 1 (Creative A): A display banner shown at $t=10$ days
+- Ad 2 (Creative B): A retargeting ad shown at $t=50$ days
+- Conversion: Purchase occurs at $t=60$ days
+
+Using exponential decay $f(\Delta t) = e^{-0.1 \Delta t}$ with estimated effects $\hat{\beta}_A = 0.05$ and $\hat{\beta}_B = 0.08$ (note that Creative B has 60\% higher effectiveness, typical for retargeting ads):
+
+\begin{table}[htbp]
+\centering
+\caption{Dynamic Attribution at Time of Conversion ($t_c=60$)}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Analysis & Calculation and Interpretation \\
+\midrule
+Ad 1 Stock & Calculate the remaining influence of Ad 1 at conversion time. \\
+& Time elapsed $\Delta t_1 = 60 - 10 = 50$. Remaining Stock = $e^{-0.1 \cdot 50} \approx 0.0067$. \\
+& Causal Influence at $t_c$: $\hat{\beta}_A \cdot 0.0067 = 0.05 \cdot 0.0067 \approx 0.00034$. \\
+\addlinespace[0.5em]
+Ad 2 Stock & Calculate the remaining influence of Ad 2. \\
+& Time elapsed $\Delta t_2 = 60 - 50 = 10$. Remaining Stock = $e^{-0.1 \cdot 10} \approx 0.3679$. \\
+& Causal Influence at $t_c$: $\hat{\beta}_B \cdot 0.3679 = 0.08 \cdot 0.3679 \approx 0.02943$. \\
+\addlinespace[0.5em]
+Attribution & Total causal influence at $t_c$: $0.00034 + 0.02943 = 0.02977$. \\
+& \textit{Credit for Ad 1:} $\frac{0.00034}{0.02977} \approx 1.1\%$ \\
+& \textit{Credit for Ad 2:} $\frac{0.02943}{0.02977} \approx 98.9\%$ \\
+& \textit{Conclusion:} The model correctly attributes nearly all credit to the more recent and effective Ad 2, reflecting the decay of Ad 1's influence. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/attribution_example.pdf}
+\caption{Attribution analysis. Left: ad stock decay from two impressions with conversion timing. Right: credit attribution at conversion, showing how recency and effectiveness determine weights.}
+\label{fig:attribution_example}
+\end{figure}
+
+\end{document}

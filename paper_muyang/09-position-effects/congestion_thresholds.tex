@@ -1,0 +1,60 @@
+\subsection{Auction Competition and Threshold Bids}
+\label{subsec:congestion-thresholds}
+
+The number of competing advertisers in an auction determines the minimum bid required to secure an impression. This section analyzes how auction competition affects bidding thresholds across different placement contexts, which has direct implications for advertiser costs and platform revenue.
+
+Let $Q_1$ denote the quality score (pCTR) of the winning bidder, and let $S_2$ denote the score of the runner-up, where score equals the product of quality and final bid. The threshold bid is defined as the minimum bid required for the winner to beat the runner-up given their quality score: $\text{threshold\_bid} = S_2 / Q_1$. This quantity represents the competitive floor that a winning bidder must exceed.
+
+The unit of analysis is the auction. The sample includes 90,734 auctions with at least two valid bids across four placements. For each auction, we observe the number of bidders, the winning quality score, and the runner-up score from which the threshold bid is computed.
+
+Table~\ref{tab:congestion-elasticity} reports log-log OLS regressions of runner-up score and threshold bid on bidder count, estimated separately by placement.
+
+\begin{table}[H]
+\centering
+\caption{Elasticity of Competition by Placement (Log-Log OLS)}
+\label{tab:congestion-elasticity}
+\begin{tabular}{lccccc}
+\toprule
+Placement & $N$ & $\beta(\log S_2)$ & $R^2$ & $\beta(\log \text{threshold})$ & $R^2$ \\
+\midrule
+1 (Search) & 16,704 & 0.65 & 0.37 & 0.65 & 0.28 \\
+2 (Brand) & 9,124 & 0.70 & 0.31 & 0.57 & 0.22 \\
+3 (Product) & 55,191 & $-$0.46 & 0.004 & $-$0.57 & 0.005 \\
+5 (Category) & 9,715 & 0.97 & 0.09 & 0.79 & 0.07 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+Dependent variable in first regression is $\log(S_2)$; in second regression is $\log(\text{threshold\_bid})$. Independent variable is $\log(\text{bidder\_count})$ in both cases. Robust standard errors.
+\end{minipage}
+\end{table}
+
+Placements 1, 2, and 5 exhibit positive elasticities consistent with standard auction theory: a 1 percent increase in bidder count is associated with a 0.57 to 0.79 percent increase in threshold bids. More competition raises the competitive floor. Category pages (Placement 5) show the highest elasticity at 0.79, indicating that additional bidders in this context intensify competition more strongly than elsewhere.
+
+Placement 3 (Product pages) shows a negative elasticity, where auctions with more bidders exhibit lower threshold bids. The low $R^2$ values (0.4 to 0.5 percent) indicate that bidder count explains negligible variation in competitive intensity for product page auctions. This pattern may reflect the constrained bidder pool on product pages, where the ads shown in ``More like this'' sections draw from a narrower set of related products.
+
+Table~\ref{tab:congestion-summary} reports summary statistics for the competition measures by placement.
+
+\begin{table}[H]
+\centering
+\caption{Auction Competition Summary Statistics by Placement}
+\label{tab:congestion-summary}
+\begin{tabular}{lcccc}
+\toprule
+Placement & Mean Bidders & Median $Q_1$ & Median $S_2$ & Median Threshold \\
+\midrule
+1 (Search) & 35.2 & 0.027 & 0.179 & 6.96 \\
+2 (Brand) & 43.2 & 0.043 & 0.315 & 7.70 \\
+3 (Product) & 49.5 & 0.030 & 0.125 & 4.30 \\
+5 (Category) & 57.3 & 0.067 & 1.240 & 18.44 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+$Q_1$ is winner's quality score. $S_2$ is runner-up's score (quality $\times$ bid). Threshold bid $= S_2 / Q_1$. All monetary values in platform currency.
+\end{minipage}
+\end{table}
+
+Category pages (Placement 5) exhibit the highest competition levels: the most bidders on average (57.3), the highest runner-up scores, and the highest threshold bids. Product pages (Placement 3) show lower thresholds despite having many bidders, consistent with the negative elasticity result. These patterns suggest that the competitive dynamics of ad auctions vary substantially by placement context, with implications for how advertisers should allocate budgets across different page types.

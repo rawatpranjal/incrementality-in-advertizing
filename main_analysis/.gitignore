@@ -1,0 +1,2 @@
+# Ignore data folder - parquet files too large for git
+data/

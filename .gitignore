@@ -1,3 +1,10 @@
+# Claude/AI agent config (local only)
+CLAUDE.md
+claude.md
+AGENTS.md
+agents.md
+MEMORY.md
+
 # Environment and credentials
 .env
 *.env
@@ -60,10 +67,16 @@ texput.log
 # Large data files
 *.txt
 !requirements.txt
+!**/README_MUYANG.txt
+*.npz
 
 # Data files (too large for git)
-**/data/*.parquet
-**/data/*.pkl
-**/data/*.feather
+*.parquet
+*.pkl
+*.feather
+*.npy
+*.h5
+*.hdf5
 **/results/*.png
 **/results/*.pdf
+data/

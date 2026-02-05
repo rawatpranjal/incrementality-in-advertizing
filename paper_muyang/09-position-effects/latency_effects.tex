@@ -1,0 +1,52 @@
+\subsection{Load Time and Dwell Time Effects}
+\label{subsec:latency-effects}
+
+Page load speed and user engagement duration may independently affect click behavior beyond the position effects estimated above. Users who experience slow page loads may abandon the session before engaging with ads, while users who spend more time on a page, conditional on their scroll position, may exhibit higher click propensity. This section constructs timing variables from the impression data and estimates their effects on click-through rates.
+
+The variable $\text{load\_s}$ measures the time in seconds from auction request to first impression. This variable proxies for page load time, where longer values indicate slower page rendering or delayed ad serving. The variable $\text{dwell\_resid}$ captures residualized dwell time. For each impression beyond the first in a session, we compute the log time since the first impression, then subtract the mean at each placement by rank cell, with rank capped at 50.\footnote{This residualization removes the mechanical relationship between position and viewing time: ads at higher ranks are seen earlier by construction.} This transformation isolates engagement duration that is orthogonal to position.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/illustrative_diagrams/04_dwell_vs_load.pdf}
+\caption{Decomposition of latency into load time (server delay) and dwell time (user scrolling).}
+\label{fig:dwell-vs-load}
+\end{figure}
+
+The position bias model is augmented with latency terms:
+\begin{equation}
+P(\text{click}) = \Lambda\left(\cdots + \beta_1 \log(\text{load}) + \beta_2 \log(\text{load})^2 + \beta_3 \cdot \text{dwell\_resid} + \beta_4 \cdot \text{dwell\_resid}^2\right)
+\label{eq:latency-model}
+\end{equation}
+where the ellipsis denotes the baseline covariates (quality, rank, price) and fixed effects. The quadratic terms allow for non-monotonic effects. Estimation is restricted to Placement 1 (Search) where timing variation is most meaningful due to user-initiated queries.
+
+Table~\ref{tab:latency-effects} presents the latency estimates for Placement 1.
+
+\begin{table}[H]
+\centering
+\caption{Latency Effects: Fixed-Effects Logit Results (Placement 1)}
+\label{tab:latency-effects}
+\begin{tabular}{lcccc}
+\toprule
+Variable & Estimate & Std.\ Error & $z$-value & Sig.\ \\
+\midrule
+Quality & 2.393 & 1.050 & 2.28 & * \\
+Rank & $-$0.022 & 0.004 & $-$5.90 & *** \\
+Price & $-$0.019 & 0.006 & $-$2.93 & ** \\
+$\log(\text{load})$ & $-$0.194 & 0.058 & $-$3.33 & *** \\
+$\log(\text{load})^2$ & 0.059 & 0.017 & 3.52 & *** \\
+dwell\_resid & 0.196 & 0.025 & 7.85 & *** \\
+dwell\_resid$^2$ & 0.038 & 0.012 & 3.10 & ** \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+$N = 19{,}482$ impressions. CTR = 2.74\%. Fixed effects: 2,125 vendors. Standard errors clustered by auction. Significance: *** $p < 0.001$, ** $p < 0.01$, * $p < 0.05$.
+\end{minipage}
+\end{table}
+
+The load time effect is negative, consistent with user impatience: slower page loads reduce the probability of engagement with rendered ads. A 10 percent increase in load time is associated with a 0.12 percentage point decrease in click-through rate. The positive quadratic term indicates diminishing marginal harm at very long load times, possibly reflecting selection effects among users who persist through extended waits.
+
+The dwell time effect is positive, where users who spend more time on a page, conditional on position, are more likely to click on ads. A 10 percent increase in residualized dwell time corresponds to a 0.14 percentage point increase in click-through rate. The positive quadratic term indicates slight acceleration of this effect at longer dwell times.
+
+Both effects are statistically significant but economically modest relative to the baseline click-through rate of 2.74 percent on search pages. A 10 percent change in either timing measure moves click-through rate by approximately 0.1 percentage points.

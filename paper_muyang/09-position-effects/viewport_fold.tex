@@ -1,0 +1,37 @@
+\subsection{Above-the-Fold Discontinuity}
+\label{subsec:viewport-fold}
+
+The continuous rank gradient documented above may mask a discrete visibility threshold. Ads appearing in the initial viewport without scrolling (above the fold) may enjoy a discontinuous advantage over ads requiring user action to view. This section tests for such a fold effect using a regression discontinuity design.
+
+Let $z = \text{rank} - c$ denote the running variable, where $c$ is the fold cutoff. The cutoff differs by device type. For mobile users, $c = 2.5$ such that ranks one and two appear above the fold. For desktop users, $c = 4.5$ such that ranks one through four appear above the fold. The treatment indicator equals one for impressions with rank at or below the cutoff (above the fold) and zero otherwise. The outcome is the binary click indicator.
+
+Device type is not directly observed and must be inferred. The proxy exploits viewport burst size, defined as the number of impressions observed within the same second for a given user and placement. Mobile screens display fewer ads simultaneously than desktop screens. Users whose modal burst size is two or fewer are classified as mobile; those with larger bursts are classified as desktop.\footnote{This classification reflects the platform's mobile application design, which typically shows two ads per viewport.}
+
+Table~\ref{tab:viewport-rdd} reports the regression discontinuity results for Placement 1 (Search), estimated separately by inferred device type.
+
+\begin{table}[H]
+\centering
+\caption{Viewport Fold RDD Results (Placement 1)}
+\label{tab:viewport-rdd}
+\begin{tabular}{lcccccc}
+\toprule
+Device & $N$ & $N$ Above & CTR Above & CTR Below & Discontinuity & $p$-value \\
+\midrule
+Mobile & 95,348 & 22,560 (23.7\%) & 3.15\% & 2.94\% & $-$0.0029 (0.0039) & 0.45 \\
+Desktop & 13,737 & 5,496 (40.0\%) & 1.22\% & 0.92\% & +0.0004 (0.0064) & 0.95 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.9\textwidth}
+\vspace{0.3cm}
+\footnotesize
+Discontinuity estimated via local linear regression within $\pm 3$ ranks of cutoff. Standard errors in parentheses. Mobile cutoff at rank 2.5; desktop cutoff at rank 4.5.
+\end{minipage}
+\end{table}
+
+The discrete nature of the rank variable presents methodological challenges. Standard RDD software assuming continuous running variables fails due to matrix singularity. The analysis instead uses local linear regression estimated via ordinary least squares within a bandwidth of three ranks on either side of the cutoff.\footnote{A McCrary density test for desktop users rejects the null of no manipulation ($p = 0.0001$), suggesting potential sorting around the fold cutoff. This could reflect strategic bid optimization or selection effects in the device classification. Mobile users do not exhibit this pattern.}
+
+Neither device type shows a statistically significant discontinuity at the fold. The point estimate for mobile users is a 0.29 percentage point decrease in click-through rate when crossing from above to below the fold, opposite the expected direction. The point estimate for desktop users is a 0.04 percentage point increase, essentially zero. Both estimates are indistinguishable from zero at conventional significance levels.
+
+Several factors may explain the absence of a fold discontinuity. First, the continuous rank gradient already captures the dominant effect of position: click-through rates decline smoothly with rank regardless of fold position, and the fold may not create an additional discrete jump. Second, user scrolling behavior may attenuate any fold effect if users routinely scroll past the initial viewport. Third, the device proxy is imperfect; misclassification between mobile and desktop could attenuate true effects toward zero. Fourth, with only integer ranks, the regression discontinuity identifies a narrow local average treatment effect that may miss broader patterns.
+
+Position effects in this marketplace appear to operate primarily through the continuous rank gradient rather than through a discrete visibility threshold.

@@ -1,0 +1,7 @@
+\section{The Endogeneity of Ad Position}
+
+A central question in the economics of online advertising is to quantify the causal effect of an advertisement's position on its performance. A naive ordinary least squares (OLS) regression of a performance metric, such as click-through rate (CTR), on ad rank typically reveals a strong negative correlation: ads at the top of the page receive significantly more clicks than ads at the bottom. However, this correlation is unlikely to represent a causal relationship due to the endogenous nature of ad rank.
+
+Ad auction systems are designed to award the most prominent positions to the ads that are most likely to be successful. Ad rank is a function of both the advertiser's bid and a quality score, which itself is often a prediction of the ad's relevance and click-through rate. Consequently, higher-quality, more appealing advertisements are systematically selected into higher ranks. This creates a classic endogeneity problem due to selection bias: a simple regression cannot disentangle the causal effect of being in a better position from the fact that better ads are placed in those positions.
+
+To address this challenge, we employ a suite of econometric methods to isolate the causal effect of ad position from the confounding effect of ad quality. We summarize the findings from three distinct but complementary approaches: a structural position-based model, an instrumental variable strategy, and a regression discontinuity design.
